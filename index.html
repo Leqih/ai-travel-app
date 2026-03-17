@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Campus Nest</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="bg-shape bg-shape-a"></div>
+      <div class="bg-shape bg-shape-b"></div>
+      <div class="bg-shape bg-shape-c"></div>
+
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">学生租房 · 转租 · 经验社区</p>
+          <div class="topbar">
+            <div class="brand-chip">CN</div>
+            <nav class="top-actions" aria-label="快捷操作">
+              <a class="icon-button" href="./community.html">消息</a>
+              <a class="icon-button" href="./profile.html">个人</a>
+            </nav>
+          </div>
+          <h1>Campus Nest</h1>
+          <p class="hero-text">
+            帮你在学校附近更快找到真实房源，用更少时间完成安心找房。
+          </p>
+
+          <div class="search-card">
+            <div class="search-main">
+              <span class="search-label">想住在哪里？</span>
+              <strong>University Loop, 10 min to campus</strong>
+            </div>
+              <a class="pill-button" href="./search.html">开始找房</a>
+            </div>
+
+          <div class="filter-row" aria-label="房源筛选">
+            <button class="filter-pill active" type="button">$500-$800</button>
+            <button class="filter-pill" type="button">步行 10 分钟内</button>
+            <button class="filter-pill" type="button">仅看转租</button>
+            <button class="filter-pill" type="button">女生室友</button>
+          </div>
+
+          <div class="hero-tags">
+            <span>真实校友评价</span>
+            <span>地图找房</span>
+            <span>转租优先提醒</span>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="phone-card">
+            <div class="map-bubble">
+              <span class="map-dot"></span>
+              <span>Near Campus</span>
+            </div>
+            <div class="house-card">
+              <span class="mini-label">今日推荐</span>
+              <strong>2B1B 合租</strong>
+              <p>$780 / 月 · 步行 8 分钟</p>
+            </div>
+            <div class="face face-left"></div>
+            <div class="face face-right"></div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="section utility-strip">
+          <article class="utility-card">
+            <strong>智能提醒</strong>
+            <p>收藏房源降价、转租发布和看房回复都会第一时间通知。</p>
+          </article>
+          <article class="utility-card accent">
+            <strong>室友匹配</strong>
+            <p>按预算、作息和院系快速找到合适的同住伙伴。</p>
+          </article>
+        </section>
+
+        <section class="quick-grid">
+          <article class="feature-card peach">
+            <div>
+              <p class="card-kicker">房源聚合</p>
+              <h2>不再来回切平台</h2>
+              <p>整合整租、合租和转租信息，减少搜索碎片化带来的时间浪费。</p>
+            </div>
+            <span class="card-icon">⌂</span>
+          </article>
+
+          <article class="feature-card mint">
+            <div>
+              <p class="card-kicker">地图模式</p>
+              <h2>直观看学校周边</h2>
+              <p>按距离、预算和通勤时间筛选，优先看到真正适合学生生活圈的房源。</p>
+            </div>
+            <span class="card-icon">◎</span>
+          </article>
+
+          <article class="feature-card butter">
+            <div>
+              <p class="card-kicker">可信信息</p>
+              <h2>降低不确定感</h2>
+              <p>房东认证、学生评价和更新时间一起展示，帮助你快速判断真实性。</p>
+            </div>
+            <span class="card-icon">✓</span>
+          </article>
+        </section>
+
+        <section class="section section-split">
+          <div class="section-heading">
+            <p class="section-kicker">核心体验</p>
+            <h2>从焦虑找房，到有掌控感地做决定</h2>
+            <p>
+              每个模块都围绕 “真实、清晰、少折腾” 设计，让学生能快速比较、收藏和行动。
+            </p>
+            <div class="mode-tabs" role="tablist" aria-label="浏览模式">
+              <button class="mode-tab active" type="button" data-mode="map" aria-pressed="true">地图模式</button>
+              <button class="mode-tab" type="button" data-mode="list" aria-pressed="false">列表模式</button>
+              <button class="mode-tab" type="button" data-mode="sublet" aria-pressed="false">转租优先</button>
+            </div>
+          </div>
+
+          <div class="map-panel">
+            <div class="map-header">
+              <strong id="mode-title">地图找房</strong>
+              <span id="mode-meta">Walk 5-15 min</span>
+            </div>
+            <div class="map-board mode-panel active" data-panel="map">
+              <div class="road road-a"></div>
+              <div class="road road-b"></div>
+              <div class="pin pin-a">$650</div>
+              <div class="pin pin-b">$820</div>
+              <div class="pin pin-c">转租</div>
+              <div class="campus-badge">Campus</div>
+            </div>
+            <div class="mode-panel list-panel" data-panel="list">
+              <article class="mini-listing">
+                <strong>East Line Loft</strong>
+                <span>$760 / 月</span>
+                <p>离校车站 2 分钟，适合课多通勤的学生。</p>
+              </article>
+              <article class="mini-listing">
+                <strong>Library Corner</strong>
+                <span>$845 / 月</span>
+                <p>安静楼层，24 小时门禁，评价稳定。</p>
+              </article>
+              <article class="mini-listing">
+                <strong>Green Block Shared</strong>
+                <span>$620 / 月</span>
+                <p>3 人合租，适合预算敏感型用户。</p>
+              </article>
+            </div>
+            <div class="mode-panel sublet-panel" data-panel="sublet">
+              <div class="sublet-banner">
+                <strong>本周新增 18 条转租</strong>
+                <p>优先展示短租、拎包入住和可协商租期的房源。</p>
+              </div>
+              <div class="sublet-stack">
+                <span>今天 09:20 更新</span>
+                <span>校内论坛同步</span>
+                <span>身份已验证</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section listings-section">
+          <div class="section-heading compact">
+            <p class="section-kicker">精选推荐</p>
+            <h2>热门房源与转租</h2>
+          </div>
+
+          <div class="listing-grid" id="listing-grid">
+            <article class="listing-card selected" data-listing="south-gate">
+              <span class="listing-badge coral">Verified</span>
+              <h3>South Gate Studio</h3>
+              <p class="listing-meta">$920 / 月 · 12 个月</p>
+              <p class="listing-copy">家具齐全，骑车 6 分钟到校，适合希望独居的研究生。</p>
+              <div class="listing-footer">
+                <span>4.8 分 · 37 条评价</span>
+                <button class="save-button" type="button" aria-pressed="false" data-default-label="收藏" data-active-label="已收藏">收藏</button>
+              </div>
+            </article>
+
+            <article class="listing-card highlight" data-listing="2b1b-sublet">
+              <span class="listing-badge sky">Sublet</span>
+              <h3>2B1B 次卧转租</h3>
+              <p class="listing-meta">$700 / 月 · 即刻入住</p>
+              <p class="listing-copy">室友均为学生，接受短租，离图书馆和亚洲超市都很近。</p>
+              <div class="listing-footer">
+                <span>今天更新</span>
+                <button class="save-button" type="button" aria-pressed="false" data-default-label="联系" data-active-label="已联系">联系</button>
+              </div>
+            </article>
+
+            <article class="listing-card" data-listing="north-loop">
+              <span class="listing-badge lime">Safe</span>
+              <h3>North Loop 3B2B</h3>
+              <p class="listing-meta">$610 / 月 · 合租</p>
+              <p class="listing-copy">公交直达校区，公寓管理稳定，楼内有洗衣房和自习区。</p>
+              <div class="listing-footer">
+                <span>已认证房东</span>
+                <button class="save-button" type="button" aria-pressed="false" data-default-label="对比" data-active-label="已加入对比">对比</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section detail-section">
+          <div class="detail-card">
+            <div class="detail-header">
+              <div>
+                <p class="section-kicker">房源详情预览</p>
+                <h2 id="detail-title">South Gate Studio</h2>
+              </div>
+              <span class="detail-chip" id="detail-status">已验证</span>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-stat">
+                <strong id="detail-price">$920 / 月</strong>
+                <span>预算范围</span>
+              </div>
+              <div class="detail-stat">
+                <strong id="detail-distance">骑车 6 分钟</strong>
+                <span>到校通勤</span>
+              </div>
+              <div class="detail-stat">
+                <strong id="detail-fit">适合独居</strong>
+                <span>居住方式</span>
+              </div>
+            </div>
+            <p class="detail-copy" id="detail-copy">
+              家具齐全，骑车 6 分钟到校，适合希望独居的研究生。
+            </p>
+          </div>
+        </section>
+
+        <section class="section community-section">
+          <div class="community-card">
+            <div class="community-copy">
+              <p class="section-kicker">学生社区</p>
+              <h2>不只看房，也看别人怎么住</h2>
+              <p>
+                从公寓避雷、室友匹配到搬家建议，社区讨论让租房经验更透明，也更有人情味。
+              </p>
+              <div class="community-pills">
+                <span># 转租提醒</span>
+                <span># 公寓测评</span>
+                <span># 搬家攻略</span>
+              </div>
+            </div>
+
+            <div class="chat-preview">
+              <div class="chat-bubble yellow">“这栋公寓隔音怎么样？”</div>
+              <div class="chat-bubble white">“我住过一年，管理挺快，晚上也比较安静。”</div>
+              <div class="chat-bubble pink">“步行去工程学院大概 9 分钟。”</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-row">
+          <article>
+            <strong>3x</strong>
+            <span>更快定位附近房源</span>
+          </article>
+          <article>
+            <strong>24h</strong>
+            <span>内优先推送新转租</span>
+          </article>
+          <article>
+            <strong>100%</strong>
+            <span>围绕学生找房场景设计</span>
+          </article>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="底部导航">
+        <a class="nav-item active" href="./index.html">首页</a>
+        <a class="nav-item" href="./search.html">找房</a>
+        <a class="nav-item" href="./detail.html">详情</a>
+        <a class="nav-item" href="./community.html">社区</a>
+        <a class="nav-item" href="./profile.html">我的</a>
+      </nav>
+    </div>
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "pencil": {
+      "command": "/Users/leqihuang/.cursor/extensions/highagency.pencildev-0.6.32-universal/out/mcp-server-darwin-arm64",
+      "args": ["--app", "claude-code"]
+    },
+    "Vibma": {
+      "command": "npx",
+      "args": ["-y", "@ufira/vibma@latest", "--edit", "--port=3055"]
+    }
+  }
+}
