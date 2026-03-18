@@ -275,8 +275,9 @@ export function HomeClient() {
         {/* ══ 4. Your Trips — compact horizontal ══ */}
         <div className="hp-section-hd">
           <div>
+            <p className="hp-section-cat">Your Journeys</p>
             <span className="hp-section-title">Your Trips</span>
-            <p className="hp-section-sub">3 upcoming</p>
+            <p className="hp-section-sub">3 upcoming · Plan your next</p>
           </div>
           <button className="hp-section-link">+ New</button>
         </div>
@@ -291,7 +292,7 @@ export function HomeClient() {
                 <p className="hp-trip-title">{trip.title}</p>
                 <p className="hp-trip-meta">{trip.dates} · {trip.places} places</p>
               </div>
-              <div className="hp-trip-dot" style={{ background: trip.color }} />
+              <div className="hp-trip-action-btn">→ Open</div>
             </Link>
           ))}
         </div>
@@ -300,7 +301,11 @@ export function HomeClient() {
 
         {/* ══ 6. Featured Topics ══ */}
         <div className="hp-section-hd">
-          <span className="hp-section-title">Featured Topics</span>
+          <div>
+            <p className="hp-section-cat">Travel Guides</p>
+            <span className="hp-section-title">Featured Topics</span>
+            <p className="hp-section-sub">Hand-picked guides for you</p>
+          </div>
           <Link href="/nearby" className="hp-section-link">All ›</Link>
         </div>
 
@@ -311,6 +316,7 @@ export function HomeClient() {
               <div className="hp-topic-grad" />
               <span className="hp-topic-tag">{t.tag}</span>
               <p className="hp-topic-title">{t.title}</p>
+              <div className="hp-topic-action-btn">+ Explore</div>
             </Link>
           ))}
         </div>
@@ -318,6 +324,7 @@ export function HomeClient() {
         {/* ══ 7. Discover ══ */}
         <div className="hp-section-hd">
           <div>
+            <p className="hp-section-cat">Explore</p>
             <span className="hp-section-title">Discover</span>
             <p className="hp-section-sub">Curated for your style</p>
           </div>
