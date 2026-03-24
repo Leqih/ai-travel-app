@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 /* ─── Data ───────────────────────────────────────────────────────── */
@@ -60,8 +61,7 @@ function NoteEditor({ note, onBack, onDelete }) {
       {/* Nav bar */}
       <div className="apnotes-editor-nav">
         <button className="apnotes-editor-back-btn" onClick={handleBack}>
-          <span className="apnotes-editor-back-chevron">‹</span>
-          <span className="apnotes-editor-back-label">Notes</span>
+          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
         <button className="apnotes-editor-share-btn" aria-label="Share">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -140,6 +140,7 @@ function NoteEditor({ note, onBack, onDelete }) {
 
 /* ─── NotesPage (View A + View B) ───────────────────────────────── */
 export function NotesPage() {
+  const router = useRouter();
   const [notes, setNotes] = useState(INITIAL_NOTES);
   const [search, setSearch] = useState("");
   const [openNote, setOpenNote] = useState(null); // null = list view
@@ -201,9 +202,9 @@ export function NotesPage() {
     <div className="apnotes-shell">
       {/* Nav bar */}
       <div className="apnotes-nav">
-        <Link href="/nearby" className="apnotes-nav-back">
-          ‹ Back
-        </Link>
+        <button className="apnotes-nav-back" onClick={() => router.back()}>
+          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
         <span className="apnotes-nav-title">Notes</span>
         <button className="apnotes-nav-compose" onClick={handleCompose} aria-label="New note">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

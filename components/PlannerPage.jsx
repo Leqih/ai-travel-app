@@ -1,0 +1,992 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { gsap } from "gsap";
+const CircularGallery = dynamic(() => import("./CircularGallery"), { ssr: false });
+const PixelBlast = dynamic(() => import("./PixelBlast"), { ssr: false });
+
+const TRAVEL_TYPES = ["Vacation", "Adventure", "Relaxation", "Cultural", "Romantic", "Business", "Road Trip", "Backpacking"];
+
+const CITY_OPTIONS = [
+  { label: "Tokyo", emoji: "🗼", country: "Japan", code: "TYO", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=300&h=300&fit=crop" },
+  { label: "Seoul", emoji: "🇰🇷", country: "South Korea", code: "SEL", img: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=300&h=300&fit=crop" },
+  { label: "Bangkok", emoji: "🛕", country: "Thailand", code: "BKK", img: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=300&h=300&fit=crop" },
+  { label: "Bali", emoji: "🌴", country: "Indonesia", code: "DPS", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=300&h=300&fit=crop" },
+  { label: "Paris", emoji: "🗼", country: "France", code: "CDG", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&h=300&fit=crop" },
+  { label: "New York", emoji: "🗽", country: "United States", code: "JFK", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=300&h=300&fit=crop" },
+  { label: "London", emoji: "🇬🇧", country: "United Kingdom", code: "LHR", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=300&h=300&fit=crop" },
+  { label: "Rome", emoji: "🏛️", country: "Italy", code: "FCO", img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&h=300&fit=crop" },
+  { label: "Istanbul", emoji: "🕌", country: "Turkey", code: "IST", img: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=300&h=300&fit=crop" },
+  { label: "Dubai", emoji: "🏙️", country: "UAE", code: "DXB", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=300&h=300&fit=crop" },
+  { label: "Sydney", emoji: "🦘", country: "Australia", code: "SYD", img: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=300&h=300&fit=crop" },
+  { label: "Barcelona", emoji: "🇪🇸", country: "Spain", code: "BCN", img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=300&h=300&fit=crop" },
+  { label: "Kyoto", emoji: "⛩️", country: "Japan", code: "KIX", img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=300&h=300&fit=crop" },
+  { label: "Santorini", emoji: "🏝️", country: "Greece", code: "JTR", img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=300&h=300&fit=crop" },
+  { label: "Marrakech", emoji: "🇲🇦", country: "Morocco", code: "RAK", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=300&h=300&fit=crop" },
+  { label: "Singapore", emoji: "🇸🇬", country: "Singapore", code: "SIN", img: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=300&h=300&fit=crop" },
+  { label: "Prague", emoji: "🏰", country: "Czech Republic", code: "PRG", img: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=300&h=300&fit=crop" },
+  { label: "Lisbon", emoji: "🇵🇹", country: "Portugal", code: "LIS", img: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=300&h=300&fit=crop" },
+  { label: "Cape Town", emoji: "🇿🇦", country: "South Africa", code: "CPT", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=300&h=300&fit=crop" },
+  { label: "Havana", emoji: "🇨🇺", country: "Cuba", code: "HAV", img: "https://images.unsplash.com/photo-1500759285222-a95626b934cb?w=300&h=300&fit=crop" },
+  { label: "Amsterdam", emoji: "🇳🇱", country: "Netherlands", code: "AMS", img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=300&h=300&fit=crop" },
+  { label: "Reykjavik", emoji: "🇮🇸", country: "Iceland", code: "KEF", img: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?w=300&h=300&fit=crop" },
+  { label: "Buenos Aires", emoji: "🇦🇷", country: "Argentina", code: "EZE", img: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=300&h=300&fit=crop" },
+  { label: "Osaka", emoji: "🏯", country: "Japan", code: "KIX", img: "https://images.unsplash.com/photo-1590559899731-a382839e5549?w=300&h=300&fit=crop" },
+  { label: "Vienna", emoji: "🎵", country: "Austria", code: "VIE", img: "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=300&h=300&fit=crop" },
+  { label: "Petra", emoji: "🏜️", country: "Jordan", code: "AMM", img: "https://images.unsplash.com/photo-1579606032821-4e6161c81571?w=300&h=300&fit=crop" },
+  { label: "Rio", emoji: "🇧🇷", country: "Brazil", code: "GIG", img: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=300&h=300&fit=crop" },
+  { label: "Hanoi", emoji: "🇻🇳", country: "Vietnam", code: "HAN", img: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=300&h=300&fit=crop" },
+  { label: "Maldives", emoji: "🏝️", country: "Maldives", code: "MLE", img: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=300&h=300&fit=crop" },
+  { label: "Taipei", emoji: "🇹🇼", country: "Taiwan", code: "TPE", img: "https://images.unsplash.com/photo-1470004914212-05527e49370b?w=300&h=300&fit=crop" },
+];
+
+const BUDGET_STEPS = [
+  { label: "Budget", amount: "$50", sub: "/ day" },
+  { label: "Mid-Range", amount: "$150", sub: "/ day" },
+  { label: "Luxury", amount: "$500", sub: "/ day" },
+  { label: "Ultra-Luxury", amount: "$2000", sub: "/ day" },
+];
+
+/* Interest icons matching Figma: dining, accommodation, culture, hiking, outdoors, museum, shopping, nightlife */
+const INTEREST_OPTIONS = [
+  { label: "Dining", icon: "dining" },
+  { label: "Stay", icon: "stay" },
+  { label: "Culture", icon: "culture" },
+  { label: "Hiking", icon: "hiking" },
+  { label: "Outdoors", icon: "outdoors" },
+  { label: "Museum", icon: "museum" },
+  { label: "Shopping", icon: "shopping" },
+  { label: "Nightlife", icon: "nightlife" },
+];
+
+const INTEREST_CATEGORIES = ["Culture", "Adventure", "Relaxation", "Luxury"];
+
+const DURATION_OPTIONS = [
+  { label: "3 Days", days: 3 },
+  { label: "5 Days", days: 5 },
+  { label: "1 Week", days: 7 },
+  { label: "10 Days", days: 10 },
+  { label: "2 Weeks", days: 14 },
+  { label: "3 Weeks", days: 21 },
+  { label: "1 Month", days: 30 },
+];
+
+/* SVG icons for interest orbital */
+function InterestIcon({ type, active }) {
+  const color = active ? "#000" : "rgba(255,255,255,0.5)";
+  const size = 20;
+  const icons = {
+    dining: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+      </svg>
+    ),
+    stay: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h.01"/><path d="M9 12h.01"/><path d="M9 15h.01"/>
+      </svg>
+    ),
+    culture: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 000 20 14.5 14.5 0 000-20"/><path d="M2 12h20"/>
+      </svg>
+    ),
+    hiking: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M13 4v16"/><path d="M17 4v16"/><path d="M19 4H11a2 2 0 00-2 2v12a2 2 0 002 2h8"/><path d="M5 8l4 4-4 4"/>
+      </svg>
+    ),
+    outdoors: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 22H7l-5-9 10-11 10 11-5 9z"/><path d="M12 2v20"/>
+      </svg>
+    ),
+    museum: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4a3 3 0 016 0v4"/>
+      </svg>
+    ),
+    shopping: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    ),
+    nightlife: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3a6 6 0 019 9 9 9 0 11-9-9z"/>
+      </svg>
+    ),
+  };
+  return icons[type] || null;
+}
+
+
+/* ── Bottom Sheet wrapper ── */
+function BottomSheet({ open, onClose, children }) {
+  if (!open) return null;
+  return (
+    <div className="pl-sheet-overlay" onClick={onClose}>
+      <div className="pl-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="pl-sheet-handle" />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ── City selector — ReactBits Circular Gallery ── */
+function CitySheet({ open, onClose, value, onSelect }) {
+  const [selected, setSelected] = useState(value);
+  useEffect(() => { if (open) setSelected(value); }, [open, value]);
+
+  const galleryItems = CITY_OPTIONS.map((c) => ({
+    image: c.img.replace("w=300&h=300", "w=800&h=600"),
+    text: c.label,
+  }));
+
+  return (
+    <BottomSheet open={open} onClose={onClose}>
+      <h2 className="pl-sheet-title">Select Destination</h2>
+      <p className="pl-sheet-subtitle">Swipe to explore destinations</p>
+
+      <div style={{ height: "480px", position: "relative" }}>
+        <CircularGallery
+          items={galleryItems}
+          bend={1}
+          textColor="#ffffff"
+          borderRadius={0.05}
+          scrollSpeed={2}
+          scrollEase={0.05}
+          onSnap={(item) => { if (item) setSelected(item.text); }}
+        />
+      </div>
+
+      <button
+        className="pl-sheet-cta"
+        onClick={() => { if (selected) { onSelect(selected); onClose(); } }}
+      >
+        Confirm Selection
+        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
+          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+    </BottomSheet>
+  );
+}
+
+/* ── Budget selector — spinnable dial ── */
+/* 36 ticks, each tick = $100, range $0–$3,500 */
+const MIN_BUDGET = 0;
+const MAX_BUDGET = 3500;
+const TICK_COUNT = 36;
+const TICK_VALUE = 100; // each tick = $100
+
+function budgetToAngle(budget) {
+  const t = Math.max(0, Math.min(1, budget / MAX_BUDGET));
+  return t * 270 - 135;
+}
+
+function angleToBudget(angle) {
+  const t = (angle + 135) / 270;
+  const clamped = Math.max(0, Math.min(1, t));
+  const raw = clamped * MAX_BUDGET;
+  // Snap to nearest $100 (one tick)
+  return Math.round(raw / TICK_VALUE) * TICK_VALUE;
+}
+
+function getBudgetLabel(amount) {
+  if (amount <= 100) return "Budget";
+  if (amount <= 500) return "Mid-Range";
+  if (amount <= 1500) return "Luxury";
+  return "Ultra-Luxury";
+}
+
+function RangeSlider({ min, max, rangeMin, rangeMax, step, onChangeMin, onChangeMax }) {
+  const trackRef = useRef(null);
+  const draggingThumb = useRef(null); // "min" | "max" | null
+
+  const pctMin = ((rangeMin - min) / (max - min)) * 100;
+  const pctMax = ((rangeMax - min) / (max - min)) * 100;
+
+  const getValueFromEvent = (e) => {
+    if (!trackRef.current) return 0;
+    const rect = trackRef.current.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const raw = min + pct * (max - min);
+    return Math.round(raw / step) * step;
+  };
+
+  const handleStart = (thumb) => (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    draggingThumb.current = thumb;
+  };
+
+  const handleTrackClick = (e) => {
+    if (draggingThumb.current) return;
+    const val = getValueFromEvent(e);
+    const distMin = Math.abs(val - rangeMin);
+    const distMax = Math.abs(val - rangeMax);
+    if (distMin <= distMax) {
+      onChangeMin(Math.min(val, rangeMax));
+    } else {
+      onChangeMax(Math.max(val, rangeMin));
+    }
+  };
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!draggingThumb.current) return;
+      e.preventDefault();
+      const val = getValueFromEvent(e);
+      if (draggingThumb.current === "min") {
+        onChangeMin(Math.min(val, rangeMax));
+      } else {
+        onChangeMax(Math.max(val, rangeMin));
+      }
+    };
+    const onEnd = () => { draggingThumb.current = null; };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onEnd);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onEnd);
+    };
+  }, [rangeMin, rangeMax]);
+
+  return (
+    <div className="pl-rslider">
+      {/* Track */}
+      <div className="pl-rslider-track" ref={trackRef} onMouseDown={handleTrackClick} onTouchStart={handleTrackClick}>
+        <div className="pl-rslider-fill" style={{ left: `${pctMin}%`, width: `${pctMax - pctMin}%` }} />
+        {/* Min thumb */}
+        <div
+          className="pl-rslider-thumb pl-rslider-thumb-min"
+          style={{ left: `${pctMin}%` }}
+          onMouseDown={handleStart("min")}
+          onTouchStart={handleStart("min")}
+        >
+          <div className="pl-rslider-thumb-glow" />
+        </div>
+        {/* Max thumb */}
+        <div
+          className="pl-rslider-thumb pl-rslider-thumb-max"
+          style={{ left: `${pctMax}%` }}
+          onMouseDown={handleStart("max")}
+          onTouchStart={handleStart("max")}
+        >
+          <div className="pl-rslider-thumb-glow" />
+        </div>
+      </div>
+      {/* Scale labels */}
+      <div className="pl-rslider-labels">
+        <span>${min.toLocaleString()}</span>
+        <span>${max.toLocaleString()}</span>
+      </div>
+    </div>
+  );
+}
+
+function BudgetSheet({ open, onClose, value, onSelect }) {
+  const [mode, setMode] = useState("single"); // "single" | "range"
+  const [amount, setAmount] = useState(MIN_BUDGET);
+  const [rangeMin, setRangeMin] = useState(500);
+  const [rangeMax, setRangeMax] = useState(2000);
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState("");
+  const inputRef = useRef(null);
+  const dialRef = useRef(null);
+  const dragging = useRef(false);
+  const activePointer = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      if (value && value.includes("–")) {
+        setMode("range");
+        const parts = value.replace(/[$,/day]/g, "").split("–").map(s => parseInt(s.trim(), 10));
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+          setRangeMin(parts[0]);
+          setRangeMax(parts[1]);
+        }
+      } else if (value && value.startsWith("$")) {
+        setMode("single");
+        const num = parseInt(value.replace(/[$,/day]/g, ""), 10);
+        setAmount(isNaN(num) ? 0 : num);
+      } else {
+        const map = { "Budget": 100, "Mid-Range": 500, "Luxury": 1500, "Ultra-Luxury": 3000 };
+        setAmount(map[value] || 0);
+      }
+    }
+  }, [open, value]);
+
+  const rotation = budgetToAngle(amount);
+
+  const getAngleFromEvent = (e, rect) => {
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    let angle = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
+    if (angle > 180) angle -= 360;
+    return Math.max(-135, Math.min(135, angle));
+  };
+
+  const handleStart = (e) => {
+    if (!dialRef.current) return;
+    if (e.target.closest && e.target.closest('.pl-dial-inner')) return;
+    dragging.current = true;
+    const rect = dialRef.current.getBoundingClientRect();
+    const angle = getAngleFromEvent(e, rect);
+    activePointer.current = "single";
+    setAmount(angleToBudget(angle));
+  };
+
+  const handleMove = (e) => {
+    if (!dragging.current || !dialRef.current) return;
+    e.preventDefault();
+    const rect = dialRef.current.getBoundingClientRect();
+    const angle = getAngleFromEvent(e, rect);
+    setAmount(angleToBudget(angle));
+  };
+
+  const handleEnd = () => {
+    dragging.current = false;
+    activePointer.current = null;
+  };
+
+  useEffect(() => {
+    if (!open || mode !== "single") return;
+    const onMove = (e) => handleMove(e);
+    const onEnd = () => handleEnd();
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onEnd);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onEnd);
+    };
+  }, [open, mode]);
+
+  const label = mode === "single" ? getBudgetLabel(amount) : `${getBudgetLabel(rangeMin)} – ${getBudgetLabel(rangeMax)}`;
+
+  return (
+    <BottomSheet open={open} onClose={onClose}>
+      <div className="pl-budget-header">
+        <span className="pl-budget-icon-wrap">
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+            <rect x="1" y="1" width="16" height="12" rx="2" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5"/>
+            <path d="M1 5h16" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
+          </svg>
+        </span>
+        <span className="pl-budget-title">Daily Budget</span>
+        <div className="pl-budget-toggle">
+          <button className={`pl-budget-toggle-btn ${mode === "single" ? "pl-budget-toggle-active" : ""}`} onClick={() => setMode("single")}>Single</button>
+          <button className={`pl-budget-toggle-btn ${mode === "range" ? "pl-budget-toggle-active" : ""}`} onClick={() => setMode("range")}>Range</button>
+        </div>
+      </div>
+
+      {mode === "single" ? (
+        /* ── Single: Rotary Dial ── */
+        <div className="pl-dial-wrap">
+          <div
+            className="pl-dial-outer"
+            ref={dialRef}
+            onMouseDown={handleStart}
+            onTouchStart={handleStart}
+            style={{ cursor: "grab", userSelect: "none", touchAction: "none" }}
+          >
+            {Array.from({ length: 36 }).map((_, i) => {
+              const a = (i / 36) * 360;
+              const isMajor = i % 5 === 0;
+              return (
+                <div
+                  key={i}
+                  className={`pl-dial-tick ${isMajor ? "pl-dial-tick-major" : ""}`}
+                  style={{ transform: `rotate(${a}deg)` }}
+                />
+              );
+            })}
+            <div className="pl-dial-pointer" style={{ transform: `rotate(${rotation}deg)` }}>
+              <div className="pl-dial-pointer-tri" />
+            </div>
+            <div
+              className="pl-dial-inner"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditing(true);
+                setInputVal(String(amount));
+                setTimeout(() => inputRef.current?.focus(), 50);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <span className="pl-dial-unit">USD / DAY</span>
+              {editing ? (
+                <span className="pl-dial-amount">
+                  <span className="pl-dial-dollar">$</span>
+                  <input
+                    ref={inputRef}
+                    className="pl-dial-input"
+                    type="number"
+                    min="0"
+                    max="3500"
+                    step="100"
+                    value={inputVal}
+                    onChange={(e) => setInputVal(e.target.value)}
+                    onBlur={() => {
+                      const v = Math.max(0, Math.min(MAX_BUDGET, Math.round(Number(inputVal) / TICK_VALUE) * TICK_VALUE));
+                      setAmount(isNaN(v) ? 0 : v);
+                      setEditing(false);
+                    }}
+                    onKeyDown={(e) => { if (e.key === "Enter") e.target.blur(); }}
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                  />
+                </span>
+              ) : (
+                <span className="pl-dial-amount">
+                  <span className="pl-dial-dollar">$</span>
+                  {amount.toLocaleString()}
+                </span>
+              )}
+              <div className="pl-dial-dots">
+                {BUDGET_STEPS.map((b, i) => (
+                  <span key={i} className={`pl-dial-dot ${b.label === label ? "pl-dial-dot-active" : ""}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="pl-dial-range">
+            <span>MIN $0</span>
+            <span>MAX $3,500</span>
+          </div>
+        </div>
+      ) : (
+        /* ── Range: Horizontal Slider ── */
+        <div className="pl-range-section">
+          <div className="pl-range-display">
+            <span className="pl-range-display-label">USD / DAY</span>
+            <span className="pl-range-display-value">
+              <span className="pl-dial-dollar">$</span>{rangeMin.toLocaleString()}
+              <span className="pl-range-display-sep"> – </span>
+              <span className="pl-dial-dollar">$</span>{rangeMax.toLocaleString()}
+            </span>
+          </div>
+          <RangeSlider
+            min={MIN_BUDGET}
+            max={MAX_BUDGET}
+            step={TICK_VALUE}
+            rangeMin={rangeMin}
+            rangeMax={rangeMax}
+            onChangeMin={setRangeMin}
+            onChangeMax={setRangeMax}
+          />
+        </div>
+      )}
+
+      {mode === "single" ? (
+        <div className="pl-budget-segments">
+          {BUDGET_STEPS.map((b) => (
+            <button
+              key={b.label}
+              className={`pl-budget-seg ${b.label === getBudgetLabel(amount) ? "pl-budget-seg-active" : ""}`}
+              onClick={() => {
+                const map = { "Budget": 100, "Mid-Range": 500, "Luxury": 1500, "Ultra-Luxury": 3000 };
+                setAmount(map[b.label]);
+              }}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="pl-budget-range-presets">
+          {[
+            { label: "Budget", min: 0, max: 500 },
+            { label: "Mid-Range", min: 500, max: 1500 },
+            { label: "Luxury", min: 1500, max: 3000 },
+            { label: "Flexible", min: 0, max: 3500 },
+          ].map((p) => {
+            // Highlight if range is within this preset's bounds
+            const isActive = rangeMin >= p.min && rangeMax <= p.max;
+            return (
+              <button
+                key={p.label}
+                className={`pl-budget-seg ${isActive ? "pl-budget-seg-active" : ""}`}
+                onClick={() => { setRangeMin(p.min); setRangeMax(p.max); }}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <button
+        className="pl-sheet-cta"
+        onClick={() => {
+          if (mode === "single") {
+            onSelect(`$${amount.toLocaleString()}/day`);
+          } else {
+            onSelect(`$${rangeMin.toLocaleString()} – $${rangeMax.toLocaleString()}/day`);
+          }
+          onClose();
+        }}
+      >
+        Set Budget
+        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
+          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      <p className="pl-sheet-hint">{mode === "single" ? "Drag around the dial to adjust, or tap a preset below" : "Drag either pointer to set your budget range"}</p>
+    </BottomSheet>
+  );
+}
+
+/* ── Travel Style / Interests — orbital ring (Figma 624:11700) ── */
+function StyleSheet({ open, onClose, value, onSelect }) {
+  const [selected, setSelected] = useState(() => value ? [value] : []);
+
+  useEffect(() => {
+    if (open) setSelected(value ? [value] : []);
+  }, [open, value]);
+
+  const toggle = (label) => {
+    setSelected((prev) =>
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
+    );
+  };
+
+  const selectedCount = selected.length;
+
+  return (
+    <BottomSheet open={open} onClose={onClose}>
+      <h2 className="pl-sheet-title">Select Interests</h2>
+      <p className="pl-sheet-subtitle">Swipe to explore, tap to collect</p>
+
+      <div className="pl-interest-orbit">
+        <div className="pl-orbit-ring pl-orbit-ring-inner" />
+        <div className="pl-orbit-ring pl-orbit-ring-outer" />
+        {INTEREST_OPTIONS.map((item, i) => {
+          const angle = (i / INTEREST_OPTIONS.length) * 360 - 90;
+          const rad = (angle * Math.PI) / 180;
+          const r = 120;
+          const x = Math.cos(rad) * r;
+          const y = Math.sin(rad) * r;
+          const isActive = selected.includes(item.label);
+          return (
+            <button
+              key={item.label}
+              className={`pl-orbit-item ${isActive ? "pl-orbit-item-active" : ""}`}
+              style={{ transform: `translate(${x}px, ${y}px)` }}
+              onClick={() => toggle(item.label)}
+            >
+              <InterestIcon type={item.icon} active={isActive} />
+              <span className="pl-orbit-item-label">{item.label}</span>
+            </button>
+          );
+        })}
+        <div className="pl-orbit-center">
+          <span className="pl-orbit-center-label">SELECTED</span>
+          <div className="pl-orbit-dots">
+            {[0, 1, 2].map((i) => (
+              <span key={i} className={`pl-orbit-dot ${i < selectedCount ? "pl-orbit-dot-active" : ""}`} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="pl-sheet-categories">
+        {INTEREST_CATEGORIES.map((cat) => (
+          <span key={cat} className="pl-sheet-cat">{cat}</span>
+        ))}
+      </div>
+
+      <button
+        className="pl-sheet-cta"
+        onClick={() => {
+          if (selected.length > 0) {
+            onSelect(selected.length === 1 ? selected[0] : `${selected.length} Interests`);
+            onClose();
+          }
+        }}
+      >
+        Confirm Selection
+        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
+          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+    </BottomSheet>
+  );
+}
+
+/* ── Duration selector ── */
+function getDaysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
+function getFirstDayOfWeek(year, month) {
+  return new Date(year, month, 1).getDay();
+}
+function formatDuration(startDate, endDate) {
+  if (!startDate || !endDate) return null;
+  const diff = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+  if (diff <= 1) return "1 Day";
+  if (diff < 7) return `${diff} Days`;
+  if (diff === 7) return "1 Week";
+  if (diff < 14) return `${diff} Days`;
+  if (diff === 14) return "2 Weeks";
+  if (diff < 21) return `${diff} Days`;
+  if (diff === 21) return "3 Weeks";
+  if (diff < 30) return `${diff} Days`;
+  if (diff === 30) return "1 Month";
+  return `${diff} Days`;
+}
+function dateDiffDays(a, b) {
+  return Math.round((b - a) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"];
+
+function DurationSheet({ open, onClose, value, onSelect }) {
+  const today = new Date();
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  useEffect(() => {
+    if (open) {
+      setViewYear(today.getFullYear());
+      setViewMonth(today.getMonth());
+      setStartDate(null);
+      setEndDate(null);
+    }
+  }, [open]);
+
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+    else setViewMonth(viewMonth - 1);
+  };
+  const nextMonth = () => {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+    else setViewMonth(viewMonth + 1);
+  };
+
+  const daysInMonth = getDaysInMonth(viewYear, viewMonth);
+  const firstDay = getFirstDayOfWeek(viewYear, viewMonth);
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  const handleDayClick = (day) => {
+    const clicked = new Date(viewYear, viewMonth, day);
+    if (clicked < todayDate) return; // can't select past dates
+
+    if (!startDate || (startDate && endDate)) {
+      // Start new selection
+      setStartDate(clicked);
+      setEndDate(null);
+    } else {
+      // Set end date
+      if (clicked < startDate) {
+        setEndDate(startDate);
+        setStartDate(clicked);
+      } else {
+        setEndDate(clicked);
+      }
+    }
+  };
+
+  const isInRange = (day) => {
+    if (!startDate || !endDate) return false;
+    const d = new Date(viewYear, viewMonth, day);
+    return d >= startDate && d <= endDate;
+  };
+  const isStart = (day) => {
+    if (!startDate) return false;
+    const d = new Date(viewYear, viewMonth, day);
+    return d.getTime() === startDate.getTime();
+  };
+  const isEnd = (day) => {
+    if (!endDate) return false;
+    const d = new Date(viewYear, viewMonth, day);
+    return d.getTime() === endDate.getTime();
+  };
+  const isPast = (day) => {
+    const d = new Date(viewYear, viewMonth, day);
+    return d < todayDate;
+  };
+
+  const durationLabel = formatDuration(startDate, endDate);
+  const dayCount = startDate && endDate ? dateDiffDays(startDate, endDate) : startDate ? 1 : 0;
+
+  // Build calendar grid
+  const cells = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <BottomSheet open={open} onClose={onClose}>
+      <h2 className="pl-sheet-title">Trip Duration</h2>
+
+      {/* Date range display — always visible */}
+      <div className="pl-cal-range-row">
+        <div className="pl-cal-range-date">
+          <span className="pl-cal-range-label">Start</span>
+          <span className={`pl-cal-range-value ${!startDate ? "pl-cal-range-placeholder" : ""}`}>
+            {startDate ? `${MONTH_NAMES[startDate.getMonth()].slice(0,3)} ${startDate.getDate()}` : "— —"}
+          </span>
+        </div>
+        <span className="pl-cal-range-arrow">→</span>
+        <div className="pl-cal-range-date">
+          <span className="pl-cal-range-label">End</span>
+          <span className={`pl-cal-range-value ${!endDate ? "pl-cal-range-placeholder" : ""}`}>
+            {endDate ? `${MONTH_NAMES[endDate.getMonth()].slice(0,3)} ${endDate.getDate()}` : "— —"}
+          </span>
+        </div>
+      </div>
+
+      {/* Calendar */}
+      <div className="pl-cal">
+        {/* Month nav */}
+        <div className="pl-cal-header">
+          <button className="pl-cal-nav" onClick={prevMonth}>
+            <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9l8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          <span className="pl-cal-month">{MONTH_NAMES[viewMonth]} {viewYear}</span>
+          <button className="pl-cal-nav" onClick={nextMonth}>
+            <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M1 1l8 8-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+        </div>
+
+        {/* Weekday headers */}
+        <div className="pl-cal-weekdays">
+          {WEEKDAYS.map(w => <span key={w} className="pl-cal-weekday">{w}</span>)}
+        </div>
+
+        {/* Days grid */}
+        <div className="pl-cal-grid">
+          {cells.map((day, i) => {
+            if (day === null) return <span key={`e${i}`} className="pl-cal-empty" />;
+            const past = isPast(day);
+            const start = isStart(day);
+            const end = isEnd(day);
+            const inRange = isInRange(day);
+            const isToday = viewYear === today.getFullYear() && viewMonth === today.getMonth() && day === today.getDate();
+            return (
+              <button
+                key={day}
+                className={[
+                  "pl-cal-day",
+                  past && "pl-cal-day-past",
+                  start && "pl-cal-day-start",
+                  end && "pl-cal-day-end",
+                  inRange && !start && !end && "pl-cal-day-range",
+                  isToday && !start && !end && "pl-cal-day-today",
+                ].filter(Boolean).join(" ")}
+                onClick={() => handleDayClick(day)}
+                disabled={past}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <button
+        className="pl-sheet-cta"
+        onClick={() => {
+          if (durationLabel) { onSelect(durationLabel); onClose(); }
+          else if (startDate) { onSelect("1 Day"); onClose(); }
+        }}
+        style={{ opacity: startDate ? 1 : 0.4, pointerEvents: startDate ? "auto" : "none" }}
+      >
+        Set Timeline
+        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
+          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      <p className="pl-sheet-hint">Tap a start date, then an end date</p>
+    </BottomSheet>
+  );
+}
+
+
+export function PlannerPage() {
+  const router = useRouter();
+  const [travelType, setTravelType] = useState(0);
+  const [travelOpen, setTravelOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const [city, setCity] = useState(null);
+  const [budget, setBudget] = useState(null);
+  const [style, setStyle] = useState(null);
+  const [duration, setDuration] = useState(null);
+
+  const [activeSheet, setActiveSheet] = useState(null);
+  const shellRef = useRef(null);
+
+  // Masonry-style entrance animation
+  useEffect(() => {
+    if (!shellRef.current) return;
+    const elements = shellRef.current.querySelectorAll(".pl-header, .pl-heading, .pl-card, .pl-actions");
+    gsap.fromTo(elements,
+      { opacity: 0, y: 60, filter: "blur(10px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out", stagger: 0.08 }
+    );
+  }, []);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setTravelOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div className="pl-shell" ref={shellRef}>
+      {/* PixelBlast background */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.5 }}>
+        <PixelBlast
+          variant="square"
+          pixelSize={4}
+          color="#ff6a00"
+          patternScale={2}
+          patternDensity={1.2}
+          pixelSizeJitter={0}
+          enableRipples
+          rippleSpeed={0.4}
+          rippleThickness={0.12}
+          rippleIntensityScale={1.5}
+          liquid={false}
+          liquidStrength={0.12}
+          liquidRadius={1.2}
+          liquidWobbleSpeed={5}
+          speed={0.5}
+          edgeFade={0.1}
+          transparent
+        />
+      </div>
+
+      {/* Header */}
+      <div className="pl-header">
+        <div className="pl-badge">AI TRAVEL PLANNER</div>
+      </div>
+
+      {/* Heading */}
+      <div className="pl-heading">
+        <h1 className="pl-title">Plan The Best<br />Trip To The</h1>
+        <div className="pl-vacation-wrap" ref={dropdownRef}>
+          <button className="pl-vacation-btn" onClick={() => setTravelOpen(!travelOpen)}>
+            <span className="pl-vacation">{TRAVEL_TYPES[travelType]}</span>
+            <svg className={`pl-vacation-arrow ${travelOpen ? "pl-vacation-arrow-open" : ""}`} width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 7L9 12L14 7" stroke="#ff7b4b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          {travelOpen && (
+              <div className="pl-travel-dropdown">
+                {TRAVEL_TYPES.map((t, i) => (
+                  <button
+                    key={t}
+                    className={`pl-travel-option ${i === travelType ? "pl-travel-option-active" : ""}`}
+                    onClick={() => { setTravelType(i); setTravelOpen(false); }}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+          )}
+        </div>
+      </div>
+
+      {/* Dropdown backdrop — rendered at shell level to avoid stacking context clipping */}
+      {travelOpen && <div className="pl-dropdown-backdrop" onClick={() => setTravelOpen(false)} />}
+
+      {/* Mad-libs card */}
+      <div className="pl-card">
+        <p className="pl-prompt">
+          I want to explore{" "}
+          <button className={`pl-pill ${city ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("city")}>
+            <span className="pl-pill-text">{city || "City/Region"}</span>
+          </button>
+          <br/>
+          prefer a{" "}
+          <button className={`pl-pill ${budget ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("budget")}>
+            <span className="pl-pill-text">{budget || "Budget"}</span>
+          </button>
+          {" "}budget,
+          <br/>
+          my travel style is{" "}
+          <button className={`pl-pill ${style ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("style")}>
+            <span className="pl-pill-text">{style || "Type of Group"}</span>
+          </button>
+          <br/>
+          for{" "}
+          <button className={`pl-pill ${duration ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("duration")}>
+            <span className="pl-pill-text">{duration || "Duration"}</span>
+          </button>
+          {" "}....
+        </p>
+      </div>
+
+      {/* Action buttons */}
+      <div className="pl-actions">
+        <Link href="/planner/manual" className="pl-btn-inspire">DIRECTLY CREATE</Link>
+        <button className="pl-btn-generate">
+          HELP ME PLAN
+          <span className="pl-sparkle">✦</span>
+        </button>
+      </div>
+
+      {/* Bottom sheets */}
+      <CitySheet open={activeSheet === "city"} onClose={() => setActiveSheet(null)} value={city} onSelect={setCity} />
+      <BudgetSheet open={activeSheet === "budget"} onClose={() => setActiveSheet(null)} value={budget} onSelect={setBudget} />
+      <StyleSheet open={activeSheet === "style"} onClose={() => setActiveSheet(null)} value={style} onSelect={setStyle} />
+      <DurationSheet open={activeSheet === "duration"} onClose={() => setActiveSheet(null)} value={duration} onSelect={setDuration} />
+
+      {/* Bottom nav */}
+      <nav className="hp-nav">
+        <div className="hp-nav-pill">
+          <Link href="/" className="hp-nav-item">
+            <span className="hp-nav-icon">⌂</span>
+            <span className="hp-nav-label">Home</span>
+          </Link>
+          <Link href="/nearby" className="hp-nav-item">
+            <span className="hp-nav-icon">⊙</span>
+            <span className="hp-nav-label">Discover</span>
+          </Link>
+          <div className="hp-nav-center-wrap">
+            <Link href="/planner" className="hp-nav-center-btn">
+              <span className="hp-nav-center-icon">+</span>
+            </Link>
+          </div>
+          <Link href="/nearby" className="hp-nav-item">
+            <span className="hp-nav-icon">✈︎</span>
+            <span className="hp-nav-label">My Trips</span>
+          </Link>
+          <Link href="/profile" className="hp-nav-item">
+            <span className="hp-nav-icon">◉</span>
+            <span className="hp-nav-label">Profile</span>
+          </Link>
+        </div>
+      </nav>
+    </div>
+  );
+}

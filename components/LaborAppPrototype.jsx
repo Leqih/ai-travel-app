@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Bell,
@@ -620,7 +621,9 @@ function SettlementScreen() {
 }
 
 export function LaborAppPrototype() {
-  const [screen, setScreen] = useState("workbench");
+  const searchParams = useSearchParams();
+  const initialScreen = searchParams.get("screen") || "workbench";
+  const [screen, setScreen] = useState(initialScreen);
   const [selectedPerson, setSelectedPerson] = useState(people[0]);
 
   const activeTab =

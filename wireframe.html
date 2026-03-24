@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>南沙 A 厂 — Wireframe</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #e8e8e8;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 32px 16px;
+      font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* ─── Phone Shell ─── */
+    .phone {
+      width: 375px;
+      min-height: 833px;
+      background: #f5f5f5;
+      border-radius: 44px;
+      border: 3px solid #bbb;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 12px 40px rgba(0,0,0,.18);
+    }
+
+    /* ─── Screen ─── */
+    .screen {
+      padding: 16px 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ─── Header ─── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+    .header-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -1px;
+    }
+    .header-btn {
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      background: #d4d4d4;
+      border: 2px solid #bbb;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .icon-box {
+      width: 18px; height: 14px;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .icon-box span {
+      display: block; height: 2px; background: #666; border-radius: 2px;
+    }
+    .icon-box span:nth-child(2) { width: 70%; }
+
+    /* ─── Status Pills ─── */
+    .pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .pill {
+      display: flex; align-items: center; gap: 5px;
+      background: #ddd;
+      border: 1.5px solid #bbb;
+      border-radius: 999px;
+      padding: 6px 12px;
+      white-space: nowrap;
+      font-size: 12px;
+      color: #444;
+    }
+    .pill-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #999;
+      flex-shrink: 0;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      background: #e0e0e0;
+      border: 2px solid #bbb;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: #777;
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+    }
+    .card-tag {
+      background: #ccc;
+      border: 1.5px solid #aaa;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      color: #555;
+      white-space: nowrap;
+    }
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    /* Progress */
+    .progress-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .progress-bar-bg {
+      height: 10px; border-radius: 999px;
+      background: #ccc; border: 1.5px solid #bbb;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 999px;
+      background: repeating-linear-gradient(
+        45deg, #aaa 0, #aaa 4px, #bbb 4px, #bbb 8px
+      );
+      width: 72%;
+    }
+    .progress-meta {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: #666;
+    }
+    .progress-meta strong { color: #1a1a1a; font-weight: 700; }
+
+    /* Stat Cards */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat-card {
+      background: #d4d4d4;
+      border: 2px solid #bbb;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-label { font-size: 11px; color: #666; }
+    .stat-value { font-size: 26px; font-weight: 800; color: #1a1a1a; line-height: 1.1; }
+    .stat-sub { font-size: 11px; color: #777; }
+
+    /* ─── Section heading ─── */
+    .section-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .section-label { font-size: 10px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: #777; }
+    .section-title { font-size: 17px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5px; }
+    .section-link { font-size: 14px; color: #777; margin-top: 4px; }
+
+    /* Task List */
+    .task-list { display: flex; flex-direction: column; gap: 10px; }
+    .task-item {
+      background: #d4d4d4;
+      border: 2px solid #bbb;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .task-info { display: flex; flex-direction: column; gap: 4px; }
+    .task-name { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+    .task-desc { font-size: 13px; color: #777; }
+    .task-count {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 17px; font-weight: 800; color: #1a1a1a;
+    }
+    .arrow {
+      width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .arrow::after {
+      content: '';
+      display: block;
+      width: 6px; height: 6px;
+      border-top: 2px solid #888;
+      border-right: 2px solid #888;
+      transform: rotate(45deg);
+    }
+
+    /* Quick Actions */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .quick-btn {
+      background: #d4d4d4;
+      border: 2px solid #bbb;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 82px;
+    }
+    .quick-btn.primary {
+      background: #bbb;
+      border-color: #999;
+    }
+    .quick-icon {
+      width: 22px; height: 22px;
+      background: #aaa;
+      border-radius: 6px;
+    }
+    .quick-label { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+    .quick-btn.primary .quick-label { font-weight: 800; }
+
+    /* ─── Bottom Nav ─── */
+    .bottom-nav {
+      margin: 12px 0 0;
+      background: #ddd;
+      border: 2px solid #bbb;
+      border-radius: 24px;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 4px;
+      border-radius: 18px;
+      border: 2px solid transparent;
+    }
+    .nav-item.active {
+      background: #c8c8c8;
+      border-color: #aaa;
+    }
+    .nav-item.cta {
+      background: #bbb;
+      border-color: #999;
+    }
+    .nav-icon {
+      width: 20px; height: 20px;
+      background: #999;
+      border-radius: 4px;
+    }
+    .nav-label { font-size: 11px; color: #555; font-weight: 500; }
+    .nav-item.active .nav-label { font-weight: 700; color: #1a1a1a; }
+    .nav-item.cta .nav-label { font-weight: 800; color: #1a1a1a; }
+
+    /* ─── Wireframe annotation strip ─── */
+    .wf-badge {
+      position: absolute; top: 12px; right: 12px;
+      background: #1a1a1a; color: #f5f5f5;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      padding: 3px 8px; border-radius: 6px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* ─── Annotation labels ─── */
+    .annot {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.8px; text-transform: uppercase;
+      color: #999;
+      margin-bottom: -4px;
+    }
+
+    /* spacer at bottom */
+    .safe-area { height: 20px; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="wf-badge">Wireframe</div>
+
+    <div class="screen">
+
+      <!-- ── Header ── -->
+      <div class="header">
+        <div class="header-title">南沙 A 厂</div>
+        <div class="header-btn">
+          <div class="icon-box">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Status Pills ── -->
+      <div class="pills">
+        <div class="pill">
+          <div class="pill-dot"></div>
+          07:40 早班
+        </div>
+        <div class="pill">
+          <div class="pill-dot"></div>
+          7 条高优先异常
+        </div>
+        <div class="pill">
+          <div class="pill-dot"></div>
+          值班热线在线
+        </div>
+      </div>
+
+      <!-- ── Section 1: 早班现场 ── -->
+      <div class="annot">早班现场</div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-label">早班现场</div>
+            <div class="card-title">南沙 A 厂 1 号门</div>
+          </div>
+          <div class="card-tag">07:40 进场高峰</div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill"></div>
+          </div>
+          <div class="progress-meta">
+            <span>已到场 126 / 目标 175</span>
+            <strong>72%</strong>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <span class="stat-label">到场</span>
+            <span class="stat-value">126</span>
+            <span class="stat-sub">+18</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">待入职</span>
+            <span class="stat-value">8</span>
+            <span class="stat-sub">2 急办</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">异常</span>
+            <span class="stat-value">24</span>
+            <span class="stat-sub">7 高风险</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 2: 今日任务 ── -->
+      <div class="annot">待处理任务</div>
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <div class="section-label">待处理</div>
+            <div class="section-title">今日任务</div>
+          </div>
+          <div class="section-link">查看全部 ›</div>
+        </div>
+
+        <div class="task-list">
+          <div class="task-item">
+            <div class="task-info">
+              <span class="task-name">待面试</span>
+              <span class="task-desc">09:00 前处理 5 人</span>
+            </div>
+            <div class="task-count">
+              12
+              <div class="arrow"></div>
+            </div>
+          </div>
+
+          <div class="task-item">
+            <div class="task-info">
+              <span class="task-name">未打卡</span>
+              <span class="task-desc">早班缺卡预警</span>
+            </div>
+            <div class="task-count">
+              19
+              <div class="arrow"></div>
+            </div>
+          </div>
+
+          <div class="task-item">
+            <div class="task-info">
+              <span class="task-name">流失风险</span>
+              <span class="task-desc">连续缺勤 / 想离职</span>
+            </div>
+            <div class="task-count">
+              5
+              <div class="arrow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 3: 快捷操作 ── -->
+      <div class="annot">快捷操作</div>
+      <div class="card">
+        <div>
+          <div class="section-label">快捷操作</div>
+          <div class="section-title">现场高频</div>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-btn primary">
+            <div class="quick-icon"></div>
+            <span class="quick-label">扫码建档</span>
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon"></div>
+            <span class="quick-label">快速入职</span>
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon"></div>
+            <span class="quick-label">批量办理</span>
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon"></div>
+            <span class="quick-label">生成对账</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Bottom Nav ── -->
+      <div class="bottom-nav">
+        <div class="nav-item active">
+          <div class="nav-icon"></div>
+          <span class="nav-label">工作台</span>
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon"></div>
+          <span class="nav-label">人员</span>
+        </div>
+        <div class="nav-item cta">
+          <div class="nav-icon"></div>
+          <span class="nav-label">扫码</span>
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon"></div>
+          <span class="nav-label">我的</span>
+        </div>
+      </div>
+
+      <div class="safe-area"></div>
+    </div>
+  </div>
+</body>
+</html>

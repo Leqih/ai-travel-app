@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 /* ─── Preset category templates ─────────────────────────────── */
@@ -36,13 +37,15 @@ function RingProgress({ percent }) {
 /* ═══════════════════════════════════════════════════════════════
    View A — Empty State
    ═══════════════════════════════════════════════════════════════ */
-function EmptyState({ onAddCategory }) {
+function EmptyState({ onAddCategory, onBack }) {
   return (
     <div className="pk-shell">
       <div className="pk-nav">
-        <Link href="/nearby" className="pk-nav-back">‹ Back</Link>
+        <button className="pk-nav-back" onClick={onBack}>
+          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
         <span className="pk-nav-title">Packing List</span>
-        <div style={{ width: 60 }} />
+        <div style={{ width: 44 }} />
       </div>
 
       <div className="pk-empty-body">
@@ -89,6 +92,7 @@ function CategoryPicker({ existing, onAdd, onClose }) {
    View C — Main List
    ═══════════════════════════════════════════════════════════════ */
 export function PackingPage() {
+  const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [packed, setPacked]         = useState(new Set());
   const [addingTo, setAddingTo]     = useState(null);
@@ -137,7 +141,7 @@ export function PackingPage() {
   if (categories.length === 0) {
     return (
       <>
-        <EmptyState onAddCategory={() => setPickerOpen(true)} />
+        <EmptyState onAddCategory={() => setPickerOpen(true)} onBack={() => router.back()} />
         {pickerOpen && (
           <CategoryPicker
             existing={categories}
@@ -154,7 +158,9 @@ export function PackingPage() {
     <div className="pk-shell">
       {/* Nav */}
       <div className="pk-nav">
-        <Link href="/nearby" className="pk-nav-back">‹ Back</Link>
+        <button className="pk-nav-back" onClick={() => router.back()}>
+          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
         <span className="pk-nav-title">Packing List</span>
         <button className="pk-nav-add" onClick={() => setPickerOpen(true)} aria-label="Add category">+</button>
       </div>
