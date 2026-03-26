@@ -2,6 +2,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const DESTINATIONS = [
   "Tokyo", "Seoul", "Bangkok", "Bali", "Paris",
@@ -23,15 +26,16 @@ const PREFERENCES = [
 ];
 
 const NAV_ITEMS = [
-  { icon: "⌂", label: "Home", href: "/" },
-  { icon: "⊙", label: "Discover", href: "/nearby" },
+  { icon: faHouse,      label: "Home",      href: "/"        },
+  { icon: faCompass,    label: "Discover",  href: "/nearby"  },
   { center: true },
-  { icon: "✈︎", label: "My Trips", href: "/nearby" },
-  { icon: "◉", label: "Profile", href: "/profile" },
+  { icon: faPlane,      label: "My Trips",  href: "/trips"   },
+  { icon: faCircleUser, label: "Profile",   href: "/profile" },
 ];
 
 export default function ManualPlanPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [step, setStep] = useState("setup"); // "setup" | "plan"
   const [destination, setDestination] = useState("");
   const [duration, setDuration] = useState("");
@@ -152,12 +156,12 @@ export default function ManualPlanPage() {
               item.center ? (
                 <div key="center" className="hp-nav-center-wrap">
                   <Link href="/planner" className="hp-nav-center-btn">
-                    <span className="hp-nav-center-icon">+</span>
+                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
                   </Link>
                 </div>
               ) : (
-                <Link key={i} href={item.href} className="hp-nav-item">
-                  <span className="hp-nav-icon">{item.icon}</span>
+                <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
+                  <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
                   <span className="hp-nav-label">{item.label}</span>
                 </Link>
               )

@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
 /* ─── Data ───────────────────────────────────────────────────────── */
 const INITIAL_NOTES = [
@@ -61,7 +63,7 @@ function NoteEditor({ note, onBack, onDelete }) {
       {/* Nav bar */}
       <div className="apnotes-editor-nav">
         <button className="apnotes-editor-back-btn" onClick={handleBack}>
-          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
         <button className="apnotes-editor-share-btn" aria-label="Share">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -203,7 +205,7 @@ export function NotesPage() {
       {/* Nav bar */}
       <div className="apnotes-nav">
         <button className="apnotes-nav-back" onClick={() => router.back()}>
-          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
         <span className="apnotes-nav-title">Notes</span>
         <button className="apnotes-nav-compose" onClick={handleCompose} aria-label="New note">

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
 /* ── Curated Picks Data ── */
 const PICKS = [
@@ -161,7 +163,7 @@ export function PicksPage() {
       {/* Top bar */}
       <div className="picks-topbar">
         <button className="picks-back" onClick={() => router.back()}>
-          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
         <h1 className="picks-page-title">Today's Picks</h1>
         <div className="picks-topbar-spacer" />

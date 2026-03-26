@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { gsap } from "gsap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight, faChevronLeft, faChevronRight, faChevronDown, faCreditCard, faHouse, faCompass, faPlane, faCircleUser, faPlus, faMagnifyingGlass, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 const CircularGallery = dynamic(() => import("./CircularGallery"), { ssr: false });
 const PixelBlast = dynamic(() => import("./PixelBlast"), { ssr: false });
 
@@ -139,39 +141,132 @@ function BottomSheet({ open, onClose, children }) {
 
 /* ── City selector — ReactBits Circular Gallery ── */
 function CitySheet({ open, onClose, value, onSelect }) {
-  const [selected, setSelected] = useState(value);
-  useEffect(() => { if (open) setSelected(value); }, [open, value]);
+  const [selected, setSelected] = useState(value || CITY_OPTIONS[0]?.label);
+  const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
+  const inputRef = useRef(null);
 
-  const galleryItems = CITY_OPTIONS.map((c) => ({
-    image: c.img.replace("w=300&h=300", "w=800&h=600"),
-    text: c.label,
-  }));
+  const isSearchMode = focused || query.trim().length > 0;
+
+  const filtered = useMemo(() =>
+    query.trim()
+      ? CITY_OPTIONS.filter(c =>
+          c.label.toLowerCase().includes(query.toLowerCase()) ||
+          c.country.toLowerCase().includes(query.toLowerCase())
+        )
+      : CITY_OPTIONS,
+    [query]
+  );
+
+  // Reset on open
+  useEffect(() => {
+    if (open) {
+      setSelected(value || CITY_OPTIONS[0]?.label);
+      setQuery("");
+      setFocused(false);
+    }
+  }, [open, value]);
+
+  const galleryItems = useMemo(() =>
+    CITY_OPTIONS.map((c) => ({
+      image: c.img.replace("w=300&h=300", "w=800&h=600"),
+      text: c.label,
+    })),
+    []
+  );
+
+  // Pick a city from the list, collapse back to gallery
+  const pickCity = (city) => {
+    setSelected(city.label);
+    setQuery("");
+    setFocused(false);
+    inputRef.current?.blur();
+  };
+
+  const clearSearch = () => {
+    setQuery("");
+    inputRef.current?.focus();
+  };
+
+  const canConfirm = !!selected;
+  const selectedCity = CITY_OPTIONS.find(c => c.label === selected);
+  const buttonLabel = selectedCity ? `${selectedCity.emoji}  ${selectedCity.label}, ${selectedCity.country}` : "Select a city";
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <h2 className="pl-sheet-title">Select Destination</h2>
-      <p className="pl-sheet-subtitle">Swipe to explore destinations</p>
-
-      <div style={{ height: "480px", position: "relative" }}>
-        <CircularGallery
-          items={galleryItems}
-          bend={1}
-          textColor="#ffffff"
-          borderRadius={0.05}
-          scrollSpeed={2}
-          scrollEase={0.05}
-          onSnap={(item) => { if (item) setSelected(item.text); }}
-        />
+      {/* Header */}
+      <div className="pl-city-header">
+        <h2 className="pl-city-title">
+          {isSearchMode ? "Search Destinations" : "Explore Cities"}
+        </h2>
       </div>
 
+      {/* Search bar */}
+      <div className="pl-city-search-wrap">
+        <FontAwesomeIcon icon={faMagnifyingGlass} className="pl-city-search-icon" />
+        <input
+          ref={inputRef}
+          className="pl-city-search"
+          type="text"
+          placeholder="Search city or country..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => { if (!query.trim()) setFocused(false); }}
+          autoComplete="off"
+        />
+        {query.trim().length > 0 && (
+          <button className="pl-city-search-clear" onClick={clearSearch} aria-label="Clear">
+            <FontAwesomeIcon icon={faXmark} />
+          </button>
+        )}
+      </div>
+
+      {/* SEARCH MODE — flat list */}
+      {isSearchMode ? (
+        <div className="pl-city-list">
+          {filtered.length > 0 ? filtered.map(city => (
+            <button
+              key={city.code}
+              className={`pl-city-list-item${selected === city.label ? " pl-city-list-item--active" : ""}`}
+              onClick={() => pickCity(city)}
+            >
+              <span className="pl-city-list-emoji">{city.emoji}</span>
+              <div className="pl-city-list-info">
+                <span className="pl-city-list-name">{city.label}</span>
+                <span className="pl-city-list-country">{city.country}</span>
+              </div>
+              {selected === city.label && (
+                <FontAwesomeIcon icon={faCheck} className="pl-city-list-check" />
+              )}
+            </button>
+          )) : (
+            <p className="pl-city-list-empty">No destinations found for "{query}"</p>
+          )}
+        </div>
+      ) : (
+        /* GALLERY MODE — circular carousel */
+        <div style={{ height: "360px", position: "relative", width: "100%", marginTop: "4px" }}>
+          <CircularGallery
+            items={galleryItems}
+            bend={1}
+            textColor="#ffffff"
+            borderRadius={0.05}
+            scrollSpeed={2}
+            scrollEase={0.05}
+            showLabel={false}
+            onSnap={(item) => { if (item) setSelected(item.text); }}
+          />
+        </div>
+      )}
+
       <button
-        className="pl-sheet-cta"
-        onClick={() => { if (selected) { onSelect(selected); onClose(); } }}
+        className={`pl-sheet-cta${!canConfirm ? " pl-sheet-cta--disabled" : ""}`}
+        disabled={!canConfirm}
+        onClick={() => { if (canConfirm) { onSelect(selected); onClose(); } }}
       >
-        Confirm Selection
-        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
-          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        {buttonLabel}
+        <FontAwesomeIcon icon={faArrowRight} style={{ width: 16, height: 16, color: "black" }} />
       </button>
     </BottomSheet>
   );
@@ -386,10 +481,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
     <BottomSheet open={open} onClose={onClose}>
       <div className="pl-budget-header">
         <span className="pl-budget-icon-wrap">
-          <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
-            <rect x="1" y="1" width="16" height="12" rx="2" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5"/>
-            <path d="M1 5h16" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
-          </svg>
+          <FontAwesomeIcon icon={faCreditCard} style={{ width: 18, height: 14, color: "rgba(255,255,255,0.5)" }} />
         </span>
         <span className="pl-budget-title">Daily Budget</span>
         <div className="pl-budget-toggle">
@@ -547,9 +639,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
         }}
       >
         Set Budget
-        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
-          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <FontAwesomeIcon icon={faArrowRight} style={{ width: 16, height: 16, color: "black" }} />
       </button>
       <p className="pl-sheet-hint">{mode === "single" ? "Drag around the dial to adjust, or tap a preset below" : "Drag either pointer to set your budget range"}</p>
     </BottomSheet>
@@ -625,9 +715,7 @@ function StyleSheet({ open, onClose, value, onSelect }) {
         }}
       >
         Confirm Selection
-        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
-          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <FontAwesomeIcon icon={faArrowRight} style={{ width: 16, height: 16, color: "black" }} />
       </button>
     </BottomSheet>
   );
@@ -764,11 +852,11 @@ function DurationSheet({ open, onClose, value, onSelect }) {
         {/* Month nav */}
         <div className="pl-cal-header">
           <button className="pl-cal-nav" onClick={prevMonth}>
-            <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9l8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14 }} />
           </button>
           <span className="pl-cal-month">{MONTH_NAMES[viewMonth]} {viewYear}</span>
           <button className="pl-cal-nav" onClick={nextMonth}>
-            <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M1 1l8 8-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <FontAwesomeIcon icon={faChevronRight} style={{ width: 10, height: 14 }} />
           </button>
         </div>
 
@@ -816,9 +904,7 @@ function DurationSheet({ open, onClose, value, onSelect }) {
         style={{ opacity: startDate ? 1 : 0.4, pointerEvents: startDate ? "auto" : "none" }}
       >
         Set Timeline
-        <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
-          <path d="M1 8h16M13 3l5 5-5 5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <FontAwesomeIcon icon={faArrowRight} style={{ width: 16, height: 16, color: "black" }} />
       </button>
       <p className="pl-sheet-hint">Tap a start date, then an end date</p>
     </BottomSheet>
@@ -828,6 +914,7 @@ function DurationSheet({ open, onClose, value, onSelect }) {
 
 export function PlannerPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [travelType, setTravelType] = useState(0);
   const [travelOpen, setTravelOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -896,9 +983,7 @@ export function PlannerPage() {
         <div className="pl-vacation-wrap" ref={dropdownRef}>
           <button className="pl-vacation-btn" onClick={() => setTravelOpen(!travelOpen)}>
             <span className="pl-vacation">{TRAVEL_TYPES[travelType]}</span>
-            <svg className={`pl-vacation-arrow ${travelOpen ? "pl-vacation-arrow-open" : ""}`} width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M4 7L9 12L14 7" stroke="#ff7b4b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <FontAwesomeIcon icon={faChevronDown} className={`pl-vacation-arrow ${travelOpen ? "pl-vacation-arrow-open" : ""}`} style={{ width: 14, height: 14, color: "#ff7b4b" }} />
           </button>
           {travelOpen && (
               <div className="pl-travel-dropdown">
@@ -950,8 +1035,21 @@ export function PlannerPage() {
       <div className="pl-actions">
         <Link href="/planner/manual" className="pl-btn-inspire">DIRECTLY CREATE</Link>
         <button className="pl-btn-generate">
-          HELP ME PLAN
-          <span className="pl-sparkle">✦</span>
+          <div className="pl-uiverse-wrapper">
+            <span>HELP ME PLAN</span>
+            <div className="pl-circle pl-circle-12"></div>
+            <div className="pl-circle pl-circle-11"></div>
+            <div className="pl-circle pl-circle-10"></div>
+            <div className="pl-circle pl-circle-9"></div>
+            <div className="pl-circle pl-circle-8"></div>
+            <div className="pl-circle pl-circle-7"></div>
+            <div className="pl-circle pl-circle-6"></div>
+            <div className="pl-circle pl-circle-5"></div>
+            <div className="pl-circle pl-circle-4"></div>
+            <div className="pl-circle pl-circle-3"></div>
+            <div className="pl-circle pl-circle-2"></div>
+            <div className="pl-circle pl-circle-1"></div>
+          </div>
         </button>
       </div>
 
@@ -964,25 +1062,25 @@ export function PlannerPage() {
       {/* Bottom nav */}
       <nav className="hp-nav">
         <div className="hp-nav-pill">
-          <Link href="/" className="hp-nav-item">
-            <span className="hp-nav-icon">⌂</span>
+          <Link href="/" className={`hp-nav-item${pathname === "/" ? " hp-nav-active" : ""}`}>
+            <FontAwesomeIcon icon={faHouse} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
             <span className="hp-nav-label">Home</span>
           </Link>
-          <Link href="/nearby" className="hp-nav-item">
-            <span className="hp-nav-icon">⊙</span>
+          <Link href="/nearby" className={`hp-nav-item${pathname === "/nearby" ? " hp-nav-active" : ""}`}>
+            <FontAwesomeIcon icon={faCompass} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
             <span className="hp-nav-label">Discover</span>
           </Link>
           <div className="hp-nav-center-wrap">
             <Link href="/planner" className="hp-nav-center-btn">
-              <span className="hp-nav-center-icon">+</span>
+              <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
             </Link>
           </div>
-          <Link href="/nearby" className="hp-nav-item">
-            <span className="hp-nav-icon">✈︎</span>
+          <Link href="/trips" className={`hp-nav-item${pathname === "/trips" ? " hp-nav-active" : ""}`}>
+            <FontAwesomeIcon icon={faPlane} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
             <span className="hp-nav-label">My Trips</span>
           </Link>
-          <Link href="/profile" className="hp-nav-item">
-            <span className="hp-nav-icon">◉</span>
+          <Link href="/profile" className={`hp-nav-item${pathname === "/profile" ? " hp-nav-active" : ""}`}>
+            <FontAwesomeIcon icon={faCircleUser} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
             <span className="hp-nav-label">Profile</span>
           </Link>
         </div>

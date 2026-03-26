@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
 /* ─── Preset category templates ─────────────────────────────── */
 const PRESET_CATEGORIES = [
@@ -42,7 +44,7 @@ function EmptyState({ onAddCategory, onBack }) {
     <div className="pk-shell">
       <div className="pk-nav">
         <button className="pk-nav-back" onClick={onBack}>
-          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
         <span className="pk-nav-title">Packing List</span>
         <div style={{ width: 44 }} />
@@ -159,7 +161,7 @@ export function PackingPage() {
       {/* Nav */}
       <div className="pk-nav">
         <button className="pk-nav-back" onClick={() => router.back()}>
-          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
         <span className="pk-nav-title">Packing List</span>
         <button className="pk-nav-add" onClick={() => setPickerOpen(true)} aria-label="Add category">+</button>

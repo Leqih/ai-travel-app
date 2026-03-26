@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 /* ─── Data ──────────────────────────────────────────────────────── */
 const PLAN = [
@@ -78,11 +81,11 @@ const STATS = [
 ];
 
 const NAV_ITEMS = [
-  { icon: "⌂",  label: "Home",      href: "/",        active: true  },
-  { icon: "⊙",  label: "Discover",  href: "/nearby",  active: false },
+  { icon: faHouse,       label: "Home",      href: "/"        },
+  { icon: faCompass,     label: "Discover",  href: "/nearby"  },
   { center: true },
-  { icon: "✈︎",  label: "My Trips",  href: "/nearby",  active: false },
-  { icon: "◉",  label: "Profile",   href: "/profile", active: false },
+  { icon: faPlane,       label: "My Trips",  href: "/trips"   },
+  { icon: faCircleUser,  label: "Profile",   href: "/profile" },
 ];
 
 const TRIP_DATE = new Date("2026-03-20T09:00:00");
@@ -98,6 +101,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
 
 /* ─── HomeClient ─────────────────────────────────────────────────── */
 export function HomeClient() {
+  const pathname = usePathname();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
   const today = new Date();
@@ -320,15 +324,15 @@ export function HomeClient() {
               return (
                 <div key="center" className="hp-nav-center-wrap">
                   <Link href="/planner" className="hp-nav-center-btn">
-                    <span className="hp-nav-center-icon">+</span>
+                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
                   </Link>
                 </div>
               );
             }
             return (
               <Link key={i} href={item.href}
-                className={`hp-nav-item${item.active ? " hp-nav-active" : ""}`}>
-                <span className="hp-nav-icon">{item.icon}</span>
+                className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
+                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
                 <span className="hp-nav-label">{item.label}</span>
               </Link>
             );

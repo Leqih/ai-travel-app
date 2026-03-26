@@ -390,10 +390,12 @@ class GalleryApp {
   }
 }
 
-export default function CircularGallery({ items, bend = 3, textColor = "#ffffff", borderRadius = 0.05, font = "bold 48px sans-serif", scrollSpeed = 2, scrollEase = 0.05, onSnap }) {
+export default function CircularGallery({ items, bend = 3, textColor = "#ffffff", borderRadius = 0.05, font = "bold 48px sans-serif", scrollSpeed = 2, scrollEase = 0.05, onSnap, showLabel = true }) {
   const containerRef = useRef(null);
   const appRef = useRef(null);
   const labelRef = useRef(null);
+  const onSnapRef = useRef(onSnap);
+  useEffect(() => { onSnapRef.current = onSnap; }, [onSnap]);
 
   useEffect(() => {
     const app = new GalleryApp(containerRef.current, { items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase });
@@ -413,7 +415,7 @@ export default function CircularGallery({ items, bend = 3, textColor = "#ffffff"
         if (labelRef.current && item) {
           labelRef.current.textContent = item.text;
         }
-        if (onSnap) onSnap(item);
+        if (onSnapRef.current) onSnapRef.current(item);
       }
     };
     const interval = setInterval(trackCenter, 100);
@@ -422,30 +424,33 @@ export default function CircularGallery({ items, bend = 3, textColor = "#ffffff"
       clearInterval(interval);
       app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, onSnap]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <div className="circular-gallery" ref={containerRef} />
-      <div
-        ref={labelRef}
-        style={{
-          position: "absolute",
-          bottom: "16px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          color: "#fff",
-          fontFamily: "'SF Pro Display', -apple-system, sans-serif",
-          fontSize: "18px",
-          fontWeight: "700",
-          letterSpacing: "0.5px",
-          textAlign: "center",
-          pointerEvents: "none",
-          textShadow: "0 2px 8px rgba(0,0,0,0.5)",
-        }}
-      >
-        {items && items.length ? items[0].text : ""}
-      </div>
+      {showLabel !== false && (
+        <div
+          ref={labelRef}
+          style={{
+            position: "absolute",
+            bottom: "16px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            color: "#fff",
+            fontFamily: "'SF Pro Display', -apple-system, sans-serif",
+            fontSize: "18px",
+            fontWeight: "700",
+            letterSpacing: "0.5px",
+            textAlign: "center",
+            pointerEvents: "none",
+            textShadow: "0 2px 8px rgba(0,0,0,0.5)",
+          }}
+        >
+          {items && items.length ? items[0].text : ""}
+        </div>
+      )}
     </div>
   );
 }

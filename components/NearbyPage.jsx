@@ -2,9 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import Stack from "@/components/ui/Stack";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faShareNodes, faBookmark, faEllipsisVertical, faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark as faBookmarkReg } from "@fortawesome/free-regular-svg-icons";
 
 /* ── Unsplash real-location photo mapping (arrays for multi-photo grids) ── */
 const PHOTO_MAP = {
@@ -120,11 +123,11 @@ function uimg(name, w = 400, h = 300, idx = 0) {
 }
 
 const NAV_ITEMS = [
-  { icon: "⌂",  label: "Home",      href: "/",        active: false },
-  { icon: "⊙",  label: "Discover",  href: "/nearby",  active: true  },
+  { icon: faHouse,      label: "Home",      href: "/"        },
+  { icon: faCompass,    label: "Discover",  href: "/nearby"  },
   { center: true },
-  { icon: "✈︎",  label: "My Trips",  href: "/nearby",  active: false },
-  { icon: "◉",  label: "Profile",   href: "/profile", active: false },
+  { icon: faPlane,      label: "My Trips",  href: "/trips"   },
+  { icon: faCircleUser, label: "Profile",   href: "/profile" },
 ];
 
 const SNAZZY_EMBED = "https://snazzymaps.com/embed/778956";
@@ -967,12 +970,14 @@ function MapView({ activities, fullscreen, selectedIdx, onPinClick, totalMode = 
 }
 
 export function NearbyPage() {
+  const pathname = usePathname();
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeCity, setActiveCity]         = useState("Tokyo");
   const [cardMode, setCardMode]             = useState(false);
   const [citySheet, setCitySheet]           = useState(false);
   const [citySearch, setCitySearch]         = useState("");
   const [savedCards, setSavedCards]           = useState(new Set());
+  const [mapSaved, setMapSaved]               = useState(false);
   const [detailDest, setDetailDest]         = useState(() => {
     if (typeof window !== "undefined") {
       try {
@@ -1270,7 +1275,7 @@ export function NearbyPage() {
           : (detailDest.itinerary[tripDay]?.activities || []);
         const act    = acts[selectedActIdx] || acts[0];
         return (
-          <div className="nd-mapview" style={{ zIndex: mapMode ? 1000 : 5 }}>
+          <div className={`nd-mapview${!mapMode ? ' nd-mapview--behind' : ''}`} style={{ zIndex: 1000 }}>
             {/* Full-screen map with markers */}
             <div className="nd-mapview-map">
               <MapView
@@ -1289,15 +1294,21 @@ export function NearbyPage() {
             <button className="nd-mapview-back"
               onClick={() => { setMapMode(false); setDetailDest(null); }}
               onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setMapMode(false); setDetailDest(null); }}>
-              <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
             </button>
 
-            {/* List icon — opens trip detail panel */}
-            <button className="nd-mapview-list-btn"
+            {/* Share button */}
+            <button className="nd-mapview-share-btn"
+              onClick={() => navigator.share ? navigator.share({ title: activeTrip?.cardTitle, text: activeTrip?.desc }) : null}>
+              <FontAwesomeIcon icon={faShareNodes} style={{ width: 16, height: 16, color: "white" }} />
+            </button>
+
+            {/* Bottom handle — swipe up or tap to restore panel */}
+            <div className="nd-mapview-bottom-handle"
               onClick={() => { mapExitTime.current = Date.now(); setTimeout(() => setMapMode(false), 80); }}
               onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); mapExitTime.current = Date.now(); setTimeout(() => setMapMode(false), 80); }}>
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
-            </button>
+              <div className="nd-mapview-bottom-handle-pill" />
+            </div>
 
             {/* Swipeable card carousel — spring bounce (hidden in total mode) */}
             {!isTotal && acts.length > 0 && (
@@ -1446,18 +1457,14 @@ export function NearbyPage() {
           {/* Top bar */}
           <div className="nd-act-detail-topbar">
             <button className="nd-act-detail-back" onClick={() => setDetailAct(null)}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13 3L5 10L13 17" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <FontAwesomeIcon icon={faChevronLeft} style={{ width: 14, height: 14, color: "white" }} />
             </button>
             <div className="nd-act-detail-topbar-right">
               <button className="nd-act-detail-icon-btn">
-                <svg width="20" height="20" viewBox="0 0 20 22" fill="none"><path d="M2 4.5V20.5L10 16.5L18 20.5V4.5C18 3.39543 17.1046 2.5 16 2.5H4C2.89543 2.5 2 3.39543 2 4.5Z" stroke="white" strokeWidth="2" strokeLinejoin="round"/></svg>
+                <FontAwesomeIcon icon={faBookmarkReg} style={{ width: 16, height: 16, color: "white" }} />
               </button>
               <button className="nd-act-detail-icon-btn">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="4" r="2" fill="white"/>
-                  <circle cx="10" cy="10" r="2" fill="white"/>
-                  <circle cx="10" cy="16" r="2" fill="white"/>
-                </svg>
+                <FontAwesomeIcon icon={faEllipsisVertical} style={{ width: 5, height: 16, color: "white" }} />
               </button>
             </div>
           </div>
@@ -1611,9 +1618,9 @@ export function NearbyPage() {
       )}
 
       {/* ═══ Panel Mode — regular trip detail sheet ═══ */}
-      {detailDest && !mapMode && !detailAct && (
-        <div className="nd-trip-overlay" onClick={() => { if (Date.now() - mapExitTime.current < 800) return; setMapMode(true); }}
-          onTouchEnd={(e) => { if (Date.now() - mapExitTime.current < 800) { e.stopPropagation(); e.preventDefault(); return; } }}>
+      {detailDest && !detailAct && (
+        <div className={`nd-trip-overlay${mapMode ? ' nd-trip-overlay--out' : ''}`} onClick={() => { if (mapMode || Date.now() - mapExitTime.current < 800) return; setMapMode(true); }}
+          onTouchEnd={(e) => { if (mapMode) { e.stopPropagation(); return; } if (Date.now() - mapExitTime.current < 800) { e.stopPropagation(); e.preventDefault(); return; } }}>
           <div className="nd-trip-panel" onClick={e => e.stopPropagation()}>
             <div
               className="nd-trip-handle-row"
@@ -1822,14 +1829,14 @@ export function NearbyPage() {
               return (
                 <div key="center" className="hp-nav-center-wrap">
                   <Link href="/planner" className="hp-nav-center-btn">
-                    <span className="hp-nav-center-icon">+</span>
+                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
                   </Link>
                 </div>
               );
             }
             return (
-              <Link key={i} href={item.href} className={`hp-nav-item${item.active ? " hp-nav-active" : ""}`}>
-                <span className="hp-nav-icon">{item.icon}</span>
+              <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
+                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
                 <span className="hp-nav-label">{item.label}</span>
               </Link>
             );

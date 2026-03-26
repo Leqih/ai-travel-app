@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
 /* ── Google Maps loader (shared with NearbyPage) ── */
 let gmapsPromise = null;
@@ -328,7 +330,7 @@ export function PickArticlePage({ articleId }) {
       {/* Top bar */}
       <div className="pa-topbar">
         <button className="pa-back-btn" onClick={() => router.back()}>
-          <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
         <button
           className={`pa-save-all-btn${saved ? " pa-save-all-btn--saved" : ""}`}
