@@ -206,10 +206,6 @@ function CitySheet({ open, onClose, value, onSelect }) {
 
       {/* Search bar */}
       <div className="pl-city-search-wrap">
-        <svg className="pl-city-search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          <path d="M13 13L17 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
         <input
           ref={inputRef}
           className="pl-city-search"
