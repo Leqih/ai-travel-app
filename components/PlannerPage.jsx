@@ -1092,6 +1092,25 @@ export function PlannerPage() {
       {/* Generating loading overlay */}
       {generating && (
         <div className="pl-gen-overlay">
+          {/* Same pixel background as planner page */}
+          <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.5 }}>
+            <PixelBlast
+              variant="square"
+              pixelSize={4}
+              color="#ff6a00"
+              patternScale={2}
+              patternDensity={1.2}
+              pixelSizeJitter={0}
+              enableRipples
+              rippleSpeed={0.4}
+              rippleThickness={0.12}
+              rippleIntensityScale={1.5}
+              liquid={false}
+              speed={0.5}
+              edgeFade={0.1}
+              transparent
+            />
+          </div>
           <div className="pl-gen-card">
             <div className="pl-gen-orb" />
             <div className="pl-gen-content">

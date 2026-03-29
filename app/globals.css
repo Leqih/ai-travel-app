@@ -13335,6 +13335,7 @@ button {
 }
 .pl-gen-card {
   position: relative;
+  z-index: 1;
   width: calc(100% - 48px);
   max-width: 360px;
   background: rgba(20,20,26,0.9);
@@ -13428,6 +13429,8 @@ button {
   font-weight: 500;
 }
 .pl-gen-cancel {
+  position: relative;
+  z-index: 1;
   font-size: 14px;
   color: rgba(255,255,255,0.4);
   background: none;
