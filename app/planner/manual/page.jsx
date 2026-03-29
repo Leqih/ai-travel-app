@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -33,28 +33,51 @@ const NAV_ITEMS = [
   { icon: faCircleUser, label: "Profile",   href: "/profile" },
 ];
 
-export default function ManualPlanPage() {
+function ManualPlanInner() {
   const router = useRouter();
   const pathname = usePathname();
-  const [step, setStep] = useState("setup"); // "setup" | "plan"
-  const [destination, setDestination] = useState("");
-  const [duration, setDuration] = useState("");
-  const [prefs, setPrefs] = useState([]);
+  const searchParams = useSearchParams();
 
-  // Itinerary state
+  const paramCity     = searchParams.get("city")     || "";
+  const paramDuration = searchParams.get("duration") || "";
+
+  // Derive clean destination label (strip country, e.g. "Tokyo, Japan" → "Tokyo")
+  const initDest = paramCity ? paramCity.split(",")[0].trim() : "";
+  // Normalise duration: "3 Days" stays "3 Days", "3 days" normalised
+  const initDur  = paramDuration || "";
+
+  const [step, setStep]               = useState(initDest && initDur ? "plan" : "setup");
+  const [destination, setDestination] = useState(initDest);
+  const [duration, setDuration]       = useState(initDur);
+  const [prefs, setPrefs]             = useState([]);
+
   const numDays = parseInt(duration) || 3;
-  const [tripDay, setTripDay] = useState(0);
-  const [activities, setActivities] = useState({});
+  const [tripDay, setTripDay]         = useState(0);
+  const [activities, setActivities]   = useState(() => {
+    const init = {};
+    const days = parseInt(initDur) || 3;
+    for (let i = 1; i <= days; i++) init[i] = [];
+    return init;
+  });
 
-  const togglePref = (label) => {
+  // If params arrive but activities not initialised yet, re-init
+  useEffect(() => {
+    if (initDest && initDur) {
+      const init = {};
+      for (let i = 1; i <= (parseInt(initDur) || 3); i++) init[i] = [];
+      setActivities(init);
+      setStep("plan");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const togglePref = (label) =>
     setPrefs((p) => p.includes(label) ? p.filter((x) => x !== label) : [...p, label]);
-  };
 
   const handleStart = () => {
     if (!destination || !duration) return;
-    // Initialize empty days
     const init = {};
-    for (let i = 1; i <= numDays; i++) init[i] = [];
+    for (let i = 1; i <= (parseInt(duration) || 3); i++) init[i] = [];
     setActivities(init);
     setStep("plan");
   };
@@ -76,6 +99,7 @@ export default function ManualPlanPage() {
     }));
   };
 
+  // ── Setup screen ──
   if (step === "setup") {
     return (
       <div className="ct-shell">
@@ -89,7 +113,6 @@ export default function ManualPlanPage() {
           ))}
         </div>
 
-        {/* Header */}
         <div className="mp-header">
           <button className="mp-back" onClick={() => router.back()}>
             <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
@@ -100,33 +123,26 @@ export default function ManualPlanPage() {
           <div style={{ width: 44 }} />
         </div>
 
-        {/* Destination */}
         <div className="mp-section">
           <h2 className="mp-section-title">Where to?</h2>
           <div className="mp-chips">
             {DESTINATIONS.map((d) => (
               <button key={d} className={`mp-chip${destination === d ? " mp-chip-active" : ""}`}
-                onClick={() => setDestination(d)}>
-                {d}
-              </button>
+                onClick={() => setDestination(d)}>{d}</button>
             ))}
           </div>
         </div>
 
-        {/* Duration */}
         <div className="mp-section">
           <h2 className="mp-section-title">How long?</h2>
           <div className="mp-chips">
             {DURATIONS.map((d) => (
               <button key={d} className={`mp-chip${duration === d ? " mp-chip-active" : ""}`}
-                onClick={() => setDuration(d)}>
-                {d}
-              </button>
+                onClick={() => setDuration(d)}>{d}</button>
             ))}
           </div>
         </div>
 
-        {/* Preferences */}
         <div className="mp-section">
           <h2 className="mp-section-title">What do you enjoy?</h2>
           <div className="mp-chips">
@@ -139,7 +155,6 @@ export default function ManualPlanPage() {
           </div>
         </div>
 
-        {/* CTA */}
         <div className="mp-cta-wrap">
           <button className="mp-cta" disabled={!destination || !duration} onClick={handleStart}>
             Start Planning
@@ -149,7 +164,6 @@ export default function ManualPlanPage() {
           </button>
         </div>
 
-        {/* Nav */}
         <nav className="hp-nav">
           <div className="hp-nav-pill">
             {NAV_ITEMS.map((item, i) =>
@@ -173,29 +187,26 @@ export default function ManualPlanPage() {
   }
 
   // ── Plan / Itinerary Editor ──
-  const allActs = tripDay === 0
-    ? Object.entries(activities).flatMap(([day, acts]) => acts.map((a) => ({ ...a, day: Number(day) })))
-    : (activities[tripDay] || []).map((a) => ({ ...a, day: tripDay }));
-
   return (
     <div className="mp-plan-shell">
       {/* Top bar */}
       <div className="mp-plan-top">
-        <button className="mp-back" onClick={() => setStep("setup")}>
+        <button className="mp-back" onClick={() => router.back()}>
           <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path d="M8.5 1L1.5 8l7 7" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
         <div className="mp-plan-top-info">
-          <h2 className="mp-plan-dest">{destination}</h2>
-          <p className="mp-plan-meta">{duration} · {prefs.slice(0, 3).join(", ") || "Custom"}</p>
+          <h2 className="mp-plan-dest">{destination || "My Trip"}</h2>
+          <p className="mp-plan-meta">{duration}{prefs.length > 0 ? ` · ${prefs.slice(0, 3).join(", ")}` : ""}</p>
         </div>
         <div style={{ width: 44 }} />
       </div>
 
       {/* Day selector */}
       <div className="nd-trip-day-scroll">
-        <button className={`nd-trip-day-tab nd-trip-day-text${tripDay === 0 ? " nd-trip-day-text-active" : ""}`}
+        <button
+          className={`nd-trip-day-tab nd-trip-day-text${tripDay === 0 ? " nd-trip-day-text-active" : ""}`}
           onClick={() => setTripDay(0)}>
           <span className="nd-trip-day-num">Total</span>
         </button>
@@ -212,7 +223,6 @@ export default function ManualPlanPage() {
       {/* Itinerary body */}
       <div className="mp-plan-body">
         {tripDay === 0 ? (
-          // Overview - all days
           <>
             <div className="nd-trip-section-head" style={{ marginBottom: 16 }}>
               <span className="nd-trip-section-icon">🗺️</span>
@@ -235,17 +245,14 @@ export default function ManualPlanPage() {
                     </div>
                   ))}
                   {(activities[dayNum] || []).length === 0 && (
-                    <p className="mp-empty-hint">No spots yet</p>
+                    <p className="mp-empty-hint">No spots yet — tap below to add</p>
                   )}
                 </div>
-                <button className="mp-add-spot" onClick={() => addSpot(dayNum)}>
-                  + Add Spot
-                </button>
+                <button className="mp-add-spot" onClick={() => addSpot(dayNum)}>+ Add Spot</button>
               </div>
             ))}
           </>
         ) : (
-          // Single day detail
           <div className="nd-trip-day-group">
             <div className="nd-trip-day-header">
               <div className="nd-trip-day-badge">{tripDay}</div>
@@ -253,27 +260,23 @@ export default function ManualPlanPage() {
             </div>
             <div className="nd-trip-activities">
               {(activities[tripDay] || []).map((act, idx) => (
-                <div key={idx}>
-                  <div className="nd-trip-rich-card">
-                    <div className="mp-spot-placeholder">
-                      <span className="mp-spot-num">{idx + 1}</span>
-                    </div>
-                    <div className="nd-trip-rich-content">
-                      <p className="nd-trip-rich-title">{idx + 1} · {act.name}</p>
-                      <p className="nd-trip-rich-category">{act.category}</p>
-                      <p className="nd-trip-rich-meta"><span className="nd-trip-rich-emoji">⏰</span> {act.time}</p>
-                    </div>
-                    <button className="mp-spot-remove" onClick={() => removeSpot(tripDay, idx)}>×</button>
+                <div key={idx} className="nd-trip-rich-card">
+                  <div className="mp-spot-placeholder">
+                    <span className="mp-spot-num">{idx + 1}</span>
                   </div>
+                  <div className="nd-trip-rich-content">
+                    <p className="nd-trip-rich-title">{act.name}</p>
+                    <p className="nd-trip-rich-category">{act.category}</p>
+                    <p className="nd-trip-rich-meta"><span className="nd-trip-rich-emoji">⏰</span> {act.time}</p>
+                  </div>
+                  <button className="mp-spot-remove" onClick={() => removeSpot(tripDay, idx)}>×</button>
                 </div>
               ))}
               {(activities[tripDay] || []).length === 0 && (
                 <p className="mp-empty-hint">No spots added for this day yet</p>
               )}
             </div>
-            <button className="mp-add-spot" onClick={() => addSpot(tripDay)}>
-              + Add Spot
-            </button>
+            <button className="mp-add-spot" onClick={() => addSpot(tripDay)}>+ Add Spot</button>
           </div>
         )}
       </div>
@@ -285,12 +288,12 @@ export default function ManualPlanPage() {
             item.center ? (
               <div key="center" className="hp-nav-center-wrap">
                 <Link href="/planner" className="hp-nav-center-btn">
-                  <span className="hp-nav-center-icon">+</span>
+                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
                 </Link>
               </div>
             ) : (
-              <Link key={i} href={item.href} className="hp-nav-item">
-                <span className="hp-nav-icon">{item.icon}</span>
+              <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
+                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
                 <span className="hp-nav-label">{item.label}</span>
               </Link>
             )
@@ -298,5 +301,13 @@ export default function ManualPlanPage() {
         </div>
       </nav>
     </div>
+  );
+}
+
+export default function ManualPlanPage() {
+  return (
+    <Suspense fallback={<div className="mp-plan-shell" />}>
+      <ManualPlanInner />
+    </Suspense>
   );
 }

@@ -1069,7 +1069,10 @@ export function PlannerPage() {
 
       {/* Action buttons */}
       <div className="pl-actions">
-        <Link href="/planner/manual" className="pl-btn-inspire">DIRECTLY CREATE</Link>
+        <Link
+          href={`/planner/manual${city || duration ? `?city=${encodeURIComponent(city || "")}&duration=${encodeURIComponent(duration || "")}` : ""}`}
+          className="pl-btn-inspire"
+        >DIRECTLY CREATE</Link>
         <button className="pl-btn-generate" onClick={() => setGenerating(true)}>
           <div className="pl-uiverse-wrapper">
             <span>HELP ME PLAN</span>
