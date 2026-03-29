@@ -434,8 +434,8 @@ function RangeSlider({ min, max, rangeMin, rangeMax, step, onChangeMin, onChange
 function BudgetSheet({ open, onClose, value, onSelect }) {
   const [mode, setMode] = useState("single"); // "single" | "range"
   const [amount, setAmount] = useState(MIN_BUDGET);
-  const [rangeMin, setRangeMin] = useState(500);
-  const [rangeMax, setRangeMax] = useState(2000);
+  const [rangeMin, setRangeMin] = useState(0);
+  const [rangeMax, setRangeMax] = useState(3500);
   const [editing, setEditing] = useState(false);
   const [inputVal, setInputVal] = useState("");
   const inputRef = useRef(null);
@@ -653,8 +653,8 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
             { label: "Luxury", min: 1500, max: 3000 },
             { label: "Flexible", min: 0, max: 3500 },
           ].map((p) => {
-            // Highlight only when range exactly matches this preset
-            const isActive = rangeMin === p.min && rangeMax === p.max;
+            // Highlight when range matches this preset (within $50 tolerance)
+            const isActive = Math.abs(rangeMin - p.min) <= 50 && Math.abs(rangeMax - p.max) <= 50;
             return (
               <button
                 key={p.label}
