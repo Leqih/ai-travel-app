@@ -740,12 +740,6 @@ function StyleSheet({ open, onClose, value, onSelect }) {
         </div>
       </div>
 
-      <div className="pl-sheet-categories">
-        {INTEREST_CATEGORIES.map((cat) => (
-          <span key={cat} className="pl-sheet-cat">{cat}</span>
-        ))}
-      </div>
-
       <button
         className="pl-sheet-cta"
         onClick={() => {
