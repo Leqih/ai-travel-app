@@ -653,8 +653,8 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
             { label: "Luxury", min: 1500, max: 3000 },
             { label: "Flexible", min: 0, max: 3500 },
           ].map((p) => {
-            // Highlight if range is within this preset's bounds
-            const isActive = rangeMin >= p.min && rangeMax <= p.max;
+            // Highlight only when range exactly matches this preset
+            const isActive = rangeMin === p.min && rangeMax === p.max;
             return (
               <button
                 key={p.label}
