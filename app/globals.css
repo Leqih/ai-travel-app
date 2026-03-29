@@ -11911,8 +11911,10 @@ button {
   left: 40px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 17px;
-  color: rgba(255,255,255,0.3);
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: rgba(255,255,255,0.75);
   pointer-events: none;
 }
 .pl-city-search {
