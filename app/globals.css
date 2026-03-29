@@ -11908,22 +11908,23 @@ button {
 }
 .pl-city-search-icon {
   position: absolute;
-  left: 40px;
+  left: 42px;
   top: 50%;
   transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: rgba(255,255,255,0.9);
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
   pointer-events: none;
   flex-shrink: 0;
+  filter: drop-shadow(0 0 1px rgba(255,255,255,0.4));
 }
 .pl-city-search {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.1) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
   border-radius: 999px !important;
   padding: 13px 14px 13px 44px !important;
   font-size: 15px;
