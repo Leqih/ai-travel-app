@@ -146,6 +146,7 @@ function CitySheet({ open, onClose, value, onSelect }) {
   const [focused, setFocused] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const inputRef = useRef(null);
+  const tapRef = useRef(null);
 
   const isSearchMode = focused || query.trim().length > 0;
 
@@ -247,7 +248,21 @@ function CitySheet({ open, onClose, value, onSelect }) {
           )}
         </div>
       ) : (
-        <div style={{ height: "320px", overflow: "hidden", position: "relative", width: "100%" }}>
+        <div
+          style={{ height: "320px", overflow: "hidden", position: "relative", width: "100%" }}
+          onPointerDown={(e) => {
+            if (flipped) return;
+            tapRef.current = { x: e.clientX, y: e.clientY, t: Date.now() };
+          }}
+          onPointerUp={(e) => {
+            if (flipped || !tapRef.current) return;
+            const dx = Math.abs(e.clientX - tapRef.current.x);
+            const dy = Math.abs(e.clientY - tapRef.current.y);
+            const dt = Date.now() - tapRef.current.t;
+            tapRef.current = null;
+            if (dx < 8 && dy < 8 && dt < 300) setFlipped(true);
+          }}
+        >
           <div style={{ position: "absolute", top: "-130px", left: 0, right: 0, height: "480px" }}>
             <CircularGallery
               items={galleryItems}
@@ -262,13 +277,6 @@ function CitySheet({ open, onClose, value, onSelect }) {
           </div>
           {/* Gradient fade at bottom */}
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "90px", background: "linear-gradient(to bottom, transparent, #111)", pointerEvents: "none", zIndex: 10 }} />
-          {/* Tap zone — only over the card, so gallery scrolling still works */}
-          {!flipped && (
-            <div
-              style={{ position: "absolute", left: "14%", right: "14%", top: 38, height: 274, zIndex: 15, cursor: "pointer" }}
-              onClick={() => setFlipped(true)}
-            />
-          )}
           {/* Detail — same position as WebGL card, scaleX flip so it feels like the card back */}
           {flipped && selectedCity && (
             <div className="pl-detail-card" onClick={() => setFlipped(false)}>
