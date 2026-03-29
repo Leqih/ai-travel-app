@@ -11711,13 +11711,13 @@ button {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: plOverlayIn 0.3s ease;
+  animation: plOverlayIn 0.25s ease;
 }
 @keyframes plOverlayIn {
   from { opacity: 0; }
@@ -11727,10 +11727,14 @@ button {
 .pl-sheet {
   width: 100%;
   max-width: 420px;
-  background: #111;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  border-radius: 48px 48px 0 0;
-  padding: 0 32px 40px;
+  background: rgba(14,14,18,0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-left: 1px solid rgba(255,255,255,0.05);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  border-radius: 36px 36px 0 0;
+  padding: 0 28px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11747,10 +11751,10 @@ button {
 }
 
 .pl-sheet-handle {
-  width: 36px;
+  width: 40px;
   height: 4px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.12);
   margin: 12px auto 0;
   flex-shrink: 0;
 }
@@ -11906,7 +11910,7 @@ button {
 }
 .pl-city-search-icon {
   position: absolute;
-  left: 38px;
+  left: 40px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 17px;
@@ -11916,10 +11920,12 @@ button {
 .pl-city-search {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(255,255,255,0.07) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  border-radius: 16px !important;
-  padding: 13px 14px 13px 42px !important;
+  background: rgba(255,255,255,0.06) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 999px !important;
+  padding: 13px 14px 13px 44px !important;
   font-size: 15px;
   color: #fff !important;
   font-family: inherit;
@@ -11996,25 +12002,26 @@ button {
   text-align: center;
 }
 
-/* ── CTA Button (white, rounded, glow) ── */
+/* ── CTA Button (Opal active state: solid white) ── */
 .pl-sheet-cta {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   width: 100%;
-  height: 64px;
+  height: 60px;
   background: #fff;
   color: #000;
   border: none;
-  border-radius: 20px;
+  border-radius: 999px;
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
   font-size: 16px;
   font-weight: 700;
+  letter-spacing: -0.2px;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(255,255,255,0.15);
+  box-shadow: 0 8px 24px rgba(255,255,255,0.12), 0 2px 8px rgba(0,0,0,0.3);
   transition: all 0.2s;
-  margin-top: 12px;
+  margin-top: 14px;
   flex-shrink: 0;
 }
 .pl-sheet-cta:hover { background: rgba(255,255,255,0.9); }
