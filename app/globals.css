@@ -11992,14 +11992,14 @@ button {
   font-weight: 600;
   color: #fff;
   letter-spacing: -0.5px;
-  margin: 0 0 4px;
+  margin: 20px 0 4px;
   text-align: center;
 }
 .pl-sheet-subtitle {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
   font-size: 14px;
   color: rgba(255,255,255,0.4);
-  margin: 0 0 32px;
+  margin: 0 0 24px;
   text-align: center;
 }
 
@@ -12309,7 +12309,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  margin: 0 auto 24px;
 }
 .pl-orbit-ring {
   position: absolute;
