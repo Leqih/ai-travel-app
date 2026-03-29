@@ -722,7 +722,7 @@ function StyleSheet({ open, onClose, value, onSelect }) {
             <button
               key={item.label}
               className={`pl-orbit-item ${isActive ? "pl-orbit-item-active" : ""}`}
-              style={{ transform: `translate(${x}px, ${y}px)` }}
+              style={{ transform: `translate(${x}px, ${y}px)`, '--ox': `${x}px`, '--oy': `${y}px` }}
               onClick={() => toggle(item.label)}
             >
               <InterestIcon type={item.icon} active={isActive} />

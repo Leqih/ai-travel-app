@@ -12347,7 +12347,7 @@ button {
   background: #fff;
   border-color: #fff;
   box-shadow: 0 0 20px rgba(255,255,255,0.3);
-  transform: translate(var(--tw-translate-x, 0), var(--tw-translate-y, 0)) scale(1.15) !important;
+  transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(1.15) !important;
 }
 .pl-orbit-item-label {
   position: absolute;
