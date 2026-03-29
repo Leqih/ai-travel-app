@@ -12850,6 +12850,7 @@ button {
   gap: 8px;
   width: 100%;
   justify-content: center;
+  margin: 16px 0 20px;
 }
 .pl-budget-seg {
   padding: 8px 16px;
