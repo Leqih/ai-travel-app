@@ -13,36 +13,36 @@ const PixelBlast = dynamic(() => import("./PixelBlast"), { ssr: false });
 const TRAVEL_TYPES = ["Vacation", "Adventure", "Relaxation", "Cultural", "Romantic", "Business", "Road Trip", "Backpacking"];
 
 const CITY_OPTIONS = [
-  { label: "Tokyo", emoji: "🗼", country: "Japan", code: "TYO", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=300&h=300&fit=crop" },
-  { label: "Seoul", emoji: "🇰🇷", country: "South Korea", code: "SEL", img: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=300&h=300&fit=crop" },
-  { label: "Bangkok", emoji: "🛕", country: "Thailand", code: "BKK", img: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=300&h=300&fit=crop" },
-  { label: "Bali", emoji: "🌴", country: "Indonesia", code: "DPS", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=300&h=300&fit=crop" },
-  { label: "Paris", emoji: "🗼", country: "France", code: "CDG", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&h=300&fit=crop" },
-  { label: "New York", emoji: "🗽", country: "United States", code: "JFK", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=300&h=300&fit=crop" },
-  { label: "London", emoji: "🇬🇧", country: "United Kingdom", code: "LHR", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=300&h=300&fit=crop" },
-  { label: "Rome", emoji: "🏛️", country: "Italy", code: "FCO", img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&h=300&fit=crop" },
-  { label: "Istanbul", emoji: "🕌", country: "Turkey", code: "IST", img: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=300&h=300&fit=crop" },
-  { label: "Dubai", emoji: "🏙️", country: "UAE", code: "DXB", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=300&h=300&fit=crop" },
-  { label: "Sydney", emoji: "🦘", country: "Australia", code: "SYD", img: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=300&h=300&fit=crop" },
-  { label: "Barcelona", emoji: "🇪🇸", country: "Spain", code: "BCN", img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=300&h=300&fit=crop" },
-  { label: "Kyoto", emoji: "⛩️", country: "Japan", code: "KIX", img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=300&h=300&fit=crop" },
-  { label: "Santorini", emoji: "🏝️", country: "Greece", code: "JTR", img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=300&h=300&fit=crop" },
-  { label: "Marrakech", emoji: "🇲🇦", country: "Morocco", code: "RAK", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=300&h=300&fit=crop" },
-  { label: "Singapore", emoji: "🇸🇬", country: "Singapore", code: "SIN", img: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=300&h=300&fit=crop" },
-  { label: "Prague", emoji: "🏰", country: "Czech Republic", code: "PRG", img: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=300&h=300&fit=crop" },
-  { label: "Lisbon", emoji: "🇵🇹", country: "Portugal", code: "LIS", img: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=300&h=300&fit=crop" },
-  { label: "Cape Town", emoji: "🇿🇦", country: "South Africa", code: "CPT", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=300&h=300&fit=crop" },
-  { label: "Havana", emoji: "🇨🇺", country: "Cuba", code: "HAV", img: "https://images.unsplash.com/photo-1500759285222-a95626b934cb?w=300&h=300&fit=crop" },
-  { label: "Amsterdam", emoji: "🇳🇱", country: "Netherlands", code: "AMS", img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=300&h=300&fit=crop" },
-  { label: "Reykjavik", emoji: "🇮🇸", country: "Iceland", code: "KEF", img: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?w=300&h=300&fit=crop" },
-  { label: "Buenos Aires", emoji: "🇦🇷", country: "Argentina", code: "EZE", img: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=300&h=300&fit=crop" },
-  { label: "Osaka", emoji: "🏯", country: "Japan", code: "KIX", img: "https://images.unsplash.com/photo-1590559899731-a382839e5549?w=300&h=300&fit=crop" },
-  { label: "Vienna", emoji: "🎵", country: "Austria", code: "VIE", img: "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=300&h=300&fit=crop" },
-  { label: "Petra", emoji: "🏜️", country: "Jordan", code: "AMM", img: "https://images.unsplash.com/photo-1579606032821-4e6161c81571?w=300&h=300&fit=crop" },
-  { label: "Rio", emoji: "🇧🇷", country: "Brazil", code: "GIG", img: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=300&h=300&fit=crop" },
-  { label: "Hanoi", emoji: "🇻🇳", country: "Vietnam", code: "HAN", img: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=300&h=300&fit=crop" },
-  { label: "Maldives", emoji: "🏝️", country: "Maldives", code: "MLE", img: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=300&h=300&fit=crop" },
-  { label: "Taipei", emoji: "🇹🇼", country: "Taiwan", code: "TPE", img: "https://images.unsplash.com/photo-1470004914212-05527e49370b?w=300&h=300&fit=crop" },
+  { label: "Tokyo", emoji: "🗼", country: "Japan", code: "TYO", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=300&h=300&fit=crop", desc: "A neon-lit metropolis where ancient temples sit beside futuristic skyscrapers.", bestTime: "Mar – May, Oct – Nov", vibes: ["Foodie", "Tech", "Culture"] },
+  { label: "Seoul", emoji: "🇰🇷", country: "South Korea", code: "SEL", img: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=300&h=300&fit=crop", desc: "K-culture capital blending cutting-edge fashion, street food, and royal palaces.", bestTime: "Apr – Jun, Sep – Nov", vibes: ["Trendy", "Nightlife", "Food"] },
+  { label: "Bangkok", emoji: "🛕", country: "Thailand", code: "BKK", img: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=300&h=300&fit=crop", desc: "Sensory overload in the best way — ornate temples, bustling markets, street food paradise.", bestTime: "Nov – Mar", vibes: ["Street Food", "Temples", "Vibrant"] },
+  { label: "Bali", emoji: "🌴", country: "Indonesia", code: "DPS", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=300&h=300&fit=crop", desc: "Island of gods with emerald rice terraces, surf breaks, and spiritual serenity.", bestTime: "Apr – Oct", vibes: ["Wellness", "Surf", "Nature"] },
+  { label: "Paris", emoji: "🗼", country: "France", code: "CDG", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&h=300&fit=crop", desc: "The city of light, love, and croissants — romance in every cobblestone street.", bestTime: "Apr – Jun, Sep – Oct", vibes: ["Romance", "Art", "Cuisine"] },
+  { label: "New York", emoji: "🗽", country: "United States", code: "JFK", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=300&h=300&fit=crop", desc: "The city that never sleeps — energy, diversity, and skylines that define ambition.", bestTime: "Apr – Jun, Sep – Nov", vibes: ["Urban", "Arts", "Energy"] },
+  { label: "London", emoji: "🇬🇧", country: "United Kingdom", code: "LHR", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=300&h=300&fit=crop", desc: "Royal heritage meets indie music scenes — history on every corner, pubs on every street.", bestTime: "May – Sep", vibes: ["History", "Culture", "Music"] },
+  { label: "Rome", emoji: "🏛️", country: "Italy", code: "FCO", img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&h=300&fit=crop", desc: "An open-air museum where every fountain, ruin, and piazza tells a 2,000-year story.", bestTime: "Apr – Jun, Sep – Oct", vibes: ["History", "Food", "Art"] },
+  { label: "Istanbul", emoji: "🕌", country: "Turkey", code: "IST", img: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=300&h=300&fit=crop", desc: "Where Europe meets Asia — bazaars, minarets, and Bosphorus sunsets.", bestTime: "Apr – May, Sep – Nov", vibes: ["Bazaars", "Culture", "Views"] },
+  { label: "Dubai", emoji: "🏙️", country: "UAE", code: "DXB", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=300&h=300&fit=crop", desc: "Superlatives made real — tallest towers, largest malls, boldest architecture.", bestTime: "Nov – Mar", vibes: ["Luxury", "Modern", "Desert"] },
+  { label: "Sydney", emoji: "🦘", country: "Australia", code: "SYD", img: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=300&h=300&fit=crop", desc: "Harbour city with iconic sails, golden beaches, and laid-back coastal living.", bestTime: "Sep – Nov, Mar – May", vibes: ["Beaches", "Outdoors", "Relaxed"] },
+  { label: "Barcelona", emoji: "🇪🇸", country: "Spain", code: "BCN", img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=300&h=300&fit=crop", desc: "Gaudí's dreamlike architecture, tapas culture, and endless Mediterranean sunshine.", bestTime: "May – Jun, Sep – Oct", vibes: ["Architecture", "Beach", "Nightlife"] },
+  { label: "Kyoto", emoji: "⛩️", country: "Japan", code: "KIX", img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=300&h=300&fit=crop", desc: "Japan's cultural soul — thousands of temples, geisha districts, and bamboo groves.", bestTime: "Mar – May, Oct – Nov", vibes: ["Zen", "Tradition", "Nature"] },
+  { label: "Santorini", emoji: "🏝️", country: "Greece", code: "JTR", img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=300&h=300&fit=crop", desc: "Whitewashed villages clinging to volcanic cliffs above the cobalt Aegean Sea.", bestTime: "May – Oct", vibes: ["Sunset", "Romance", "Island"] },
+  { label: "Marrakech", emoji: "🇲🇦", country: "Morocco", code: "RAK", img: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=300&h=300&fit=crop", desc: "A labyrinth of souks, spices, and riads where color assaults you beautifully.", bestTime: "Mar – May, Sep – Nov", vibes: ["Exotic", "Souks", "Craft"] },
+  { label: "Singapore", emoji: "🇸🇬", country: "Singapore", code: "SIN", img: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=300&h=300&fit=crop", desc: "Futuristic garden city — sky parks, hawker centres, and hyper-efficient charm.", bestTime: "Feb – Apr", vibes: ["Modern", "Food", "Clean"] },
+  { label: "Prague", emoji: "🏰", country: "Czech Republic", code: "PRG", img: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=300&h=300&fit=crop", desc: "Fairy-tale Gothic spires, medieval squares, and Europe's finest craft beer.", bestTime: "Apr – May, Sep – Oct", vibes: ["Medieval", "Beer", "Budget"] },
+  { label: "Lisbon", emoji: "🇵🇹", country: "Portugal", code: "LIS", img: "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=300&h=300&fit=crop", desc: "Hilly, sun-drenched city with trams, fado music, and pastel de nata on every corner.", bestTime: "Mar – May, Sep – Oct", vibes: ["Charming", "Affordable", "Fado"] },
+  { label: "Cape Town", emoji: "🇿🇦", country: "South Africa", code: "CPT", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=300&h=300&fit=crop", desc: "Table Mountain backdrop, world-class wine, and the meeting of two oceans.", bestTime: "Nov – Mar", vibes: ["Nature", "Wine", "Adventure"] },
+  { label: "Havana", emoji: "🇨🇺", country: "Cuba", code: "HAV", img: "https://images.unsplash.com/photo-1500759285222-a95626b934cb?w=300&h=300&fit=crop", desc: "Frozen in time — vintage cars, salsa rhythms, and crumbling colonial grandeur.", bestTime: "Dec – Apr", vibes: ["Vintage", "Music", "Unique"] },
+  { label: "Amsterdam", emoji: "🇳🇱", country: "Netherlands", code: "AMS", img: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=300&h=300&fit=crop", desc: "Canal rings, tulip fields, world-class museums, and the world's best cycling culture.", bestTime: "Apr – May, Sep – Oct", vibes: ["Canals", "Museums", "Bikes"] },
+  { label: "Reykjavik", emoji: "🇮🇸", country: "Iceland", code: "KEF", img: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?w=300&h=300&fit=crop", desc: "Gateway to fire and ice — auroras, geysers, hot springs, and midnight sun.", bestTime: "Jun – Aug, Dec – Feb", vibes: ["Aurora", "Nature", "Wild"] },
+  { label: "Buenos Aires", emoji: "🇦🇷", country: "Argentina", code: "EZE", img: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=300&h=300&fit=crop", desc: "Paris of the South — tango, steak, bookshops, and passionate football culture.", bestTime: "Mar – May, Sep – Nov", vibes: ["Tango", "Steak", "Culture"] },
+  { label: "Osaka", emoji: "🏯", country: "Japan", code: "ITM", img: "https://images.unsplash.com/photo-1590559899731-a382839e5549?w=300&h=300&fit=crop", desc: "Japan's kitchen — takoyaki, ramen, neon-lit streets, and unmatched street food.", bestTime: "Mar – May, Oct – Nov", vibes: ["Food", "Fun", "Nightlife"] },
+  { label: "Vienna", emoji: "🎵", country: "Austria", code: "VIE", img: "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=300&h=300&fit=crop", desc: "Imperial grandeur, Mozart's birthplace, coffeehouses, and the world's best philharmonic.", bestTime: "Apr – May, Sep – Oct", vibes: ["Classical", "Coffee", "Imperial"] },
+  { label: "Petra", emoji: "🏜️", country: "Jordan", code: "AMM", img: "https://images.unsplash.com/photo-1579606032821-4e6161c81571?w=300&h=300&fit=crop", desc: "The Rose City — ancient Nabataean tombs carved into rose-red sandstone cliffs.", bestTime: "Mar – May, Sep – Nov", vibes: ["Ancient", "Adventure", "Desert"] },
+  { label: "Rio", emoji: "🇧🇷", country: "Brazil", code: "GIG", img: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=300&h=300&fit=crop", desc: "Carnival energy, Cristo Redentor, iconic beaches, and samba in the streets.", bestTime: "Dec – Mar", vibes: ["Carnival", "Beach", "Samba"] },
+  { label: "Hanoi", emoji: "🇻🇳", country: "Vietnam", code: "HAN", img: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=300&h=300&fit=crop", desc: "Old Quarter chaos, pho for breakfast, French colonial charm, and lakes at dusk.", bestTime: "Oct – Apr", vibes: ["Street Food", "History", "Budget"] },
+  { label: "Maldives", emoji: "🏝️", country: "Maldives", code: "MLE", img: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=300&h=300&fit=crop", desc: "Overwater bungalows, crystal lagoons, and the clearest water on the planet.", bestTime: "Nov – Apr", vibes: ["Luxury", "Diving", "Romance"] },
+  { label: "Taipei", emoji: "🇹🇼", country: "Taiwan", code: "TPE", img: "https://images.unsplash.com/photo-1470004914212-05527e49370b?w=300&h=300&fit=crop", desc: "Night markets, bubble tea origins, friendly locals, and Taipei 101 piercing the clouds.", bestTime: "Oct – Dec, Mar – May", vibes: ["Night Market", "Foodie", "Modern"] },
 ];
 
 const BUDGET_STEPS = [
@@ -144,6 +144,7 @@ function CitySheet({ open, onClose, value, onSelect }) {
   const [selected, setSelected] = useState(value || CITY_OPTIONS[0]?.label);
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
+  const [flipped, setFlipped] = useState(false);
   const inputRef = useRef(null);
 
   const isSearchMode = focused || query.trim().length > 0;
@@ -164,6 +165,7 @@ function CitySheet({ open, onClose, value, onSelect }) {
       setSelected(value || CITY_OPTIONS[0]?.label);
       setQuery("");
       setFocused(false);
+      setFlipped(false);
     }
   }, [open, value]);
 
@@ -245,18 +247,47 @@ function CitySheet({ open, onClose, value, onSelect }) {
           )}
         </div>
       ) : (
-        /* GALLERY MODE — circular carousel */
-        <div style={{ height: "360px", position: "relative", width: "100%", marginTop: "4px" }}>
-          <CircularGallery
-            items={galleryItems}
-            bend={1}
-            textColor="#ffffff"
-            borderRadius={0.05}
-            scrollSpeed={2}
-            scrollEase={0.05}
-            showLabel={false}
-            onSnap={(item) => { if (item) setSelected(item.text); }}
-          />
+        <div style={{ height: "320px", overflow: "hidden", position: "relative", width: "100%" }}>
+          <div style={{ position: "absolute", top: "-130px", left: 0, right: 0, height: "480px" }}>
+            <CircularGallery
+              items={galleryItems}
+              bend={1}
+              textColor="#ffffff"
+              borderRadius={0.05}
+              scrollSpeed={2}
+              scrollEase={0.05}
+              showLabel={false}
+              onSnap={(item) => { if (item) { setSelected(item.text); setFlipped(false); } }}
+            />
+          </div>
+          {/* Gradient fade at bottom */}
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "90px", background: "linear-gradient(to bottom, transparent, #111)", pointerEvents: "none", zIndex: 10 }} />
+          {/* Tap zone */}
+          {!flipped && (
+            <div style={{ position: "absolute", inset: 0, zIndex: 15, cursor: "pointer" }} onClick={() => setFlipped(true)} />
+          )}
+          {/* Detail — same position as WebGL card, scaleX flip so it feels like the card back */}
+          {flipped && selectedCity && (
+            <div className="pl-detail-card" onClick={() => setFlipped(false)}>
+              <img src={selectedCity.img.replace("w=300&h=300", "w=800&h=600")} alt="" className="pl-detail-card-bg" />
+              <div className="pl-detail-card-content">
+                <div style={{ fontSize: 30, lineHeight: 1 }}>{selectedCity.emoji}</div>
+                <div className="pl-detail-city-name">{selectedCity.label}</div>
+                <div className="pl-detail-city-country">{selectedCity.country}</div>
+                <div className="pl-detail-city-desc">{selectedCity.desc}</div>
+                <div style={{ marginTop: "auto", paddingTop: 10 }}>
+                  <div className="pl-detail-label">Best time to visit</div>
+                  <div className="pl-detail-besttime">{selectedCity.bestTime}</div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+                    {selectedCity.vibes.map(v => (
+                      <span key={v} className="pl-detail-vibe">{v}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="pl-detail-hint">tap to go back</div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

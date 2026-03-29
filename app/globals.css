@@ -11791,6 +11791,111 @@ button {
 }
 
 /* ── City search sheet ── */
+/* ── City detail card (shown on tap, outside overflow:hidden) ── */
+.pl-detail-card {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 38px;
+  /* Match gallery card height: container 320px - top offset 38px - small bottom gap */
+  height: 274px;
+  z-index: 20;
+  /* Match WebGL card corner radius: borderRadius=0.05, card ~224px wide → 0.05*224 ≈ 11px */
+  border-radius: 11px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0e0e12;
+  /* Depth shadow matching WebGL card's lift */
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.3),
+    0 12px 40px rgba(0,0,0,0.55),
+    0 30px 80px rgba(0,0,0,0.35);
+  /* Flip in, then float continuously — mirrors the WebGL sin/cos wave shader */
+  /* scaleX flip: simulates the back face of the card revealing (no preserve-3d needed) */
+  animation:
+    plCardFlipIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both,
+    plCardFloat 3.2s ease-in-out 0.3s infinite;
+}
+@keyframes plCardFlipIn {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+/* Mirrors WebGL vertex shader sin/cos wave — subtle organic float */
+@keyframes plCardFloat {
+  0%   { transform: scaleX(1) translateY(0px); }
+  30%  { transform: scaleX(1) translateY(-4px); }
+  60%  { transform: scaleX(1) translateY(-2px); }
+  80%  { transform: scaleX(1) translateY(-5px); }
+  100% { transform: scaleX(1) translateY(0px); }
+}
+.pl-detail-card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+}
+.pl-detail-card-content {
+  position: relative;
+  z-index: 1;
+  padding: 18px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+.pl-detail-city-name {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+.pl-detail-city-country {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 2px;
+}
+.pl-detail-city-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  margin-top: 8px;
+  line-height: 1.5;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.pl-detail-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+.pl-detail-besttime {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+.pl-detail-vibe {
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+  border-radius: 99px;
+  padding: 2px 9px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.pl-detail-hint {
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  margin-top: 8px;
+}
+
 .pl-city-search-wrap {
   position: relative;
   margin: 14px 0 0;
@@ -11909,7 +12014,7 @@ button {
   cursor: pointer;
   box-shadow: 0 10px 30px rgba(255,255,255,0.15);
   transition: all 0.2s;
-  margin-top: 16px;
+  margin-top: 12px;
   flex-shrink: 0;
 }
 .pl-sheet-cta:hover { background: rgba(255,255,255,0.9); }
