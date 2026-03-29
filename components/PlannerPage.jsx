@@ -262,9 +262,12 @@ function CitySheet({ open, onClose, value, onSelect }) {
           </div>
           {/* Gradient fade at bottom */}
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "90px", background: "linear-gradient(to bottom, transparent, #111)", pointerEvents: "none", zIndex: 10 }} />
-          {/* Tap zone */}
+          {/* Tap zone — only over the card, so gallery scrolling still works */}
           {!flipped && (
-            <div style={{ position: "absolute", inset: 0, zIndex: 15, cursor: "pointer" }} onClick={() => setFlipped(true)} />
+            <div
+              style={{ position: "absolute", left: "14%", right: "14%", top: 38, height: 274, zIndex: 15, cursor: "pointer" }}
+              onClick={() => setFlipped(true)}
+            />
           )}
           {/* Detail — same position as WebGL card, scaleX flip so it feels like the card back */}
           {flipped && selectedCity && (
