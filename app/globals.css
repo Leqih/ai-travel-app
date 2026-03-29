@@ -12050,10 +12050,10 @@ button {
 }
 .pl-city-search-clear:hover { background: rgba(255,255,255,0.25); }
 
-/* City list — search mode */
+/* City list — search mode (fixed height matches gallery so sheet never resizes) */
 .pl-city-list {
   width: 100%;
-  max-height: 320px;
+  height: 320px;
   overflow-y: auto;
   scrollbar-width: none;
   margin-top: 8px;
