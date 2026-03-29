@@ -958,6 +958,7 @@ export function PlannerPage() {
   const [budget, setBudget] = useState(null);
   const [style, setStyle] = useState(null);
   const [duration, setDuration] = useState(null);
+  const [generating, setGenerating] = useState(false);
 
   const [activeSheet, setActiveSheet] = useState(null);
   const shellRef = useRef(null);
@@ -1069,7 +1070,7 @@ export function PlannerPage() {
       {/* Action buttons */}
       <div className="pl-actions">
         <Link href="/planner/manual" className="pl-btn-inspire">DIRECTLY CREATE</Link>
-        <button className="pl-btn-generate">
+        <button className="pl-btn-generate" onClick={() => setGenerating(true)}>
           <div className="pl-uiverse-wrapper">
             <span>HELP ME PLAN</span>
             <div className="pl-circle pl-circle-12"></div>
@@ -1087,6 +1088,32 @@ export function PlannerPage() {
           </div>
         </button>
       </div>
+
+      {/* Generating loading overlay */}
+      {generating && (
+        <div className="pl-gen-overlay">
+          <div className="pl-gen-card">
+            <div className="pl-gen-orb" />
+            <div className="pl-gen-content">
+              <p className="pl-gen-label">AI TRAVEL PLANNER</p>
+              <h2 className="pl-gen-title">
+                Crafting your<br />perfect trip
+                {city ? <> to <span className="pl-gen-city">{city.split(",")[0]}</span></> : "…"}
+              </h2>
+              <p className="pl-gen-sub">Analysing destinations, weather, and hidden gems</p>
+              <div className="pl-gen-steps">
+                {["Researching destination", "Matching your style", "Building itinerary", "Finalising details"].map((s, i) => (
+                  <div key={s} className="pl-gen-step" style={{ animationDelay: `${i * 0.6}s` }}>
+                    <span className="pl-gen-step-dot" />
+                    <span className="pl-gen-step-text">{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <button className="pl-gen-cancel" onClick={() => setGenerating(false)}>Cancel</button>
+        </div>
+      )}
 
       {/* Bottom sheets */}
       <CitySheet open={activeSheet === "city"} onClose={() => setActiveSheet(null)} value={city} onSelect={setCity} />

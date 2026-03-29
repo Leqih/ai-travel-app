@@ -13313,3 +13313,127 @@ button {
 @keyframes pl-circle-10 { 33% { transform: translate(68px, 20px) translateZ(0); } 66% { transform: translate(100px, 28px) translateZ(0); } }
 @keyframes pl-circle-11 { 33% { transform: translate(4px, 4px) translateZ(0); } 66% { transform: translate(68px, 20px) translateZ(0); } }
 @keyframes pl-circle-12 { 33% { transform: translate(56px, 0px) translateZ(0); } 66% { transform: translate(60px, -32px) translateZ(0); } }
+
+/* ── AI Generating loading overlay ── */
+.pl-gen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  animation: plGenFadeIn 0.4s ease both;
+}
+@keyframes plGenFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.pl-gen-card {
+  position: relative;
+  width: calc(100% - 48px);
+  max-width: 360px;
+  background: rgba(20,20,26,0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 28px;
+  padding: 36px 28px 32px;
+  overflow: hidden;
+}
+.pl-gen-orb {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,123,75,0.35) 0%, rgba(120,80,255,0.2) 50%, transparent 70%);
+  filter: blur(30px);
+  animation: plGenOrbPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes plGenOrbPulse {
+  0%, 100% { transform: translateX(-50%) scale(1);   opacity: 0.8; }
+  50%       { transform: translateX(-50%) scale(1.2); opacity: 1;   }
+}
+.pl-gen-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.pl-gen-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ff7b4b;
+  margin: 0;
+}
+.pl-gen-title {
+  font-family: -apple-system, "SF Pro Display", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  margin: 6px 0 8px;
+}
+.pl-gen-city {
+  color: #ff7b4b;
+}
+.pl-gen-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin: 0 0 24px;
+  line-height: 1.4;
+}
+.pl-gen-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.pl-gen-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: plGenStepIn 0.5s ease both;
+}
+@keyframes plGenStepIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.pl-gen-step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff7b4b;
+  flex-shrink: 0;
+  animation: plGenDotPulse 1.2s ease-in-out infinite;
+}
+@keyframes plGenDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+.pl-gen-step-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+}
+.pl-gen-cancel {
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: color 0.2s;
+}
+.pl-gen-cancel:hover { color: rgba(255,255,255,0.7); }
