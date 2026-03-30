@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { gsap } from "gsap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 /* ─── Data ──────────────────────────────────────────────────────── */
 const PLAN = [
@@ -13,7 +17,7 @@ const PLAN = [
 
 const TRIPS = [
   { id: 1, title: "Japan Classic",   dates: "Mar 20–25", places: 12, img: "https://picsum.photos/seed/japan-torii/300/380",    tag: "Culture", color: "#6c6cff" },
-  { id: 2, title: "Seoul Adventure", dates: "Apr 10–13", places: 8,  img: "https://picsum.photos/seed/seoul-night/300/380",    tag: "Food",    color: "#14c8a8" },
+  { id: 2, title: "Seoul Adventure", dates: "Apr 10–13", places: 8,  img: "https://picsum.photos/seed/seoul-night/300/380",    tag: "Food",    color: "#fff" },
   { id: 3, title: "Bangkok Hop",     dates: "May 1–7",   places: 15, img: "https://picsum.photos/seed/bangkok-temple/300/380", tag: "Nature",  color: "#e0a020" },
 ];
 
@@ -50,13 +54,13 @@ const MY_TRIPS = [
     places: 8,
     img: "https://picsum.photos/seed/seoul-street/200/200",
     color: "#162420",
-    accent: "#14c8a8",
+    accent: "#fff",
   },
 ];
 
 const CITIES = [
   { city: "Tokyo",   temp: "8°C",  icon: "☁️",  img: "https://picsum.photos/seed/tokyo-tower/120/120",   color: "#4a8fe8" },
-  { city: "Seoul",   temp: "12°C", icon: "🌤️", img: "https://picsum.photos/seed/seoul-palace/120/120",  color: "#14c8a8" },
+  { city: "Seoul",   temp: "12°C", icon: "🌤️", img: "https://picsum.photos/seed/seoul-palace/120/120",  color: "#fff" },
   { city: "Bangkok", temp: "32°C", icon: "☀️",  img: "https://picsum.photos/seed/bangkok-wat/120/120",   color: "#e0a020" },
   { city: "Kyoto",   temp: "10°C", icon: "🌸",  img: "https://picsum.photos/seed/kyoto-shrine/120/120",  color: "#e05f8a" },
   { city: "Osaka",   temp: "11°C", icon: "🌥️", img: "https://picsum.photos/seed/osaka-castle/120/120",  color: "#9b59e0" },
@@ -69,7 +73,7 @@ const BUDDIES = [
 ];
 
 const STATS = [
-  { emoji: "📍", value: "12", label: "Places",  accent: "#14c8a8" },
+  { emoji: "📍", value: "12", label: "Places",  accent: "#fff" },
   { emoji: "💰", value: "¥45K", label: "Budget", accent: "#e0a020" },
   { emoji: "🌤️", value: "8°C",  label: "Tokyo",  accent: "#4a8fe8" },
   { emoji: "📝", value: "4",    label: "Notes",  accent: "#9b59e0" },
@@ -77,11 +81,11 @@ const STATS = [
 ];
 
 const NAV_ITEMS = [
-  { icon: "⌂",  label: "Home",      href: "/",        active: true  },
-  { icon: "⊙",  label: "Discover",  href: "/nearby",  active: false },
+  { icon: faHouse,       label: "Home",      href: "/"        },
+  { icon: faCompass,     label: "Discover",  href: "/nearby"  },
   { center: true },
-  { icon: "✈︎",  label: "My Trips",  href: "/nearby",  active: false },
-  { icon: "◉",  label: "Profile",   href: "/profile", active: false },
+  { icon: faPlane,       label: "My Trips",  href: "/trips"   },
+  { icon: faCircleUser,  label: "Profile",   href: "/profile" },
 ];
 
 const TRIP_DATE = new Date("2026-03-20T09:00:00");
@@ -97,6 +101,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
 
 /* ─── HomeClient ─────────────────────────────────────────────────── */
 export function HomeClient() {
+  const pathname = usePathname();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
   const today = new Date();
@@ -121,8 +126,20 @@ export function HomeClient() {
     return () => clearInterval(id);
   }, []);
 
+  const shellRef = useRef(null);
+  useEffect(() => {
+    if (!shellRef.current) return;
+    const sections = shellRef.current.querySelectorAll(
+      ".hp-section-hd, .hp-featured-card, .hp-trips-scroll, .hp-topics-scroll, .hp-disc-grid"
+    );
+    gsap.fromTo(sections,
+      { opacity: 0, y: 50, filter: "blur(8px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power3.out", stagger: 0.06 }
+    );
+  }, []);
+
   return (
-    <div className="hp-shell">
+    <div className="hp-shell" ref={shellRef}>
       <div className="hp-scroll">
 
         {/* ══ 1. Header — dotted dark bg ══ */}
@@ -196,7 +213,7 @@ export function HomeClient() {
             </div>
             <span className="hp-today-title-text">Today's Pick</span>
           </div>
-          <Link href="/nearby" className="hp-section-link">See more</Link>
+          <Link href="/picks" className="hp-section-link">See more</Link>
         </div>
 
         <div className="hp-featured-card">
@@ -213,70 +230,13 @@ export function HomeClient() {
           </div>
         </div>
 
-        {/* ══ 3. Travel Hub — bento 2×2 ══ */}
-        <div className="hp-section-hd" style={{ marginTop: 28 }}>
-          <span className="hp-section-title">Travel Hub</span>
-        </div>
-
-        <div className="hp-bento">
-          {/* Guide — tall left with floating badges */}
-          <Link href="/nearby" className="hp-bento-card hp-bento-guide">
-            <img className="hp-bento-bg" src="https://picsum.photos/seed/japan-mountain/300/500" alt="" />
-            <div className="hp-bento-dim" />
-            {/* top weather badge */}
-            <div className="hp-bento-weather-pill">
-              <span className="hp-bento-weather-temp">8°C</span>
-              <div className="hp-bento-weather-right">
-                <span className="hp-bento-weather-label">Temperature</span>
-                <span className="hp-bento-weather-sub">Tokyo · Now</span>
-              </div>
-            </div>
-            {/* bottom social pill */}
-            <div className="hp-bento-social-pill">
-              ✦ 198 travelers
-            </div>
-            <div className="hp-bento-guide-body">
-              <p className="hp-bento-guide-head">The Ultimate</p>
-              <p className="hp-bento-guide-italic">Japan Guide</p>
-            </div>
-          </Link>
-
-          {/* Saved places */}
-          <Link href="/nearby" className="hp-bento-card hp-bento-saved">
-            <img className="hp-bento-bg" src="https://picsum.photos/seed/desert-dunes/300/320" alt="" />
-            <div className="hp-bento-saved-dim" />
-            <span className="hp-bento-big-num">32<span className="hp-bento-plus">+</span></span>
-            <div>
-              <p className="hp-bento-saved-label">Your Favorite</p>
-              <p className="hp-bento-saved-italic"><em>places</em></p>
-            </div>
-          </Link>
-
-          {/* Travel crew */}
-          <Link href="/nearby" className="hp-bento-card hp-bento-crew">
-            <img className="hp-bento-bg" src="https://picsum.photos/seed/city-balloon/300/260" alt="" />
-            <div className="hp-bento-crew-dim" />
-            <div className="hp-bento-crew-top">
-              <p className="hp-bento-crew-label">Travel Crew</p>
-              <div className="hp-bento-crew-dest">
-                <span className="hp-bento-crew-arrow">→</span>
-                <span className="hp-bento-crew-trip">Tokyo · Mar 20</span>
-              </div>
-            </div>
-            <div className="hp-bento-avatars">
-              {BUDDIES.map((src, i) => (
-                <img key={i} className="hp-bento-avatar" src={src} alt="" style={{ marginLeft: i ? -10 : 0 }} />
-              ))}
-              <span className="hp-bento-avatar-more">4+</span>
-            </div>
-          </Link>
-        </div>
 
         {/* ══ 4. Your Trips — compact horizontal ══ */}
         <div className="hp-section-hd">
           <div>
+            <p className="hp-section-cat">Your Journeys</p>
             <span className="hp-section-title">Your Trips</span>
-            <p className="hp-section-sub">3 upcoming</p>
+            <p className="hp-section-sub">3 upcoming · Plan your next</p>
           </div>
           <button className="hp-section-link">+ New</button>
         </div>
@@ -291,7 +251,7 @@ export function HomeClient() {
                 <p className="hp-trip-title">{trip.title}</p>
                 <p className="hp-trip-meta">{trip.dates} · {trip.places} places</p>
               </div>
-              <div className="hp-trip-dot" style={{ background: trip.color }} />
+              <div className="hp-trip-action-btn">→ Open</div>
             </Link>
           ))}
         </div>
@@ -300,7 +260,11 @@ export function HomeClient() {
 
         {/* ══ 6. Featured Topics ══ */}
         <div className="hp-section-hd">
-          <span className="hp-section-title">Featured Topics</span>
+          <div>
+            <p className="hp-section-cat">Travel Guides</p>
+            <span className="hp-section-title">Featured Topics</span>
+            <p className="hp-section-sub">Hand-picked guides for you</p>
+          </div>
           <Link href="/nearby" className="hp-section-link">All ›</Link>
         </div>
 
@@ -311,6 +275,7 @@ export function HomeClient() {
               <div className="hp-topic-grad" />
               <span className="hp-topic-tag">{t.tag}</span>
               <p className="hp-topic-title">{t.title}</p>
+              <div className="hp-topic-action-btn">+ Explore</div>
             </Link>
           ))}
         </div>
@@ -318,6 +283,7 @@ export function HomeClient() {
         {/* ══ 7. Discover ══ */}
         <div className="hp-section-hd">
           <div>
+            <p className="hp-section-cat">Explore</p>
             <span className="hp-section-title">Discover</span>
             <p className="hp-section-sub">Curated for your style</p>
           </div>
@@ -357,16 +323,16 @@ export function HomeClient() {
             if (item.center) {
               return (
                 <div key="center" className="hp-nav-center-wrap">
-                  <Link href="/nearby" className="hp-nav-center-btn">
-                    <span className="hp-nav-center-icon">+</span>
+                  <Link href="/planner" className="hp-nav-center-btn">
+                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
                   </Link>
                 </div>
               );
             }
             return (
               <Link key={i} href={item.href}
-                className={`hp-nav-item${item.active ? " hp-nav-active" : ""}`}>
-                <span className="hp-nav-icon">{item.icon}</span>
+                className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
+                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
                 <span className="hp-nav-label">{item.label}</span>
               </Link>
             );

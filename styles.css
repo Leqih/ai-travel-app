@@ -1171,7 +1171,7 @@ h1 {
   height: 100dvh;
   overflow: hidden;
   background: #0c0d0c;
-  font-family: "Inter", "PingFang SC", sans-serif;
+  font-family: -apple-system, "SF Pro Display", "Helvetica Neue", "PingFang SC", sans-serif;
   color: #fff;
 }
 
