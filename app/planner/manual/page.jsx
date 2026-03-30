@@ -46,7 +46,8 @@ function ManualPlanInner() {
   // Normalise duration: "3 Days" stays "3 Days", "3 days" normalised
   const initDur  = paramDuration || "";
 
-  const [step, setStep]               = useState(initDest && initDur ? "plan" : "setup");
+  // Always go straight to plan view — setup is only reached manually
+  const [step, setStep]               = useState("plan");
   const [destination, setDestination] = useState(initDest);
   const [duration, setDuration]       = useState(initDur);
   const [prefs, setPrefs]             = useState([]);
@@ -60,16 +61,6 @@ function ManualPlanInner() {
     return init;
   });
 
-  // If params arrive but activities not initialised yet, re-init
-  useEffect(() => {
-    if (initDest && initDur) {
-      const init = {};
-      for (let i = 1; i <= (parseInt(initDur) || 3); i++) init[i] = [];
-      setActivities(init);
-      setStep("plan");
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const togglePref = (label) =>
     setPrefs((p) => p.includes(label) ? p.filter((x) => x !== label) : [...p, label]);
