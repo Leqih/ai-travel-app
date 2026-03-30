@@ -1,12 +1,68 @@
 "use client";
 import Link from "next/link";
-import { useState, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
-import dynamic from "next/dynamic";
-const PixelBlast = dynamic(() => import("../../../components/PixelBlast"), { ssr: false });
+
+/* ── Google Maps loader (same as NearbyPage) ── */
+let gmapsPromise = null;
+function loadGoogleMaps() {
+  if (typeof window === "undefined") return Promise.reject();
+  if (gmapsPromise) return gmapsPromise;
+  if (window.google?.maps) return Promise.resolve(window.google.maps);
+  gmapsPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&language=en`;
+    script.async = true;
+    script.onload = () => resolve(window.google.maps);
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+  return gmapsPromise;
+}
+
+const SNAZZY_STYLE = [
+  {"featureType":"all","elementType":"labels.text.fill","stylers":[{"saturation":36},{"color":"#d4aa70"},{"lightness":40}]},
+  {"featureType":"all","elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#000000"},{"lightness":16}]},
+  {"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+  {"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":20}]},
+  {"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":17},{"weight":1.2}]},
+  {"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":20}]},
+  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":21}]},
+  {"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":17}]},
+  {"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":29},{"weight":0.2}]},
+  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":18}]},
+  {"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":16}]},
+  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":19}]},
+  {"featureType":"water","elementType":"all","stylers":[{"color":"#000347"},{"visibility":"on"}]},
+];
+
+/* ── Empty map with dark style ── */
+function EmptyMap({ destination }) {
+  const mapRef = useRef(null);
+  useEffect(() => {
+    if (!mapRef.current) return;
+    // Default to world view if no destination
+    loadGoogleMaps().then((maps) => {
+      new maps.Map(mapRef.current, {
+        center: { lat: 35.6762, lng: 139.6503 }, // Tokyo default
+        zoom: 4,
+        styles: SNAZZY_STYLE,
+        disableDefaultUI: true,
+        gestureHandling: "greedy",
+      });
+    }).catch(() => {});
+  }, []);
+  return (
+    <div className="nd-map-wrap">
+      <div ref={mapRef} className="nd-map" />
+      <div className="nd-map-grad-top" />
+      <div className="nd-map-grad-bottom" />
+    </div>
+  );
+}
 
 const DESTINATIONS = [
   "Tokyo", "Seoul", "Bangkok", "Bali", "Paris",
@@ -179,124 +235,112 @@ function ManualPlanInner() {
     );
   }
 
-  // ── Plan / Itinerary Editor ──
+  // ── Plan / Itinerary Editor — map + bottom sheet layout ──
   return (
-    <div className="mp-plan-shell">
-      {/* PixelBlast background */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.45 }}>
-        <PixelBlast variant="square" pixelSize={4} color="#ff6a00" speed={0.6} density={0.55} />
-      </div>
-      {/* Top bar */}
-      <div className="mp-plan-top">
+    <div className="nd-shell">
+      {/* Full-screen dark map */}
+      <EmptyMap destination={destination} />
+
+      {/* Top bar — back + title */}
+      <div className="nd-top-bar" style={{ justifyContent: "space-between" }}>
         <button className="mp-back" onClick={() => router.back()}>
           <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path d="M8.5 1L1.5 8l7 7" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
-        <div className="mp-plan-top-info">
-          <h2 className="mp-plan-dest">{destination || "My Trip"}</h2>
-          <p className="mp-plan-meta">{duration}{prefs.length > 0 ? ` · ${prefs.slice(0, 3).join(", ")}` : ""}</p>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: "-0.3px" }}>
+            {destination || "My Trip"}
+          </div>
+          {duration && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{duration}</div>}
         </div>
         <div style={{ width: 44 }} />
       </div>
 
-      {/* Day selector */}
-      <div className="nd-trip-day-scroll">
-        <button
-          className={`nd-trip-day-tab nd-trip-day-text${tripDay === 0 ? " nd-trip-day-text-active" : ""}`}
-          onClick={() => setTripDay(0)}>
-          <span className="nd-trip-day-num">Total</span>
-        </button>
-        {Array.from({ length: numDays }, (_, i) => i + 1).map((d) => (
-          <button key={d}
-            className={`nd-trip-day-tab${tripDay === d ? " nd-trip-day-active" : " nd-trip-day-inactive"}`}
-            onClick={() => setTripDay(d)}>
-            <span className="nd-trip-day-num">{d}</span>
-            <span className="nd-trip-day-label">DAY</span>
-          </button>
-        ))}
-      </div>
+      {/* Trip panel — same overlay as NearbyPage */}
+      <div className="nd-trip-overlay">
+        <div className="nd-trip-panel">
+          <div className="nd-trip-handle-row"><div className="nd-trip-handle" /></div>
 
-      {/* Itinerary body */}
-      <div className="mp-plan-body">
-        {tripDay === 0 ? (
-          <>
-            <div className="nd-trip-section-head" style={{ marginBottom: 16 }}>
-              <span className="nd-trip-section-icon">🗺️</span>
-              <span className="nd-trip-section-title">Trip Overview</span>
-            </div>
-            {Object.keys(activities).map(Number).sort((a, b) => a - b).map((dayNum) => (
-              <div key={dayNum} className="nd-trip-day-group">
-                <div className="nd-trip-day-header">
-                  <div className="nd-trip-day-badge">{dayNum}</div>
-                  <span className="nd-trip-day-title">DAY {dayNum}</span>
+          {/* Day selector */}
+          <div className="nd-trip-day-scroll">
+            <button
+              className={`nd-trip-day-tab nd-trip-day-text${tripDay === 0 ? " nd-trip-day-text-active" : ""}`}
+              onClick={() => setTripDay(0)}>
+              <span className="nd-trip-day-num">Total</span>
+            </button>
+            {Array.from({ length: numDays }, (_, i) => i + 1).map((d) => (
+              <button key={d}
+                className={`nd-trip-day-tab${tripDay === d ? " nd-trip-day-active" : " nd-trip-day-inactive"}`}
+                onClick={() => setTripDay(d)}>
+                <span className="nd-trip-day-num">{d}</span>
+                <span className="nd-trip-day-label">DAY</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Body */}
+          <div className="nd-trip-body">
+            {tripDay === 0 ? (
+              <>
+                <div className="nd-trip-section-head" style={{ marginBottom: 16 }}>
+                  <span className="nd-trip-section-icon">🗺️</span>
+                  <span className="nd-trip-section-title">Trip Overview</span>
                 </div>
-                <div className="nd-trip-overview-list">
-                  {(activities[dayNum] || []).map((act, idx) => (
-                    <div key={idx} className="nd-trip-overview-row">
-                      <div className="nd-trip-overview-info">
-                        <span className="nd-trip-overview-name">{act.name}</span>
-                        <span className="nd-trip-overview-time">{act.time}</span>
+                {Object.keys(activities).map(Number).sort((a, b) => a - b).map((dayNum) => (
+                  <div key={dayNum} className="nd-trip-day-group">
+                    <div className="nd-trip-day-header">
+                      <div className="nd-trip-day-badge">{dayNum}</div>
+                      <span className="nd-trip-day-title">DAY {dayNum}</span>
+                    </div>
+                    <div className="nd-trip-overview-list">
+                      {(activities[dayNum] || []).map((act, idx) => (
+                        <div key={idx} className="nd-trip-overview-row">
+                          <div className="nd-trip-overview-info">
+                            <span className="nd-trip-overview-name">{act.name}</span>
+                            <span className="nd-trip-overview-time">{act.time}</span>
+                          </div>
+                          <button className="mp-spot-remove" onClick={() => removeSpot(dayNum, idx)}>×</button>
+                        </div>
+                      ))}
+                      {(activities[dayNum] || []).length === 0 && (
+                        <p className="mp-empty-hint">No spots yet — tap below to add</p>
+                      )}
+                    </div>
+                    <button className="mp-add-spot" onClick={() => addSpot(dayNum)}>+ Add Spot</button>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="nd-trip-day-group">
+                <div className="nd-trip-day-header">
+                  <div className="nd-trip-day-badge">{tripDay}</div>
+                  <span className="nd-trip-day-title">DAY {tripDay}</span>
+                </div>
+                <div className="nd-trip-activities">
+                  {(activities[tripDay] || []).map((act, idx) => (
+                    <div key={idx} className="nd-trip-rich-card">
+                      <div className="mp-spot-placeholder">
+                        <span className="mp-spot-num">{idx + 1}</span>
                       </div>
-                      <button className="mp-spot-remove" onClick={() => removeSpot(dayNum, idx)}>×</button>
+                      <div className="nd-trip-rich-content">
+                        <p className="nd-trip-rich-title">{act.name}</p>
+                        <p className="nd-trip-rich-category">{act.category}</p>
+                        <p className="nd-trip-rich-meta"><span className="nd-trip-rich-emoji">⏰</span> {act.time}</p>
+                      </div>
+                      <button className="mp-spot-remove" onClick={() => removeSpot(tripDay, idx)}>×</button>
                     </div>
                   ))}
-                  {(activities[dayNum] || []).length === 0 && (
-                    <p className="mp-empty-hint">No spots yet — tap below to add</p>
+                  {(activities[tripDay] || []).length === 0 && (
+                    <p className="mp-empty-hint">No spots added for this day yet</p>
                   )}
                 </div>
-                <button className="mp-add-spot" onClick={() => addSpot(dayNum)}>+ Add Spot</button>
+                <button className="mp-add-spot" onClick={() => addSpot(tripDay)}>+ Add Spot</button>
               </div>
-            ))}
-          </>
-        ) : (
-          <div className="nd-trip-day-group">
-            <div className="nd-trip-day-header">
-              <div className="nd-trip-day-badge">{tripDay}</div>
-              <span className="nd-trip-day-title">DAY {tripDay}</span>
-            </div>
-            <div className="nd-trip-activities">
-              {(activities[tripDay] || []).map((act, idx) => (
-                <div key={idx} className="nd-trip-rich-card">
-                  <div className="mp-spot-placeholder">
-                    <span className="mp-spot-num">{idx + 1}</span>
-                  </div>
-                  <div className="nd-trip-rich-content">
-                    <p className="nd-trip-rich-title">{act.name}</p>
-                    <p className="nd-trip-rich-category">{act.category}</p>
-                    <p className="nd-trip-rich-meta"><span className="nd-trip-rich-emoji">⏰</span> {act.time}</p>
-                  </div>
-                  <button className="mp-spot-remove" onClick={() => removeSpot(tripDay, idx)}>×</button>
-                </div>
-              ))}
-              {(activities[tripDay] || []).length === 0 && (
-                <p className="mp-empty-hint">No spots added for this day yet</p>
-              )}
-            </div>
-            <button className="mp-add-spot" onClick={() => addSpot(tripDay)}>+ Add Spot</button>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Nav */}
-      <nav className="hp-nav">
-        <div className="hp-nav-pill">
-          {NAV_ITEMS.map((item, i) =>
-            item.center ? (
-              <div key="center" className="hp-nav-center-wrap">
-                <Link href="/planner" className="hp-nav-center-btn">
-                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
-                </Link>
-              </div>
-            ) : (
-              <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
-                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-                <span className="hp-nav-label">{item.label}</span>
-              </Link>
-            )
-          )}
         </div>
-      </nav>
+      </div>
     </div>
   );
 }
