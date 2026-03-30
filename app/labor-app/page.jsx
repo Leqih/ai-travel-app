@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { LaborAppPrototype } from "@/components/LaborAppPrototype";
 
 export const metadata = {
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function LaborAppPage() {
-  return <LaborAppPrototype />;
+  return (
+    <Suspense fallback={<div style={{ background: "#0a0a0a", minHeight: "100dvh" }} />}>
+      <LaborAppPrototype />
+    </Suspense>
+  );
 }
