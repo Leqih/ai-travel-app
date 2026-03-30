@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
+import dynamic from "next/dynamic";
+const PixelBlast = dynamic(() => import("../../../components/PixelBlast"), { ssr: false });
 
 const DESTINATIONS = [
   "Tokyo", "Seoul", "Bangkok", "Bali", "Paris",
@@ -180,6 +182,10 @@ function ManualPlanInner() {
   // ── Plan / Itinerary Editor ──
   return (
     <div className="mp-plan-shell">
+      {/* PixelBlast background */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.45 }}>
+        <PixelBlast variant="square" pixelSize={4} color="#ff6a00" speed={0.6} density={0.55} />
+      </div>
       {/* Top bar */}
       <div className="mp-plan-top">
         <button className="mp-back" onClick={() => router.back()}>
