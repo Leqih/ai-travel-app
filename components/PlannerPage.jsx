@@ -1070,7 +1070,7 @@ export function PlannerPage() {
       {/* Action buttons */}
       <div className="pl-actions">
         <Link
-          href={`/planner/manual${city || duration ? `?city=${encodeURIComponent(city || "")}&duration=${encodeURIComponent(duration || "")}` : ""}`}
+          href={`/planner/manual?city=${encodeURIComponent(city || "")}&duration=${encodeURIComponent(duration || "")}${budget ? `&budget=${encodeURIComponent(budget)}` : ""}${style ? `&style=${encodeURIComponent(style)}` : ""}`}
           className="pl-btn-inspire"
         >DIRECTLY CREATE</Link>
         <button className="pl-btn-generate" onClick={() => setGenerating(true)}>
