@@ -112,12 +112,29 @@ function ManualPlanInner() {
 
   const numDays = parseInt(duration) || 3;
   const [tripDay, setTripDay]         = useState(0);
+  const [tripTab, setTripTab]         = useState("overview");
+  const [mapMode, setMapMode]         = useState(false);
+  const mapExitTime                   = useRef(0);
+  const dragY                         = useRef(null);
+
   const [activities, setActivities]   = useState(() => {
     const init = {};
     const days = parseInt(initDur) || 3;
     for (let i = 1; i <= days; i++) init[i] = [];
     return init;
   });
+
+  function onPanelDragStart(e) {
+    dragY.current = e.touches?.[0]?.clientY ?? e.clientY;
+  }
+  function onPanelDragEnd(e) {
+    if (dragY.current === null) return;
+    const endY  = e.changedTouches?.[0]?.clientY ?? e.clientY;
+    const delta = endY - dragY.current;
+    if (delta > 48)       { mapExitTime.current = Date.now(); setMapMode(true); }
+    else if (delta < -48) setMapMode(false);
+    dragY.current = null;
+  }
 
 
   const togglePref = (label) =>
@@ -235,109 +252,171 @@ function ManualPlanInner() {
     );
   }
 
-  // ── Plan / Itinerary Editor — map + bottom sheet layout ──
+  // ── Plan / Itinerary Editor — identical structure to NearbyPage trip panel ──
   return (
     <div className="nd-shell">
       {/* Full-screen dark map */}
       <EmptyMap destination={destination} />
 
-      {/* Top bar — back + title */}
-      <div className="nd-top-bar" style={{ justifyContent: "space-between" }}>
-        <button className="mp-back" onClick={() => router.back()}>
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
-            <path d="M8.5 1L1.5 8l7 7" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: "-0.3px" }}>
-            {destination || "My Trip"}
+      {/* Top bar — only visible when map is showing */}
+      {mapMode && (
+        <div className="nd-top-bar" style={{ justifyContent: "space-between" }}>
+          <button className="mp-back" onClick={() => router.back()}>
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+              <path d="M8.5 1L1.5 8l7 7" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: "-0.3px" }}>{destination || "My Trip"}</div>
+            {duration && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{duration}</div>}
           </div>
-          {duration && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{duration}</div>}
+          <div style={{ width: 44 }} />
         </div>
-        <div style={{ width: 44 }} />
-      </div>
+      )}
 
-      {/* Trip panel — same overlay as NearbyPage */}
-      <div className="nd-trip-overlay">
-        <div className="nd-trip-panel">
-          <div className="nd-trip-handle-row"><div className="nd-trip-handle" /></div>
+      {/* Map-mode bottom handle — tap/swipe up to restore panel */}
+      {mapMode && (
+        <div className="nd-mapview-bottom-handle" onClick={() => { mapExitTime.current = Date.now(); setMapMode(false); }}
+          onTouchStart={onPanelDragStart} onTouchEnd={(e) => { onPanelDragEnd(e); if (!mapMode) return; }} >
+          <div className="nd-mapview-bottom-pill" />
+        </div>
+      )}
+
+      {/* Trip panel overlay — identical to NearbyPage */}
+      <div
+        className={`nd-trip-overlay${mapMode ? " nd-trip-overlay--out" : ""}`}
+        onClick={() => { if (mapMode || Date.now() - mapExitTime.current < 800) return; setMapMode(true); }}
+        onTouchEnd={(e) => { if (mapMode) { e.stopPropagation(); return; } }}
+      >
+        <div className="nd-trip-panel" onClick={e => e.stopPropagation()}>
+          {/* Drag handle */}
+          <div className="nd-trip-handle-row"
+            onTouchStart={onPanelDragStart} onTouchEnd={onPanelDragEnd}
+            onMouseDown={onPanelDragStart} onMouseUp={onPanelDragEnd}
+            onClick={() => setMapMode(true)}>
+            <div className="nd-trip-handle" />
+          </div>
 
           {/* Day selector */}
           <div className="nd-trip-day-scroll">
-            <button
-              className={`nd-trip-day-tab nd-trip-day-text${tripDay === 0 ? " nd-trip-day-text-active" : ""}`}
-              onClick={() => setTripDay(0)}>
+            <button className={`nd-trip-day-tab nd-trip-day-text${tripDay === 0 ? " nd-trip-day-text-active" : ""}`} onClick={() => setTripDay(0)}>
               <span className="nd-trip-day-num">Total</span>
             </button>
             {Array.from({ length: numDays }, (_, i) => i + 1).map((d) => (
-              <button key={d}
-                className={`nd-trip-day-tab${tripDay === d ? " nd-trip-day-active" : " nd-trip-day-inactive"}`}
-                onClick={() => setTripDay(d)}>
+              <button key={d} className={`nd-trip-day-tab${tripDay === d ? " nd-trip-day-active" : " nd-trip-day-inactive"}`} onClick={() => setTripDay(d)}>
                 <span className="nd-trip-day-num">{d}</span>
                 <span className="nd-trip-day-label">DAY</span>
               </button>
             ))}
           </div>
 
-          {/* Body */}
-          <div className="nd-trip-body">
-            {tripDay === 0 ? (
+          {/* Overview / Details toggle */}
+          <div className="nd-trip-toggle-row">
+            <button className={`nd-trip-toggle-btn${tripTab === "overview" ? " nd-trip-toggle-active" : ""}`} onClick={() => setTripTab("overview")}>🗺️ Overview</button>
+            <button className={`nd-trip-toggle-btn${tripTab === "details" ? " nd-trip-toggle-active" : ""}`} onClick={() => setTripTab("details")}>📝 Details</button>
+          </div>
+
+          {/* Content body */}
+          <div className="nd-trip-body"
+            onTouchStart={onPanelDragStart}
+            onTouchEnd={(e) => {
+              if (dragY.current === null) return;
+              const endY = e.changedTouches?.[0]?.clientY ?? e.clientY;
+              const delta = endY - dragY.current;
+              if (delta > 72 && e.currentTarget.scrollTop === 0) { mapExitTime.current = Date.now(); setMapMode(true); }
+              dragY.current = null;
+            }}>
+
+            {tripTab === "overview" ? (
               <>
-                <div className="nd-trip-section-head" style={{ marginBottom: 16 }}>
-                  <span className="nd-trip-section-icon">🗺️</span>
-                  <span className="nd-trip-section-title">Trip Overview</span>
-                </div>
-                {Object.keys(activities).map(Number).sort((a, b) => a - b).map((dayNum) => (
-                  <div key={dayNum} className="nd-trip-day-group">
-                    <div className="nd-trip-day-header">
-                      <div className="nd-trip-day-badge">{dayNum}</div>
-                      <span className="nd-trip-day-title">DAY {dayNum}</span>
+                {tripDay === 0 ? (
+                  <>
+                    <div className="nd-trip-section-head" style={{ marginBottom: 16 }}>
+                      <span className="nd-trip-section-icon">🗺️</span>
+                      <span className="nd-trip-section-title">Trip Overview</span>
                     </div>
-                    <div className="nd-trip-overview-list">
-                      {(activities[dayNum] || []).map((act, idx) => (
-                        <div key={idx} className="nd-trip-overview-row">
-                          <div className="nd-trip-overview-info">
-                            <span className="nd-trip-overview-name">{act.name}</span>
-                            <span className="nd-trip-overview-time">{act.time}</span>
+                    {Object.keys(activities).map(Number).sort((a, b) => a - b).map((dayNum) => (
+                      <div key={dayNum} className="nd-trip-day-group">
+                        <div className="nd-trip-day-header">
+                          <div className="nd-trip-day-badge">{dayNum}</div>
+                          <span className="nd-trip-day-title">DAY {dayNum}</span>
+                        </div>
+                        <div className="nd-trip-overview-list">
+                          {(activities[dayNum] || []).map((act, idx) => (
+                            <div key={idx} className="nd-trip-overview-row">
+                              <div className="nd-trip-overview-info">
+                                <span className="nd-trip-overview-name">{act.name}</span>
+                                <span className="nd-trip-overview-time">{act.time}</span>
+                              </div>
+                              <button className="mp-spot-remove" onClick={e => { e.stopPropagation(); removeSpot(dayNum, idx); }}>×</button>
+                            </div>
+                          ))}
+                          {(activities[dayNum] || []).length === 0 && (
+                            <p className="mp-empty-hint">No spots yet — tap below to add</p>
+                          )}
+                        </div>
+                        <button className="mp-add-spot" onClick={e => { e.stopPropagation(); addSpot(dayNum); }}>+ Add Spot</button>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="nd-trip-day-group">
+                    <div className="nd-trip-day-header">
+                      <div className="nd-trip-day-badge">{tripDay}</div>
+                      <span className="nd-trip-day-title">DAY {tripDay}</span>
+                    </div>
+                    <div className="nd-trip-activities">
+                      {(activities[tripDay] || []).map((act, idx) => (
+                        <div key={idx}>
+                          <div className="nd-trip-rich-card">
+                            <div className="mp-spot-placeholder"><span className="mp-spot-num">{idx + 1}</span></div>
+                            <div className="nd-trip-rich-content">
+                              <p className="nd-trip-rich-title">{idx + 1} · {act.name}</p>
+                              <p className="nd-trip-rich-category">{act.category}</p>
+                              <p className="nd-trip-rich-meta"><span className="nd-trip-rich-emoji">⏰</span> {act.time}</p>
+                            </div>
+                            <button className="mp-spot-remove" onClick={e => { e.stopPropagation(); removeSpot(tripDay, idx); }}>×</button>
                           </div>
-                          <button className="mp-spot-remove" onClick={() => removeSpot(dayNum, idx)}>×</button>
                         </div>
                       ))}
-                      {(activities[dayNum] || []).length === 0 && (
-                        <p className="mp-empty-hint">No spots yet — tap below to add</p>
+                      {(activities[tripDay] || []).length === 0 && (
+                        <p className="mp-empty-hint">No spots added for this day yet</p>
                       )}
                     </div>
-                    <button className="mp-add-spot" onClick={() => addSpot(dayNum)}>+ Add Spot</button>
+                    <button className="mp-add-spot" onClick={e => { e.stopPropagation(); addSpot(tripDay); }}>+ Add Spot</button>
                   </div>
-                ))}
+                )}
               </>
             ) : (
-              <div className="nd-trip-day-group">
-                <div className="nd-trip-day-header">
-                  <div className="nd-trip-day-badge">{tripDay}</div>
-                  <span className="nd-trip-day-title">DAY {tripDay}</span>
+              /* ── Details tab ── */
+              <>
+                <div className="nd-trip-section-head">
+                  <span className="nd-trip-section-icon">📝</span>
+                  <span className="nd-trip-section-title">Trip Details</span>
                 </div>
-                <div className="nd-trip-activities">
-                  {(activities[tripDay] || []).map((act, idx) => (
-                    <div key={idx} className="nd-trip-rich-card">
-                      <div className="mp-spot-placeholder">
-                        <span className="mp-spot-num">{idx + 1}</span>
-                      </div>
-                      <div className="nd-trip-rich-content">
-                        <p className="nd-trip-rich-title">{act.name}</p>
-                        <p className="nd-trip-rich-category">{act.category}</p>
-                        <p className="nd-trip-rich-meta"><span className="nd-trip-rich-emoji">⏰</span> {act.time}</p>
-                      </div>
-                      <button className="mp-spot-remove" onClick={() => removeSpot(tripDay, idx)}>×</button>
-                    </div>
-                  ))}
-                  {(activities[tripDay] || []).length === 0 && (
-                    <p className="mp-empty-hint">No spots added for this day yet</p>
-                  )}
+                <div className="nd-trip-details-grid">
+                  <button className="nd-trip-detail-card nd-trip-detail-card-btn" onClick={() => router.push("/notes")}>
+                    <p className="nd-trip-detail-card-title">Notes</p>
+                    <p className="nd-trip-detail-card-sub">Record your travel ideas</p>
+                  </button>
+                  <button className="nd-trip-detail-card nd-trip-detail-card-btn" onClick={() => router.push("/packing")}>
+                    <p className="nd-trip-detail-card-title">Packing List</p>
+                    <p className="nd-trip-detail-card-sub">Plan what to bring</p>
+                  </button>
                 </div>
-                <button className="mp-add-spot" onClick={() => addSpot(tripDay)}>+ Add Spot</button>
-              </div>
+                <div className="nd-trip-collections">
+                  <div className="nd-trip-section-head" style={{ marginBottom: 12 }}>
+                    <span className="nd-trip-section-icon">📸</span>
+                    <span className="nd-trip-section-title">Collections</span>
+                  </div>
+                  <p className="nd-trip-coll-count">My Collections · 0</p>
+                  <div className="nd-trip-coll-grid">
+                    <div className="nd-trip-coll-add">+</div>
+                  </div>
+                </div>
+              </>
             )}
+            <div style={{ height: 40 }} />
           </div>
         </div>
       </div>
