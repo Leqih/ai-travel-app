@@ -28,6 +28,13 @@ const PHOTO_MAP = {
   "Roppongi Hills":    ["photo-1593357596923-c9a407493104","photo-1540959733332-eab4deabeeaf","photo-1677279150226-67d306ecdc80","photo-1675950549770-c761502421bb","photo-1583915376118-7bfcda48e26c"],
   "Shinjuku Gyoen":    ["photo-1722591759493-6745a4b4b541","photo-1560257934-c627e08b0b17","photo-1558452919-3a47422e2fd0","photo-1647785991550-a60ed49badf5","photo-1714356455511-0354c196c48f"],
   "Kabukicho":         ["photo-1639804009307-7d0d880c0c9d","photo-1677279150226-67d306ecdc80","photo-1683995259187-54142c49338b","photo-1590796583326-afd3bb20d22d","photo-1625189662357-0f65d0d7377f"],
+  // Seoul extra
+  "Hongdae":            ["photo-1583581762203-9b8863ffd7f2"],
+  "Gangnam":            ["photo-1601814933824-fd0b574dd592"],
+  "Cheonggyecheon":     ["photo-1592499615936-6c97f97b5c14"],
+  "Noryangjin Market":  ["photo-1553361371-9b22f78e8b1d"],
+  "Jongmyo Shrine":     ["photo-1566888596782-c7f41cc184c5"],
+  "Banpo Bridge":       ["photo-1601814933824-fd0b574dd592"],
   // Seoul
   "Gyeongbokgung":     ["photo-1693928105595-b323b02791ff","photo-1733405243624-54e0a57bcebe","photo-1662238787718-f577db967596","photo-1566800890932-e89159daf3dc","photo-1599655293678-d52a800cd63e"],
   "Bukchon Village":   ["photo-1579869641201-45d13ce2ace5","photo-1670735403682-0faa5ec7dd75","photo-1512059555341-6a121e7d4d86","photo-1597052142820-3be3987c0e20","photo-1603545959774-96bef891432b"],
@@ -99,14 +106,24 @@ const PHOTO_MAP = {
   "Universal Studios":   ["photo-1598734365487-1573d1b53381","photo-1704003671937-a1522f430439","photo-1725011369349-3b6c4847924f","photo-1693328622597-9b6396fa55a8","photo-1565559204102-f59129a70ae2"],
   "Tempozan":            ["photo-1565559204102-f59129a70ae2","photo-1704003671937-a1522f430439","photo-1725011369349-3b6c4847924f","photo-1704003671790-ab28034a1b24","photo-1693328622597-9b6396fa55a8"],
   // Cities (discover page)
-  "Tokyo":    ["photo-1540959733332-eab4deabeeaf"],
-  "Seoul":    ["photo-1693446796202-2c5bb126edfc"],
-  "Paris":    ["photo-1502602898657-3e91760cbb34"],
-  "Bali":     ["photo-1554689021-c9e70753d301"],
-  "Bangkok":  ["photo-1703508202823-9b3648ca4f18"],
-  "Osaka":    ["photo-1565559204102-f59129a70ae2"],
-  "New York": ["photo-1655845836463-facb2826510b"],
-  "London":   ["photo-1662154989572-716c415ea9d7"],
+  "Tokyo":     ["photo-1540959733332-eab4deabeeaf"],
+  "Seoul":     ["photo-1693446796202-2c5bb126edfc"],
+  "Paris":     ["photo-1502602898657-3e91760cbb34"],
+  "Bali":      ["photo-1554689021-c9e70753d301"],
+  "Bangkok":   ["photo-1703508202823-9b3648ca4f18"],
+  "Osaka":     ["photo-1565559204102-f59129a70ae2"],
+  "New York":  ["photo-1655845836463-facb2826510b"],
+  "London":    ["photo-1662154989572-716c415ea9d7"],
+  "Singapore": ["photo-1525625293386-3f8f99389edd"],
+  "Istanbul":  ["photo-1524231757912-21f4fe3a7200"],
+  "Rome":      ["photo-1552832230-c0197dd311b5"],
+  "Barcelona": ["photo-1539037116277-4db20889f2d4"],
+  "Kyoto":     ["photo-1493976040374-85c8e12f0c0e"],
+  "Amsterdam": ["photo-1534351590666-13e3e96b5017"],
+  "Dubai":     ["photo-1512453979798-5ea266f8880c"],
+  "Sydney":    ["photo-1506973035872-a4ec16b8e8d9"],
+  "Lisbon":    ["photo-1555881400-74d7acaacd8b"],
+  "Taipei":    ["photo-1470004914212-05527e49370b"],
 };
 /**
  * Get a real Unsplash image URL.
@@ -474,6 +491,52 @@ const DESTINATIONS = [
     ],
   },
   {
+    id: 201, city: "Seoul, Korea", place: "Hongdae",
+    desc: "Youth culture · Street art · Nightlife",
+    tag: "food", duration: "2 Days", likes: 1543, saves: 492,
+    img: uimg("Hongdae", 160, 160),
+    lat: 37.557, lng: 126.926,
+    images: [uimg("Hongdae", 800, 600), uimg("Myeongdong", 800, 600), uimg("Han River", 800, 600)],
+    days: 2,
+    itinerary: {
+      1: { stops: 4, distance: "5.8 km", activities: [
+        { name: "Hongdae", category: "Seoul · Art", desc: "Indie music, street art, and buskers around Hongik University — best on weekends.", time: "11:00 AM", img: uimg("Hongdae", 152, 152), transport: "🚇 Subway · 1.2 km · 5 min", next: "Cheonggyecheon", lat: 37.5572, lng: 126.9260 },
+        { name: "Cheonggyecheon", category: "Seoul · Nature", desc: "A 6km urban stream restored from a highway — perfect for a late-afternoon stroll.", time: "3:00 PM", img: uimg("Cheonggyecheon", 152, 152), transport: "🚇 Subway · 2.5 km · 9 min", next: "Myeongdong", lat: 37.5695, lng: 126.9784 },
+        { name: "Myeongdong", category: "Seoul · Food", desc: "Street food heaven — tteokbokki, hotteok, and egg bread. Go before 8pm.", time: "6:00 PM", img: uimg("Myeongdong", 152, 152), transport: "🚇 Subway · 2.1 km · 8 min", next: "Banpo Bridge", lat: 37.5636, lng: 126.9850 },
+        { name: "Banpo Bridge", category: "Seoul · Landmark", desc: "The rainbow fountain bridge illuminates the Han River every evening — a must-see.", time: "9:00 PM", img: uimg("Banpo Bridge", 152, 152), transport: null, next: null, lat: 37.5120, lng: 126.9947 },
+      ]},
+      2: { stops: 3, distance: "6.4 km", activities: [
+        { name: "Noryangjin Market", category: "Seoul · Food", desc: "Seoul's biggest wholesale fish market — watch live seafood auctions at dawn.", time: "7:00 AM", img: uimg("Noryangjin Market", 152, 152), transport: "🚇 Subway · 3.0 km · 12 min", next: "Gangnam", lat: 37.5125, lng: 126.9423 },
+        { name: "Gangnam", category: "Seoul · Shopping", desc: "Luxury shopping, K-pop dance studios, and the famous COEX underground mall.", time: "1:00 PM", img: uimg("Gangnam", 152, 152), transport: "🚇 Subway · 3.4 km · 12 min", next: "Jongmyo Shrine", lat: 37.4979, lng: 127.0276 },
+        { name: "Jongmyo Shrine", category: "Seoul · Culture", desc: "UNESCO-listed Confucian royal shrine — serene and largely undiscovered by tourists.", time: "5:00 PM", img: uimg("Jongmyo Shrine", 152, 152), transport: null, next: null, lat: 37.5745, lng: 126.9942 },
+      ]},
+    },
+    weather: [
+      { date: "3.15 Sun · Today", desc: "Cloudy 5° ~ 14°", icon: "☁️" },
+      { date: "3.16 Mon",         desc: "Sunny 8° ~ 18°",  icon: "☀️" },
+    ],
+  },
+  {
+    id: 202, city: "Seoul, Korea", place: "DMZ Border",
+    desc: "History · Cold War · Tension zone",
+    tag: "culture", duration: "1 Day", likes: 987, saves: 334,
+    img: uimg("Gyeongbokgung", 160, 160),
+    lat: 37.94, lng: 126.68,
+    images: [uimg("Gyeongbokgung", 800, 600), uimg("Bukchon Village", 800, 600)],
+    days: 1,
+    itinerary: {
+      1: { stops: 4, distance: "80 km", activities: [
+        { name: "Imjingak Park", category: "DMZ · Memorial", desc: "Bridge of Freedom memorial — stranded trains and barbed wire from the Korean War.", time: "8:00 AM", img: uimg("Gyeongbokgung", 152, 152), transport: "🚌 Bus · 18 km · 30 min", next: "3rd Tunnel", lat: 37.8883, lng: 126.7420 },
+        { name: "3rd Tunnel", category: "DMZ · Historic", desc: "One of four tunnels dug under the DMZ by North Korea — walk 73m below ground.", time: "10:30 AM", img: uimg("Bukchon Village", 152, 152), transport: "🚌 Bus · 5 km · 15 min", next: "Dora Observatory", lat: 37.9133, lng: 126.6987 },
+        { name: "Dora Observatory", category: "DMZ · Viewpoint", desc: "Closest viewpoint to North Korea — see Kaesong and Propaganda Village through binoculars.", time: "12:00 PM", img: uimg("Namsan Tower", 152, 152), transport: "🚌 Bus · 3 km · 10 min", next: "Dorasan Station", lat: 37.9336, lng: 126.6934 },
+        { name: "Dorasan Station", category: "DMZ · Historic", desc: "Southernmost train station in South Korea — the last stop before North Korea.", time: "2:00 PM", img: uimg("Insadong", 152, 152), transport: null, next: null, lat: 37.9014, lng: 126.7013 },
+      ]},
+    },
+    weather: [
+      { date: "3.15 Sun · Today", desc: "Cold 1° ~ 9°", icon: "🌬️" },
+    ],
+  },
+  {
     id: 3, city: "Paris, France", place: "Eiffel Tower",
     desc: "Iconic landmark · Seine riverside",
     tag: "art", duration: "7 Days", likes: 4521, saves: 1876,
@@ -536,6 +599,58 @@ const DESTINATIONS = [
     ],
   },
   {
+    id: 301, city: "Paris, France", place: "Montmartre",
+    desc: "Bohemian hilltop · Artist quarter",
+    tag: "art", duration: "3 Days", likes: 2876, saves: 1102,
+    img: uimg("Sacré-Cœur", 160, 160),
+    lat: 48.886, lng: 2.343,
+    images: [uimg("Sacré-Cœur", 800, 600), uimg("Eiffel Tower", 800, 600), uimg("Seine Cruise", 800, 600)],
+    days: 3,
+    itinerary: {
+      1: { stops: 4, distance: "4.2 km", activities: [
+        { name: "Sacré-Cœur", category: "Paris · Church", desc: "White-domed basilica on the hill of Montmartre — free entry, panoramic views.", time: "9:00 AM", color: "#c9783a", transport: "🚶 Walk · 0.5 km · 6 min", next: "Place du Tertre" },
+        { name: "Place du Tertre", category: "Paris · Art", desc: "The original artist square where painters still work en plein air daily.", time: "10:30 AM", color: "#4a8fe8", transport: "🚶 Walk · 1.2 km · 15 min", next: "Moulin Rouge" },
+        { name: "Moulin Rouge", category: "Paris · Culture", desc: "Iconic cabaret birthplace of the can-can. Book the evening show in advance.", time: "2:00 PM", color: "#8e3a59", transport: "🚇 Metro · 2.5 km · 10 min", next: "Galeries Lafayette" },
+        { name: "Galeries Lafayette", category: "Paris · Shopping", desc: "Art Nouveau department store with a breathtaking stained-glass dome.", time: "5:00 PM", color: "#383852", transport: null, next: null },
+      ]},
+      2: { stops: 3, distance: "5.5 km", activities: [
+        { name: "Centre Pompidou", category: "Paris · Museum", desc: "Inside-out modernist building housing Europe's largest modern art collection.", time: "10:00 AM", color: "#5a3882", transport: "🚶 Walk · 1.5 km · 18 min", next: "Marais District" },
+        { name: "Marais District", category: "Paris · Food", desc: "Best falafel in Paris at L'As du Fallafel, then art galleries along Rue de Bretagne.", time: "1:00 PM", color: "#c9783a", transport: "🚶 Walk · 4.0 km · 50 min", next: "Place des Vosges" },
+        { name: "Place des Vosges", category: "Paris · Historic", desc: "Paris's oldest planned square — arcaded walkways and Victor Hugo's house.", time: "5:00 PM", color: "#2d7a4a", transport: null, next: null },
+      ]},
+      3: { stops: 3, distance: "6.0 km", activities: [
+        { name: "Luxembourg Gardens", category: "Paris · Park", desc: "The most beautiful park in Paris — model sailboats, chess players, and beekeepers.", time: "9:00 AM", color: "#2d7a4a", transport: "🚶 Walk · 3.0 km · 38 min", next: "Panthéon" },
+        { name: "Panthéon", category: "Paris · Monument", desc: "Neo-classical mausoleum housing Voltaire, Rousseau, Victor Hugo, and Marie Curie.", time: "12:00 PM", color: "#383852", transport: "🚇 Metro · 3.0 km · 10 min", next: "Shakespeare & Co" },
+        { name: "Shakespeare & Co", category: "Paris · Culture", desc: "The world's most famous English bookshop — cozy, literary, with Notre-Dame views.", time: "4:00 PM", color: "#4a8fe8", transport: null, next: null },
+      ]},
+    },
+    weather: [
+      { date: "3.15 Sun · Today", desc: "Sunny 11° ~ 19°", icon: "☀️" },
+      { date: "3.16 Mon",         desc: "Cloudy 9° ~ 16°", icon: "☁️" },
+      { date: "3.17 Tue",         desc: "Rain 7° ~ 14°",   icon: "🌧️" },
+    ],
+  },
+  {
+    id: 302, city: "Paris, France", place: "Versailles Day Trip",
+    desc: "Royal palace · Grand gardens · History",
+    tag: "culture", duration: "1 Day", likes: 3241, saves: 1450,
+    img: uimg("Versailles", 160, 160),
+    lat: 48.805, lng: 2.120,
+    images: [uimg("Versailles", 800, 600), uimg("Palace Gardens", 800, 600), uimg("Louvre Museum", 800, 600)],
+    days: 1,
+    itinerary: {
+      1: { stops: 4, distance: "4.5 km (on foot)", activities: [
+        { name: "Palace of Versailles", category: "Versailles · Historic", desc: "Sun King's opulent palace — the Hall of Mirrors is unmissable. Book skip-the-line tickets.", time: "9:00 AM", color: "#c9783a", transport: "🚶 Walk · 0.5 km · 6 min", next: "Queen's Hamlet" },
+        { name: "Queen's Hamlet", category: "Versailles · Garden", desc: "Marie Antoinette's rustic mock-village retreat — a hidden gem most visitors skip.", time: "12:00 PM", color: "#2d7a4a", transport: "🚶 Walk · 1.5 km · 18 min", next: "Grand Canal" },
+        { name: "Grand Canal", category: "Versailles · Nature", desc: "Rent a rowboat on the 1.5km cross-shaped canal — the gardens from the water.", time: "2:00 PM", color: "#2a6090", transport: "🚶 Walk · 2.5 km · 30 min", next: "Trianon Palaces" },
+        { name: "Trianon Palaces", category: "Versailles · Historic", desc: "Two smaller palaces — Grand and Petit Trianon — used as royal private retreats.", time: "4:00 PM", color: "#8e3a59", transport: null, next: null },
+      ]},
+    },
+    weather: [
+      { date: "3.15 Sun · Today", desc: "Sunny 10° ~ 17°", icon: "☀️" },
+    ],
+  },
+  {
     id: 4, city: "Bali, Indonesia", place: "Ubud Rice Terraces",
     desc: "UNESCO heritage · Lush hillsides",
     tag: "nature", duration: "6 Days", likes: 3456, saves: 1234,
@@ -581,6 +696,61 @@ const DESTINATIONS = [
       { date: "3.16 Mon",         desc: "Shower 24° ~ 30°", icon: "🌦️" },
       { date: "3.17 Tue",         desc: "Sunny 27° ~ 34°", icon: "☀️" },
       { date: "3.18 Wed",         desc: "Sunny 26° ~ 33°", icon: "☀️" },
+    ],
+  },
+  {
+    id: 401, city: "Bali, Indonesia", place: "Seminyak Beach",
+    desc: "Surf · Beach clubs · Sunset cocktails",
+    tag: "nature", duration: "3 Days", likes: 2188, saves: 876,
+    img: uimg("Canggu Beach", 160, 160),
+    lat: -8.69, lng: 115.16,
+    images: [uimg("Canggu Beach", 800, 600), uimg("Tanah Lot", 800, 600), uimg("Uluwatu Temple", 800, 600)],
+    days: 3,
+    itinerary: {
+      1: { stops: 3, distance: "5.0 km", activities: [
+        { name: "Seminyak Beach", category: "Bali · Beach", desc: "Upscale beach with sunbeds and beach clubs. Potato Head Beach Club is iconic.", time: "10:00 AM", color: "#4a8fe8", transport: "🚗 Car · 2.0 km · 8 min", next: "Canggu Beach" },
+        { name: "Canggu Beach", category: "Bali · Surf", desc: "Hipster beach village — surfing lessons, rice-field cafés, and sunset yoga.", time: "2:00 PM", color: "#2d7a4a", transport: "🚗 Car · 3.0 km · 12 min", next: "Sunset at Tanah Lot" },
+        { name: "Sunset at Tanah Lot", category: "Bali · Temple", desc: "Sea temple on a rock, silhouetted against a fiery orange sunset sky.", time: "5:30 PM", color: "#c9783a", transport: null, next: null },
+      ]},
+      2: { stops: 3, distance: "22 km", activities: [
+        { name: "Uluwatu Temple", category: "Bali · Cliff", desc: "Dramatic clifftop temple — beware the monkeys and stay for the Kecak dance.", time: "9:00 AM", color: "#383852", transport: "🚗 Car · 12 km · 35 min", next: "Padang Padang Beach" },
+        { name: "Padang Padang Beach", category: "Bali · Beach", desc: "Tiny cave-entrance beach from the movie Eat Pray Love. Crystal clear water.", time: "1:00 PM", color: "#4a8fe8", transport: "🚗 Car · 10 km · 30 min", next: "Jimbaran Seafood" },
+        { name: "Jimbaran Seafood", category: "Bali · Food", desc: "Candlelit seafood barbecue on the beach — catch of the day at sunset.", time: "6:00 PM", color: "#c9783a", transport: null, next: null },
+      ]},
+      3: { stops: 2, distance: "8 km", activities: [
+        { name: "Nusa Dua", category: "Bali · Wellness", desc: "Luxury spa resorts and water sports. The Bali Collection mall is nearby.", time: "10:00 AM", color: "#5a3882", transport: "🚗 Car · 8 km · 25 min", next: "Benoa Harbour" },
+        { name: "Benoa Harbour", category: "Bali · Water", desc: "Parasailing, jet-skiing, and glass-bottom boat rides over the coral reefs.", time: "2:00 PM", color: "#2a6090", transport: null, next: null },
+      ]},
+    },
+    weather: [
+      { date: "3.15 Sun · Today", desc: "Sunny 28° ~ 34°", icon: "☀️" },
+      { date: "3.16 Mon",         desc: "Partly cloudy 26° ~ 32°", icon: "⛅" },
+      { date: "3.17 Tue",         desc: "Sunny 27° ~ 33°", icon: "☀️" },
+    ],
+  },
+  {
+    id: 402, city: "Bali, Indonesia", place: "Mount Batur Sunrise",
+    desc: "Volcano trek · Sunrise · Hot springs",
+    tag: "nature", duration: "2 Days", likes: 1654, saves: 612,
+    img: uimg("Mount Batur", 160, 160),
+    lat: -8.24, lng: 115.38,
+    images: [uimg("Mount Batur", 800, 600), uimg("Tegallalang Terrace", 800, 600), uimg("Sacred Monkey Forest", 800, 600)],
+    days: 2,
+    itinerary: {
+      1: { stops: 3, distance: "volcano + springs", activities: [
+        { name: "Mount Batur Summit", category: "Bali · Trekking", desc: "2-hour pre-dawn hike with a guide — watch the sunrise from 1717m above sea level.", time: "4:00 AM", color: "#383852", transport: "🚗 Car · 8 km · 25 min", next: "Crater Lake" },
+        { name: "Crater Lake", category: "Bali · Nature", desc: "Batur Lake shimmers turquoise in the caldera — stunning from the rim.", time: "7:00 AM", color: "#2a6090", transport: "🚗 Car · 5 km · 20 min", next: "Toya Bungkah Hot Springs" },
+        { name: "Toya Bungkah Hot Springs", category: "Bali · Wellness", desc: "Natural geothermal pools on the lake shore — the perfect post-hike soak.", time: "10:00 AM", color: "#c9783a", transport: null, next: null },
+      ]},
+      2: { stops: 3, distance: "18 km", activities: [
+        { name: "Tegallalang Terrace", category: "Ubud · Nature", desc: "UNESCO rice terraces — golden in the morning light. Try the famous coffee here.", time: "8:00 AM", color: "#2d7a4a", transport: "🚗 Car · 10 km · 30 min", next: "Sacred Monkey Forest" },
+        { name: "Sacred Monkey Forest", category: "Ubud · Nature", desc: "Ancient temple ruins and 700+ playful monkeys in a dense jungle sanctuary.", time: "12:00 PM", color: "#2d7a4a", transport: "🚶 Walk · 8 km · 30 min", next: "Ubud Palace" },
+        { name: "Ubud Palace", category: "Ubud · Culture", desc: "Royal Puri Saren palace in the heart of Ubud — evening dance performances.", time: "5:00 PM", color: "#383852", transport: null, next: null },
+      ]},
+    },
+    weather: [
+      { date: "3.15 Sun · Today", desc: "Clear 18° ~ 28°", icon: "⭐" },
+      { date: "3.16 Mon",         desc: "Sunny 22° ~ 31°", icon: "☀️" },
     ],
   },
   {
@@ -819,14 +989,24 @@ function DiscoverMap({ activeCity, onSpotClick }) {
 }
 
 const CITIES = [
-  { name: "Tokyo",    country: "Japan",     img: uimg("Tokyo", 160, 160),    lat: 35.6762, lng: 139.6503, plans: 43 },
-  { name: "Seoul",    country: "Korea",     img: uimg("Seoul", 160, 160),    lat: 37.5665, lng: 126.9780, plans: 28 },
-  { name: "Paris",    country: "France",    img: uimg("Paris", 160, 160),    lat: 48.8566, lng: 2.3522,   plans: 35 },
-  { name: "Bali",     country: "Indonesia", img: uimg("Bali", 160, 160),     lat: -8.3405, lng: 115.0920, plans: 19 },
-  { name: "Bangkok",  country: "Thailand",  img: uimg("Bangkok", 160, 160),  lat: 13.7563, lng: 100.5018, plans: 22 },
-  { name: "Osaka",    country: "Japan",     img: uimg("Osaka", 160, 160),    lat: 34.6937, lng: 135.5023, plans: 31 },
-  { name: "New York", country: "USA",       img: uimg("New York", 160, 160), lat: 40.7128, lng: -74.0060, plans: 38 },
-  { name: "London",   country: "UK",        img: uimg("London", 160, 160),   lat: 51.5074, lng: -0.1278,  plans: 26 },
+  { name: "Tokyo",     country: "Japan",       img: uimg("Tokyo", 160, 160),     lat: 35.6762,  lng: 139.6503,  plans: 43 },
+  { name: "Seoul",     country: "Korea",       img: uimg("Seoul", 160, 160),     lat: 37.5665,  lng: 126.9780,  plans: 30 },
+  { name: "Paris",     country: "France",      img: uimg("Paris", 160, 160),     lat: 48.8566,  lng: 2.3522,    plans: 37 },
+  { name: "Bali",      country: "Indonesia",   img: uimg("Bali", 160, 160),      lat: -8.3405,  lng: 115.0920,  plans: 21 },
+  { name: "Bangkok",   country: "Thailand",    img: uimg("Bangkok", 160, 160),   lat: 13.7563,  lng: 100.5018,  plans: 22 },
+  { name: "Osaka",     country: "Japan",       img: uimg("Osaka", 160, 160),     lat: 34.6937,  lng: 135.5023,  plans: 31 },
+  { name: "New York",  country: "USA",         img: uimg("New York", 160, 160),  lat: 40.7128,  lng: -74.0060,  plans: 38 },
+  { name: "London",    country: "UK",          img: uimg("London", 160, 160),    lat: 51.5074,  lng: -0.1278,   plans: 26 },
+  { name: "Singapore", country: "Singapore",   img: uimg("Singapore", 160, 160), lat: 1.3521,   lng: 103.8198,  plans: 24 },
+  { name: "Istanbul",  country: "Turkey",      img: uimg("Istanbul", 160, 160),  lat: 41.0082,  lng: 28.9784,   plans: 17 },
+  { name: "Rome",      country: "Italy",       img: uimg("Rome", 160, 160),      lat: 41.9028,  lng: 12.4964,   plans: 29 },
+  { name: "Barcelona", country: "Spain",       img: uimg("Barcelona", 160, 160), lat: 41.3851,  lng: 2.1734,    plans: 21 },
+  { name: "Kyoto",     country: "Japan",       img: uimg("Kyoto", 160, 160),     lat: 35.0116,  lng: 135.7681,  plans: 33 },
+  { name: "Amsterdam", country: "Netherlands", img: uimg("Amsterdam", 160, 160), lat: 52.3676,  lng: 4.9041,    plans: 16 },
+  { name: "Dubai",     country: "UAE",         img: uimg("Dubai", 160, 160),     lat: 25.2048,  lng: 55.2708,   plans: 20 },
+  { name: "Sydney",    country: "Australia",   img: uimg("Sydney", 160, 160),    lat: -33.8688, lng: 151.2093,  plans: 18 },
+  { name: "Lisbon",    country: "Portugal",    img: uimg("Lisbon", 160, 160),    lat: 38.7223,  lng: -9.1393,   plans: 14 },
+  { name: "Taipei",    country: "Taiwan",      img: uimg("Taipei", 160, 160),    lat: 25.0330,  lng: 121.5654,  plans: 15 },
 ];
 
 const SNAZZY_STYLE = [
@@ -997,6 +1177,8 @@ export function NearbyPage() {
   const [tripDay, setTripDay]               = useState(0); // default to Total overview
   const [carouselIndex, setCarouselIndex]   = useState({});
   const [mapMode, setMapMode]               = useState(false);
+  const [addedToTrip, setAddedToTrip]       = useState(false);
+  const [cardAddedSet, setCardAddedSet]     = useState(new Set());
   const [detailAct, setDetailAct]           = useState(null); // activity detail page
   const [descExpanded, setDescExpanded]     = useState(false);
   const mapExitTime = useRef(0);
@@ -1005,6 +1187,47 @@ export function NearbyPage() {
   const trackRef = useRef(null);
   const swipeRef = useRef({ startX: 0, currentX: 0, dragging: false });
   const springRef = useRef(null);
+
+  /* Save a destination to My Trips (localStorage) */
+  function saveDestToMyTrips(dest) {
+    if (!dest) return;
+    try {
+      const cityName = dest.city.split(",")[0].trim();
+      const activities = {};
+      Object.entries(dest.itinerary).forEach(([day, d]) => {
+        activities[Number(day)] = (d.activities || []).map(a => ({
+          name: a.name,
+          address: a.category || dest.city,
+          lat: a.lat,
+          lng: a.lng,
+        }));
+      });
+      const id = `trip_nd_${dest.id}_${Date.now()}`;
+      const now = Date.now();
+      const trip = {
+        id,
+        destination: cityName,
+        duration: dest.duration || `${dest.days} Days`,
+        prefs: [],
+        budget: "",
+        activities,
+        expenses: [],
+        createdAt: now,
+        updatedAt: now,
+      };
+      const trips = JSON.parse(localStorage.getItem("opal_trips") || "[]");
+      trips.unshift(trip);
+      localStorage.setItem("opal_trips", JSON.stringify(trips));
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function saveToMyTrips() {
+    if (saveDestToMyTrips(detailDest)) {
+      setAddedToTrip(true);
+      setTimeout(() => setAddedToTrip(false), 2000);
+    }
+  }
 
   /* Spring animation helper */
   function springTo(target, from, onUpdate, onDone) {
@@ -1186,7 +1409,7 @@ export function NearbyPage() {
                   <button className={`picks-card-save${savedCards.has(dest.id) ? ' picks-saved' : ''}`} onClick={(e) => { e.stopPropagation(); setSavedCards(prev => { const next = new Set(prev); next.has(dest.id) ? next.delete(dest.id) : next.add(dest.id); return next; }); }}>
                     {savedCards.has(dest.id) ? '✓ Saved' : `🔖 ${dest.saves || 0}`}
                   </button>
-                  <div className="nd-card-add" onClick={(e) => { e.stopPropagation(); handleCardClick(dest); }}>+ Add to Trip</div>
+                  <div className="nd-card-add" onClick={(e) => { e.stopPropagation(); if (saveDestToMyTrips(dest)) { setCardAddedSet(prev => new Set(prev).add(dest.id)); setTimeout(() => setCardAddedSet(prev => { const n = new Set(prev); n.delete(dest.id); return n; }), 2000); } }}>{cardAddedSet.has(dest.id) ? "✓ Added" : "+ Add to Trip"}</div>
                 </div>
               </div>
             ) : (
@@ -1216,7 +1439,7 @@ export function NearbyPage() {
                   <span className={`picks-card-save${savedCards.has(dest.id) ? ' picks-saved' : ''}`} role="button" onClick={(e) => { e.stopPropagation(); setSavedCards(prev => { const next = new Set(prev); next.has(dest.id) ? next.delete(dest.id) : next.add(dest.id); return next; }); }}>
                     {savedCards.has(dest.id) ? '✓ Saved' : `🔖 ${dest.saves || 0}`}
                   </span>
-                  <div className="nd-card-add" onClick={(e) => e.stopPropagation()}>+ Add to Trip</div>
+                  <div className="nd-card-add" onClick={(e) => { e.stopPropagation(); if (saveDestToMyTrips(dest)) { setCardAddedSet(prev => new Set(prev).add(dest.id)); setTimeout(() => setCardAddedSet(prev => { const n = new Set(prev); n.delete(dest.id); return n; }), 2000); } }}>{cardAddedSet.has(dest.id) ? "✓ Added" : "+ Add to Trip"}</div>
                 </div>
               </button>
             )
@@ -1815,8 +2038,31 @@ export function NearbyPage() {
                   </div>
                 </>
               )}
-              <div style={{ height: 40 }} />
+              <div style={{ height: 72 }} />
             </div>
+
+            {/* Floating "+ Add to Trip" pill — bottom-right, over content */}
+            <button
+              onClick={saveToMyTrips}
+              style={{
+                position: "absolute", bottom: 20, right: 16,
+                height: 40, borderRadius: 20, border: "none", cursor: "pointer",
+                padding: "0 18px",
+                background: addedToTrip ? "#1a3a2a" : "#fff",
+                color: addedToTrip ? "#4ade80" : "#111",
+                fontSize: 14, fontWeight: 700,
+                display: "flex", alignItems: "center", gap: 6,
+                boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
+                transition: "background 0.25s, color 0.25s",
+                zIndex: 10,
+              }}>
+              {addedToTrip ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  Saved!
+                </>
+              ) : "+ Add to Trip"}
+            </button>
           </div>
         </div>
       )}

@@ -2964,15 +2964,16 @@ button {
   width: 100%;
   height: 92dvh;
   max-height: 92dvh;
-  background: rgba(20,20,20,0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #0F0F18;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.07);
   border-bottom: none;
-  border-radius: 20px 22px 0 0;
+  border-radius: 24px 24px 0 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
   transform: translateY(0);
   will-change: transform;
   transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
@@ -3037,13 +3038,13 @@ button {
 .nd-trip-day-active .nd-trip-day-label {
   color: #000;
 }
-/* Inactive day (dark glass) */
+/* Inactive day (Opal glass) */
 .nd-trip-day-inactive {
-  background: rgba(20,20,20,0.7);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.09);
 }
-.nd-trip-day-inactive .nd-trip-day-num { color: #fff; }
-.nd-trip-day-inactive .nd-trip-day-label { color: #fff; }
+.nd-trip-day-inactive .nd-trip-day-num { color: rgba(255,255,255,0.75); }
+.nd-trip-day-inactive .nd-trip-day-label { color: rgba(255,255,255,0.4); }
 /* Future/grayed day */
 .nd-trip-day-future {
   background: rgba(255,255,255,0.05);
@@ -3710,13 +3711,13 @@ button {
   line-height: 1;
   font-weight: 300;
 }
-/* Total tab button — inactive = black like other day tabs */
+/* Total tab button — inactive */
 .nd-trip-day-text {
-  background: #000;
-  border: 1px solid #000;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.09);
 }
 .nd-trip-day-text .nd-trip-day-num {
-  color: #fff;
+  color: rgba(255,255,255,0.75);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.15px;
@@ -6041,10 +6042,12 @@ button {
 /* ── Countdown hero card ── */
 .hp-cd-card {
   margin: 0 16px;
-  height: 178px;
-  border-radius: 20px;
+  height: 192px;
+  border-radius: 22px;
   overflow: hidden;
   position: relative;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
 
 .hp-cd-img {
@@ -6056,19 +6059,19 @@ button {
   display: block;
 }
 
-/* Gradient overlay: dark bottom + orange tint left */
+/* Gradient overlay */
 .hp-cd-overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(165deg, rgba(180,60,0,0.72) 0%, rgba(100,20,0,0.55) 35%, transparent 65%),
-    linear-gradient(0deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.2) 55%, transparent 100%);
+    linear-gradient(135deg, rgba(160,50,0,0.65) 0%, rgba(80,15,0,0.4) 40%, transparent 70%),
+    linear-gradient(0deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.1) 100%);
 }
 
 .hp-cd-top {
   position: absolute;
-  top: 14px;
-  left: 20px;
+  top: 16px;
+  left: 16px;
   right: 20px;
   display: flex;
   align-items: center;
@@ -6076,67 +6079,85 @@ button {
   z-index: 2;
 }
 .hp-cd-trip {
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
 .hp-cd-badge {
-  background: rgba(20,20,20,0.7);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
+  background: rgba(20,20,20,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.85);
   font-size: 11px;
-  font-weight: 700;
-  padding: 4px 12px;
+  font-weight: 600;
+  padding: 4px 11px;
   border-radius: 16px;
   letter-spacing: 0.2px;
 }
 
 .hp-cd-main {
   position: absolute;
-  top: 40px;
-  left: 20px;
-  right: 20px;
-  font-size: 32px;
-  font-weight: 700;
+  top: 34px;
+  left: 16px;
+  right: 16px;
+  font-size: 36px;
+  font-weight: 800;
   color: #fff;
-  letter-spacing: -1.2px;
+  letter-spacing: -1.5px;
   line-height: 1;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  text-shadow: 0 2px 16px rgba(0,0,0,0.5);
   z-index: 2;
 }
 
-/* Timer row */
+/* Timer — three labeled units */
 .hp-cd-timer {
   position: absolute;
-  bottom: 56px;
-  left: 20px;
-  right: 20px;
-  height: 44px;
-  background: rgba(20,20,20,0.7);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px;
+  bottom: 48px;
+  left: 16px;
+  right: 16px;
+  height: 48px;
+  background: rgba(15,15,20,0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   z-index: 2;
 }
+.hp-cd-timer-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+}
 .hp-cd-digits {
-  font-family: 'Courier New', 'Liberation Mono', monospace;
-  font-size: 24px;
+  font-family: 'SF Mono', 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: 700;
   color: #fff;
-  text-shadow: 0 0 8px rgba(255,255,255,0.45);
-  letter-spacing: 4px;
-  min-width: 56px;
-  text-align: center;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.hp-cd-unit-label {
+  font-size: 8px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 .hp-cd-sep {
-  font-family: 'Courier New', monospace;
-  font-size: 22px;
-  color: rgba(255,255,255,0.4);
-  margin: 0 -4px;
+  font-size: 18px;
+  color: rgba(255,255,255,0.25);
+  margin: 0 2px;
+  margin-bottom: 10px;
+  line-height: 1;
 }
 
 /* ── Quick stat chips row ── */
@@ -6986,8 +7007,22 @@ button {
 }
 
 /* ── Countdown card: expandable plan ── */
-.hp-cd-card { height: 210px; transition: height 0.38s cubic-bezier(0.4,0,0.2,1); }
+.hp-cd-card { height: 192px; transition: height 0.38s cubic-bezier(0.4,0,0.2,1); }
 .hp-cd-card:has(.hp-cd-plan-open) { height: 260px; }
+.hp-cd-card.hp-cd-picker-open { height: fit-content; }
+
+@keyframes cd-picker-in {
+  from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cd-cal-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cd-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
 .hp-cd-count-view {
   position: absolute; inset: 0;
@@ -7042,13 +7077,13 @@ button {
 
 /* ── Featured article card ── */
 .hp-featured-card {
-  margin: 0 16px; height: 180px; border-radius: 18px; overflow: hidden;
+  margin: 0 16px; height: 190px; border-radius: 18px; overflow: hidden;
   position: relative; display: flex;
 }
 .hp-featured-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hp-featured-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.1) 100%);
+  position: absolute; top: 0; left: 0; bottom: 0; right: 130px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 70%, transparent 100%);
 }
 .hp-featured-content {
   position: absolute; top: 0; left: 0; bottom: 0; right: 130px;
@@ -7065,7 +7100,7 @@ button {
   position: absolute; top: 10px; right: 10px; bottom: 10px; width: 110px;
   display: flex; flex-direction: column; gap: 5px; z-index: 2;
 }
-.hp-featured-thumb { flex: 1; width: 100%; object-fit: cover; border-radius: 16px; display: block; }
+.hp-featured-thumb { flex: 1; width: 100%; object-fit: cover; border-radius: 12px; display: block; }
 
 /* ── 精选专题 topic cards ── */
 .hp-topics-scroll { display: flex; gap: 10px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; }
@@ -13645,12 +13680,15 @@ button {
 
 /* ── Spot remove button ── */
 .mp-spot-remove {
-  width: 28px;
-  height: 28px;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.07);
-  border: none;
-  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  padding: 0 !important;
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -13661,6 +13699,22 @@ button {
   transition: all 0.2s;
 }
 .mp-spot-remove:hover { background: rgba(255,80,80,0.2); color: #ff5050; }
+
+/* ── Drag handle ── */
+.mp-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-height: 44px;
+  flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.mp-drag-handle:active { cursor: grabbing; opacity: 0.7; }
 
 /* ── Spot number placeholder ── */
 .mp-spot-placeholder {
@@ -13799,9 +13853,9 @@ button {
   background: rgba(255,255,255,0.06);
 }
 .mp-sheet-close {
-  width: 30px; height: 30px;
+  width: 44px; height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.1);
   background: rgba(255,255,255,0.08);
   color: rgba(255,255,255,0.55);
   font-size: 13px;
@@ -13951,14 +14005,17 @@ button {
   flex-shrink: 0;
 }
 .mp-exp-page-back {
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   color: #fff;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
 }
+.mp-exp-page-back:active { background: rgba(255,255,255,0.14); }
 .mp-exp-page-title {
   font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
 }
@@ -14417,10 +14474,14 @@ button {
   text-overflow: ellipsis;
 }
 .mp-sheet-result-add {
-  width: 28px; height: 28px;
+  width: 36px !important; height: 36px !important;
+  min-width: 36px; min-height: 36px;
+  padding: 0 !important;
   border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.25);
-  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
   color: rgba(255,255,255,0.6);
   font-size: 18px;
   line-height: 1;

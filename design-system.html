@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<title>INFO-333 Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary:        #3e5ded;
+    --primary-dark:   #112852;
+    --primary-pressed:#3049b9;
+    --primary-light:  #c6dcff;
+    --sky:            #25c5ff;
+    --white:          #ffffff;
+    --border-default: #d1d5dc;
+    --border-active:  #3e5ded;
+    --text-primary:   #0a0a0a;
+    --text-muted:     rgba(10,10,10,0.5);
+    --text-white:     #ffffff;
+    --text-white-muted: rgba(255,255,255,0.5);
+    --bg-page:        #f5f7ff;
+    --bg-dark:        #0f1221;
+    --shadow-std:     0px 1px 10px rgba(0,0,0,0.25);
+    --shadow-blue:    0px 1px 10px #c6dcff;
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    padding: 64px;
+    width: 1440px;
+  }
+
+  /* ── Page header ── */
+  .ds-header {
+    margin-bottom: 72px;
+  }
+  .ds-header h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .ds-header p {
+    font-size: 16px;
+    color: var(--text-muted);
+    letter-spacing: -0.3px;
+  }
+  .ds-divider {
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 60%, transparent 100%);
+    border-radius: 2px;
+    margin-top: 20px;
+  }
+
+  /* ── Section ── */
+  .ds-section {
+    margin-bottom: 72px;
+  }
+  .ds-section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  .ds-section-heading {
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: -0.5px;
+    margin-bottom: 32px;
+  }
+
+  /* ── Row / Grid ── */
+  .ds-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .ds-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .ds-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  /* ────────────────────────────────────────
+     1. COLOR PALETTE
+  ──────────────────────────────────────── */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+  .color-swatch {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-std);
+  }
+  .color-swatch-fill {
+    height: 80px;
+  }
+  .color-swatch-meta {
+    background: #fff;
+    padding: 12px 14px;
+  }
+  .color-swatch-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .color-swatch-hex {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+  .color-swatch-role {
+    font-size: 10px;
+    color: var(--primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ────────────────────────────────────────
+     2. TYPOGRAPHY
+  ──────────────────────────────────────── */
+  .type-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-std);
+  }
+  .type-item {
+    display: flex;
+    align-items: center;
+    padding: 20px 28px;
+    border-bottom: 1px solid #f0f2f8;
+    gap: 32px;
+  }
+  .type-item:last-child { border-bottom: none; }
+  .type-meta {
+    width: 140px;
+    flex-shrink: 0;
+  }
+  .type-meta-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .type-meta-spec { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .type-sample { flex: 1; }
+
+  /* ────────────────────────────────────────
+     3. COMPONENTS
+  ──────────────────────────────────────── */
+
+  /* Component card wrapper */
+  .comp-card {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow-std);
+    flex: 1;
+    min-width: 280px;
+  }
+  .comp-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: -0.2px;
+    margin-bottom: 4px;
+  }
+  .comp-card-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .comp-variants {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .comp-variant-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* Dark panel for dark-bg components */
+  .dark-panel {
+    background: var(--bg-dark);
+    border-radius: 16px;
+    padding: 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── ASK VEO BUTTON ── */
+  .btn-ask-veo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 35px;
+    padding: 0 27px;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: white;
+    letter-spacing: -0.44px;
+    position: relative;
+    overflow: visible;
+  }
+  .btn-ask-veo--default  { background: var(--primary-dark); }
+  .btn-ask-veo--hover    { background: var(--primary); }
+  .btn-ask-veo--pressed  {
+    background: var(--primary-pressed);
+    box-shadow: inset 0px 2px 0px rgba(0,0,0,0.25);
+  }
+  .btn-ask-veo-icon {
+    width: 17px; height: 17px;
+    font-size: 14px; line-height: 1;
+  }
+
+  /* ── SEARCH INPUT ── */
+  .search-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 362px;
+    height: 45px;
+    padding: 0 12px;
+    border-radius: 9999px;
+    border: 0.633px solid;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: var(--text-muted);
+    letter-spacing: -0.3125px;
+    position: relative;
+    background: white;
+    justify-content: space-between;
+  }
+  .search-input--default { border-color: var(--border-default); box-shadow: var(--shadow-std); }
+  .search-input--active  { border-color: var(--border-active); box-shadow: var(--shadow-std); }
+  .search-icon { font-size: 16px; opacity: 0.4; flex-shrink: 0; }
+  .search-input-text { flex: 1; font-size: 16px; color: var(--text-muted); }
+  .search-action { width: 22px; height: 22px; border-radius: 50%; border: 1px solid; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+  .search-action--add { border-color: var(--border-default); color: var(--text-muted); }
+  .search-action--close { border-color: var(--border-default); color: var(--text-muted); }
+
+  /* ── CANCEL TEXT ── */
+  .cancel-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: -0.3px;
+  }
+  .cancel-text--inactive { color: var(--text-muted); }
+  .cancel-text--active   { color: var(--primary); }
+
+  /* ── LOCATION LIST ITEM ── */
+  .location-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 320px;
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+  .location-item--dark   { background: rgba(255,255,255,0.05); }
+  .location-item--light  { background: white; box-shadow: var(--shadow-std); }
+  .location-icon { font-size: 18px; opacity: 0.7; }
+  .location-name { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+  .location-name--dark  { color: var(--primary); }
+  .location-name--light { color: var(--primary); }
+  .location-country { font-size: 12px; color: var(--text-muted); }
+  .location-country--dark { color: rgba(255,255,255,0.4); }
+
+  /* ── CATEGORY CHIP ── */
+  .cat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    border: 1px solid;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .cat-chip--default { background: white; border-color: var(--border-default); color: var(--text-primary); box-shadow: var(--shadow-std); }
+  .cat-chip--active  { background: var(--primary-dark); border-color: var(--primary-dark); color: white; }
+
+  /* ── NUMBER CIRCLE / FAB ── */
+  .fab {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .fab--default { background: var(--primary-dark); box-shadow: var(--shadow-blue); }
+  .fab--hover   { background: var(--primary);      box-shadow: var(--shadow-std); }
+  .fab--pressed { background: var(--primary);      box-shadow: var(--shadow-std); }
+  .fab--pressed::after {
+    content: '';
+    position: absolute; inset: 0;
+    box-shadow: inset 0px 4px 0px rgba(0,0,0,0.25);
+    border-radius: inherit;
+  }
+  .fab-outline {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    border: 2px solid var(--border-default);
+    background: transparent;
+  }
+
+  /* ── ACTION BAR BUTTONS ── */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    height: 34px;
+    border-radius: 20px;
+    border: none;
+    background: white;
+    box-shadow: var(--shadow-blue);
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: black;
+    cursor: pointer;
+  }
+  .action-btn-icon { font-size: 14px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    width: 280px;
+    height: 8px;
+    border-radius: 9999px;
+    background: rgba(62,93,237,0.15);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: var(--primary);
+  }
+  .progress-dot-wrap {
+    width: 280px;
+    height: 8px;
+    border-radius: 9999px;
+    background: rgba(62,93,237,0.15);
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .progress-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin-left: -4px;
+    position: absolute; left: 0;
+    box-shadow: 0 0 0 3px rgba(62,93,237,0.2);
+  }
+
+  /* ── WEATHER CARD ── */
+  .weather-card {
+    width: 118px; height: 118px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #25c5ff 0%, #1a9bd4 100%);
+    box-shadow: var(--shadow-std);
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .weather-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: -0.44px;
+  }
+  .weather-city-top { font-size: 12px; color: white; font-weight: 500; }
+  .weather-sun { font-size: 22px; }
+  .weather-temp {
+    font-size: 32px;
+    font-weight: 600;
+    color: white;
+    line-height: 1;
+    text-align: center;
+  }
+  .weather-temp-sub { font-size: 10px; color: rgba(255,255,255,0.5); text-align: center; }
+  .weather-city-bottom { font-size: 12px; color: white; text-align: center; }
+
+  /* ── EFFECTS GRID ── */
+  .effect-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .effect-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .effect-demo {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    background: white;
+  }
+  .effect-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .effect-value { font-size: 11px; color: var(--text-muted); font-family: monospace; }
+
+  /* ── SPACING SCALE ── */
+  .spacing-grid {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: var(--shadow-std);
+  }
+  .spacing-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .spacing-box {
+    background: var(--primary-light);
+    border-radius: 4px;
+    width: 28px;
+  }
+  .spacing-token { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+  .spacing-value { font-size: 11px; color: var(--primary); font-weight: 700; }
+
+  /* ── BORDER RADIUS SCALE ── */
+  .radius-grid {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: var(--shadow-std);
+    align-items: center;
+  }
+  .radius-item {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .radius-box {
+    width: 64px; height: 64px;
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+  }
+  .radius-label { font-size: 11px; color: var(--text-muted); }
+  .radius-value { font-size: 12px; font-weight: 700; color: var(--primary); }
+
+  /* Tag badge */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .tag--blue   { background: rgba(62,93,237,0.1);  color: var(--primary); }
+  .tag--dark   { background: rgba(17,40,82,0.08);  color: var(--primary-dark); }
+  .tag--green  { background: rgba(34,197,94,0.1);  color: #16a34a; }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     PAGE HEADER
+══════════════════════════════════════════════ -->
+<div class="ds-header">
+  <h1>INFO-333 Design System</h1>
+  <p>Opal Travel App · Component library, tokens, and visual language</p>
+  <div class="ds-divider"></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     1. COLOR PALETTE
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Foundations</div>
+  <div class="ds-section-heading">Color Palette</div>
+
+  <div class="color-grid">
+    <!-- Primary -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#3e5ded;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Primary</div>
+        <div class="color-swatch-hex">#3E5DED</div>
+        <div class="color-swatch-role">Brand Blue</div>
+      </div>
+    </div>
+    <!-- Primary Dark -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#112852;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Primary Dark</div>
+        <div class="color-swatch-hex">#112852</div>
+        <div class="color-swatch-role">Navy</div>
+      </div>
+    </div>
+    <!-- Pressed -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#3049b9;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Primary Pressed</div>
+        <div class="color-swatch-hex">#3049B9</div>
+        <div class="color-swatch-role">Active State</div>
+      </div>
+    </div>
+    <!-- Light -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#c6dcff;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Primary Light</div>
+        <div class="color-swatch-hex">#C6DCFF</div>
+        <div class="color-swatch-role">Shadow / Tint</div>
+      </div>
+    </div>
+    <!-- Sky -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#25c5ff;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Sky</div>
+        <div class="color-swatch-hex">#25C5FF</div>
+        <div class="color-swatch-role">Weather / Accent</div>
+      </div>
+    </div>
+    <!-- White -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#ffffff; border:1px solid #eee;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">White</div>
+        <div class="color-swatch-hex">#FFFFFF</div>
+        <div class="color-swatch-role">Surface</div>
+      </div>
+    </div>
+    <!-- Border -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#d1d5dc;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Border Default</div>
+        <div class="color-swatch-hex">#D1D5DC</div>
+        <div class="color-swatch-role">Stroke</div>
+      </div>
+    </div>
+    <!-- Text Primary -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#0a0a0a;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Text Primary</div>
+        <div class="color-swatch-hex">#0A0A0A</div>
+        <div class="color-swatch-role">Body</div>
+      </div>
+    </div>
+    <!-- Text Muted -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:rgba(10,10,10,0.5);"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Text Muted</div>
+        <div class="color-swatch-hex">rgba(10,10,10, 0.5)</div>
+        <div class="color-swatch-role">Placeholder</div>
+      </div>
+    </div>
+    <!-- Background Dark -->
+    <div class="color-swatch">
+      <div class="color-swatch-fill" style="background:#0f1221;"></div>
+      <div class="color-swatch-meta">
+        <div class="color-swatch-name">Background Dark</div>
+        <div class="color-swatch-hex">#0F1221</div>
+        <div class="color-swatch-role">App Shell</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     2. TYPOGRAPHY
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Foundations</div>
+  <div class="ds-section-heading">Typography</div>
+
+  <div class="type-row">
+    <div class="type-item">
+      <div class="type-meta">
+        <div class="type-meta-name">Display</div>
+        <div class="type-meta-spec">Inter · 32px · SemiBold · -0.44px</div>
+      </div>
+      <div class="type-sample">
+        <span style="font-family:'Inter',sans-serif;font-size:32px;font-weight:600;letter-spacing:-0.44px;color:#112852;">24°</span>
+      </div>
+      <span class="tag tag--blue">Inter</span>
+    </div>
+    <div class="type-item">
+      <div class="type-meta">
+        <div class="type-meta-name">Heading 1</div>
+        <div class="type-meta-spec">Inter · 24px · Bold · -0.5px</div>
+      </div>
+      <div class="type-sample">
+        <span style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;letter-spacing:-0.5px;color:#112852;">Where do you want to go?</span>
+      </div>
+      <span class="tag tag--blue">Inter</span>
+    </div>
+    <div class="type-item">
+      <div class="type-meta">
+        <div class="type-meta-name">Body Large</div>
+        <div class="type-meta-spec">Inter · 16px · Regular · -0.3125px</div>
+      </div>
+      <div class="type-sample">
+        <span style="font-family:'Inter',sans-serif;font-size:16px;font-weight:400;letter-spacing:-0.3125px;color:rgba(10,10,10,0.5);">Where you want to go?</span>
+      </div>
+      <span class="tag tag--blue">Inter</span>
+    </div>
+    <div class="type-item">
+      <div class="type-meta">
+        <div class="type-meta-name">Body Small</div>
+        <div class="type-meta-spec">Inter · 12px · Regular · -0.44px</div>
+      </div>
+      <div class="type-sample">
+        <span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:400;letter-spacing:-0.44px;color:#0a0a0a;">Ask veo · Beach · New York</span>
+      </div>
+      <span class="tag tag--blue">Inter</span>
+    </div>
+    <div class="type-item">
+      <div class="type-meta">
+        <div class="type-meta-name">Label Medium</div>
+        <div class="type-meta-spec">Roboto · 12px · Medium · wdth 100</div>
+      </div>
+      <div class="type-sample">
+        <span style="font-family:'Roboto',sans-serif;font-size:12px;font-weight:500;color:#0a0a0a;">Add · Save · Clock in</span>
+      </div>
+      <span class="tag tag--dark">Roboto</span>
+    </div>
+    <div class="type-item">
+      <div class="type-meta">
+        <div class="type-meta-name">Caption</div>
+        <div class="type-meta-spec">Roboto · 10px · Regular · -0.44px</div>
+      </div>
+      <div class="type-sample">
+        <span style="font-family:'Roboto',sans-serif;font-size:10px;font-weight:400;letter-spacing:-0.44px;color:rgba(10,10,10,0.5);">United State · Sunny · 75°F</span>
+      </div>
+      <span class="tag tag--dark">Roboto</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     3. SPACING SCALE
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Foundations</div>
+  <div class="ds-section-heading">Spacing Scale</div>
+
+  <div class="spacing-grid">
+    <div class="spacing-item"><div class="spacing-box" style="height:4px;"></div><div class="spacing-token">xs</div><div class="spacing-value">4px</div></div>
+    <div class="spacing-item"><div class="spacing-box" style="height:8px;"></div><div class="spacing-token">sm</div><div class="spacing-value">8px</div></div>
+    <div class="spacing-item"><div class="spacing-box" style="height:12px;"></div><div class="spacing-token">md</div><div class="spacing-value">12px</div></div>
+    <div class="spacing-item"><div class="spacing-box" style="height:16px;"></div><div class="spacing-token">lg</div><div class="spacing-value">16px</div></div>
+    <div class="spacing-item"><div class="spacing-box" style="height:20px;"></div><div class="spacing-token">xl</div><div class="spacing-value">20px</div></div>
+    <div class="spacing-item"><div class="spacing-box" style="height:24px;"></div><div class="spacing-token">2xl</div><div class="spacing-value">24px</div></div>
+    <div class="spacing-item"><div class="spacing-box" style="height:27px;"></div><div class="spacing-token">pill-x</div><div class="spacing-value">27px</div></div>
+    <div class="spacing-item"><div class="spacing-box" style="height:32px;"></div><div class="spacing-token">3xl</div><div class="spacing-value">32px</div></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     4. BORDER RADIUS
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Foundations</div>
+  <div class="ds-section-heading">Border Radius</div>
+
+  <div class="radius-grid">
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:4px;"></div>
+      <div class="radius-label">xs</div>
+      <div class="radius-value">4px</div>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:10px;"></div>
+      <div class="radius-label">sm</div>
+      <div class="radius-value">10px</div>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:12px;"></div>
+      <div class="radius-label">md</div>
+      <div class="radius-value">12px</div>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:16px;"></div>
+      <div class="radius-label">lg</div>
+      <div class="radius-value">16px</div>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:20px;"></div>
+      <div class="radius-label">xl</div>
+      <div class="radius-value">20px</div>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:9999px; width:80px; height:45px;"></div>
+      <div class="radius-label">pill</div>
+      <div class="radius-value">9999px</div>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:50%; width:64px;"></div>
+      <div class="radius-label">circle</div>
+      <div class="radius-value">50%</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     5. EFFECTS / SHADOWS
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Foundations</div>
+  <div class="ds-section-heading">Effects & Shadows</div>
+
+  <div class="effect-grid">
+    <div class="effect-card">
+      <div class="effect-demo" style="box-shadow:0px 1px 10px rgba(0,0,0,0.25); border-radius:14px;"></div>
+      <div class="effect-name">Shadow Standard</div>
+      <div class="effect-value">0 1 10 / rgba(0,0,0,0.25)</div>
+      <span class="tag tag--dark">Global</span>
+    </div>
+    <div class="effect-card">
+      <div class="effect-demo" style="box-shadow:0px 1px 10px #c6dcff; border-radius:14px;"></div>
+      <div class="effect-name">Shadow Blue</div>
+      <div class="effect-value">0 1 10 / #C6DCFF</div>
+      <span class="tag tag--blue">Action buttons</span>
+    </div>
+    <div class="effect-card">
+      <div class="effect-demo" style="box-shadow:inset 0px 2px 0px rgba(0,0,0,0.25); border-radius:14px; background:#3e5ded;"></div>
+      <div class="effect-name">Pressed (Inset)</div>
+      <div class="effect-value">inset 0 2 0 / rgba(0,0,0,0.25)</div>
+      <span class="tag tag--dark">Pressed state</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     6. COMPONENTS — BUTTONS
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Components</div>
+  <div class="ds-section-heading">Buttons</div>
+
+  <div class="ds-row">
+
+    <!-- Ask Veo Button -->
+    <div class="comp-card">
+      <div class="comp-card-title">Ask Veo Button</div>
+      <div class="comp-card-desc">Primary CTA · 115×35px · Pill · 3 variants</div>
+      <div class="comp-variants">
+        <div class="ds-col">
+          <div class="dark-panel" style="width:100%;gap:16px;flex-direction:row;justify-content:space-evenly;">
+            <div class="ds-col">
+              <button class="btn-ask-veo btn-ask-veo--default">
+                <span class="btn-ask-veo-icon">💣</span> Ask veo
+              </button>
+              <span class="ds-label">Default</span>
+            </div>
+            <div class="ds-col">
+              <button class="btn-ask-veo btn-ask-veo--hover">
+                <span class="btn-ask-veo-icon">💣</span> Ask veo
+              </button>
+              <span class="ds-label">Hover</span>
+            </div>
+            <div class="ds-col">
+              <button class="btn-ask-veo btn-ask-veo--pressed">
+                <span class="btn-ask-veo-icon">💣</span> Ask veo
+              </button>
+              <span class="ds-label">Pressed</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag--dark">Font: Inter 12px</span>
+          <span class="tag tag--blue">Default: #112852</span>
+          <span class="tag tag--blue">Active: #3E5DED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Bar Buttons -->
+    <div class="comp-card">
+      <div class="comp-card-title">Action Bar Buttons</div>
+      <div class="comp-card-desc">Contextual actions · 34px height · White pill · Blue shadow</div>
+      <div class="comp-variants">
+        <div class="ds-row" style="gap:12px;">
+          <div class="ds-col">
+            <button class="action-btn"><span class="action-btn-icon">➕</span> Add</button>
+            <span class="ds-label">Add</span>
+          </div>
+          <div class="ds-col">
+            <button class="action-btn"><span class="action-btn-icon">☆</span> Save</button>
+            <span class="ds-label">Save</span>
+          </div>
+          <div class="ds-col">
+            <button class="action-btn"><span class="action-btn-icon">🕐</span> Clock in</button>
+            <span class="ds-label">Clock in</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag--dark">Font: Roboto 12px Medium</span>
+          <span class="tag tag--blue">Shadow: #C6DCFF</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancel Text -->
+    <div class="comp-card" style="min-width:200px;max-width:220px;">
+      <div class="comp-card-title">Cancel Text</div>
+      <div class="comp-card-desc">Inline cancel action · 2 states</div>
+      <div class="comp-variants">
+        <div class="ds-row" style="gap:20px;">
+          <div class="ds-col">
+            <span class="cancel-text cancel-text--inactive">cancel</span>
+            <span class="ds-label">Inactive</span>
+          </div>
+          <div class="ds-col">
+            <span class="cancel-text cancel-text--active">cancel</span>
+            <span class="ds-label">Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     7. COMPONENTS — FAB / ICON BUTTONS
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Components</div>
+  <div class="ds-section-heading">FAB & Icon Buttons</div>
+
+  <div class="ds-row">
+
+    <!-- Number FAB -->
+    <div class="comp-card">
+      <div class="comp-card-title">Number Circle FAB</div>
+      <div class="comp-card-desc">Step counter · 64×64px · Circle · 3 variants</div>
+      <div class="comp-variants">
+        <div class="dark-panel" style="gap:20px;flex-direction:row;">
+          <div class="ds-col">
+            <div class="fab-outline">30</div>
+            <span class="ds-label">Default</span>
+          </div>
+          <div class="ds-col">
+            <button class="fab fab--hover" style="font-size:22px;">30</button>
+            <span class="ds-label">Hover</span>
+          </div>
+          <div class="ds-col">
+            <button class="fab fab--pressed" style="font-size:22px;">30</button>
+            <span class="ds-label">Pressed</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <span class="tag tag--blue">Default: #112852</span>
+          <span class="tag tag--blue">Active: #3E5DED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow FAB -->
+    <div class="comp-card">
+      <div class="comp-card-title">Arrow FAB</div>
+      <div class="comp-card-desc">Navigation · 64×64px · Circle · 3 variants</div>
+      <div class="comp-variants">
+        <div class="dark-panel" style="gap:20px;flex-direction:row;">
+          <div class="ds-col">
+            <button class="fab fab--default" style="font-size:20px;">→</button>
+            <span class="ds-label">Default</span>
+          </div>
+          <div class="ds-col">
+            <button class="fab fab--hover" style="font-size:20px;">→</button>
+            <span class="ds-label">Hover</span>
+          </div>
+          <div class="ds-col">
+            <button class="fab fab--pressed" style="font-size:20px;">→</button>
+            <span class="ds-label">Pressed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     8. COMPONENTS — INPUTS
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Components</div>
+  <div class="ds-section-heading">Search Input</div>
+
+  <div class="ds-row">
+    <div class="comp-card">
+      <div class="comp-card-title">Search / Destination Input</div>
+      <div class="comp-card-desc">362×45px · Pill · Grey border default · Blue border active · 2 variants</div>
+      <div class="comp-variants">
+        <div class="ds-col" style="align-items:flex-start;gap:16px;">
+          <div class="ds-col">
+            <div class="search-input search-input--default">
+              <span class="search-icon">🔍</span>
+              <span class="search-input-text">Where you want to go?</span>
+              <div class="search-action search-action--add">+</div>
+            </div>
+            <span class="ds-label">Default · border #D1D5DC</span>
+          </div>
+          <div class="ds-col">
+            <div class="search-input search-input--active">
+              <span class="search-icon">🔍</span>
+              <span class="search-input-text">Where you want to go?</span>
+              <div class="search-action search-action--close">✕</div>
+            </div>
+            <span class="ds-label">Active · border #3E5DED</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <span class="tag tag--blue">Font: Inter 16px</span>
+          <span class="tag tag--dark">Height: 45px</span>
+          <span class="tag tag--green">Radius: pill</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     9. COMPONENTS — LIST ITEMS & CHIPS
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Components</div>
+  <div class="ds-section-heading">List Items & Chips</div>
+
+  <div class="ds-row">
+
+    <!-- Location List Item -->
+    <div class="comp-card">
+      <div class="comp-card-title">Location List Item</div>
+      <div class="comp-card-desc">Search suggestion row · 2 states</div>
+      <div class="comp-variants">
+        <div class="dark-panel" style="flex-direction:column;gap:12px;align-items:flex-start;width:100%;">
+          <div class="ds-col" style="align-items:flex-start;">
+            <div class="location-item location-item--dark">
+              <span class="location-icon" style="color:rgba(255,255,255,0.4);">🕐</span>
+              <div>
+                <div class="location-name location-name--dark">New York</div>
+                <div class="location-country location-country--dark">United State</div>
+              </div>
+            </div>
+            <span class="ds-label">Unselected · dark bg</span>
+          </div>
+          <div class="ds-col" style="align-items:flex-start;">
+            <div class="location-item location-item--light">
+              <span class="location-icon" style="color:rgba(0,0,0,0.3);">🕐</span>
+              <div>
+                <div class="location-name location-name--light">New York</div>
+                <div class="location-country">United State</div>
+              </div>
+            </div>
+            <span class="ds-label">Selected · white bg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Chip -->
+    <div class="comp-card">
+      <div class="comp-card-title">Category Chip</div>
+      <div class="comp-card-desc">Filter pill · Emoji + label · 2 states</div>
+      <div class="comp-variants">
+        <div class="ds-row" style="gap:12px;align-items:center;">
+          <div class="ds-col">
+            <div class="cat-chip cat-chip--default">🏖️ Beach</div>
+            <span class="ds-label">Default</span>
+          </div>
+          <div class="ds-col">
+            <div class="cat-chip cat-chip--active">🏖️ Beach</div>
+            <span class="ds-label">Selected</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <span class="tag tag--blue">Emoji + Label</span>
+          <span class="tag tag--dark">Border: #D1D5DC</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     10. COMPONENTS — PROGRESS BAR
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Components</div>
+  <div class="ds-section-heading">Progress Bar</div>
+
+  <div class="ds-row">
+    <div class="comp-card">
+      <div class="comp-card-title">Progress Bar / Slider</div>
+      <div class="comp-card-desc">2 states — Minimal (dot only) & Full (filled)</div>
+      <div class="comp-variants">
+        <div class="ds-col" style="align-items:flex-start;gap:24px;width:100%;">
+          <div class="ds-col" style="align-items:flex-start;">
+            <div class="progress-dot-wrap">
+              <div class="progress-dot"></div>
+            </div>
+            <span class="ds-label">Minimal — dot only</span>
+          </div>
+          <div class="ds-col" style="align-items:flex-start;">
+            <div class="progress-wrap">
+              <div class="progress-fill" style="width:100%;"></div>
+            </div>
+            <span class="ds-label">Full — filled</span>
+          </div>
+          <div class="ds-col" style="align-items:flex-start;">
+            <div class="progress-wrap">
+              <div class="progress-fill" style="width:60%;"></div>
+            </div>
+            <span class="ds-label">60% progress</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <span class="tag tag--blue">Fill: #3E5DED</span>
+          <span class="tag tag--dark">Track: rgba(62,93,237,0.15)</span>
+          <span class="tag tag--dark">Height: 8px</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     11. COMPONENTS — CARDS
+══════════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-title">Components</div>
+  <div class="ds-section-heading">Cards</div>
+
+  <div class="ds-row">
+    <!-- Weather Card -->
+    <div class="comp-card">
+      <div class="comp-card-title">Weather Card</div>
+      <div class="comp-card-desc">118×118px · Blue gradient · Location + temp + condition</div>
+      <div class="comp-variants">
+        <div class="ds-row" style="gap:20px;align-items:center;">
+          <div class="weather-card">
+            <div class="weather-card-top">
+              <div>
+                <div class="weather-city-top">Seattle</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.5);">Sunny</div>
+              </div>
+              <span class="weather-sun">☀️</span>
+            </div>
+            <div style="text-align:center;">
+              <div class="weather-temp">24°</div>
+              <div class="weather-temp-sub">75°F</div>
+            </div>
+            <div class="weather-city-bottom">Seattle</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <span class="tag tag--blue">Size: 118×118px</span>
+            <span class="tag tag--blue">Radius: 10px</span>
+            <span class="tag tag--blue">BG: #25C5FF → #1A9BD4</span>
+            <span class="tag tag--dark">Font: Roboto SemiBold 32px</span>
+            <span class="tag tag--dark">Shadow: std</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

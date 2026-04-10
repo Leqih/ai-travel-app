@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,24 +11,32 @@ import { faHouse, faCompass, faPlane, faCircleUser, faPlus, faChevronLeft, faSha
    Always loads with &libraries=places so autocomplete works. ── */
 function loadGoogleMaps() {
   if (typeof window === "undefined") return Promise.reject();
-  // If already fully loaded (with places), resolve immediately
+  // Already fully loaded
   if (window.google?.maps?.places) return Promise.resolve(window.google.maps);
   // Reuse existing in-flight promise
   if (window.__opalGmapsPromise) return window.__opalGmapsPromise;
-  // If Maps is loaded but Places isn't (e.g. NearbyPage loaded it first),
-  // load just the places library via a callback-based approach
-  if (window.google?.maps && !window.google.maps.places) {
+  // If Maps is already loaded (by NearbyPage without places), poll until places
+  // is ready rather than injecting a second script (which triggers the warning)
+  if (window.google?.maps) {
     window.__opalGmapsPromise = new Promise((resolve) => {
-      const cb = `__opalPlacesCb${Date.now()}`;
-      window[cb] = () => { delete window[cb]; resolve(window.google.maps); };
-      const s = document.createElement("script");
-      s.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places&language=en&callback=${cb}`;
-      s.async = true;
-      document.head.appendChild(s);
+      const poll = setInterval(() => {
+        if (window.google?.maps?.places) { clearInterval(poll); resolve(window.google.maps); }
+      }, 50);
+      // Fallback: resolve without places after 3s so the map still works
+      setTimeout(() => { clearInterval(poll); resolve(window.google.maps); }, 3000);
     });
     return window.__opalGmapsPromise;
   }
-  // Fresh load
+  // If another script tag is already being injected, wait for it
+  if (document.querySelector('script[src*="maps.googleapis.com"]')) {
+    window.__opalGmapsPromise = new Promise((resolve) => {
+      const poll = setInterval(() => {
+        if (window.google?.maps) { clearInterval(poll); resolve(window.google.maps); }
+      }, 50);
+    });
+    return window.__opalGmapsPromise;
+  }
+  // Fresh load with places
   window.__opalGmapsPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places&language=en`;
@@ -72,11 +80,79 @@ const CITY_COORDS = {
 
 const DAY_COLORS = ["#8B9DAF","#7B9E7F","#A07B7B","#9E9B7B","#7B7B9E","#9E7B9E"];
 
+/* ── Hardcoded fallback spots per city (used when Places API unavailable) ── */
+const CITY_FALLBACK_SPOTS = {
+  "Tokyo": [
+    { name: "Shibuya Crossing",   address: "Shibuya, Tokyo",              lat: 35.6595, lng: 139.7004 },
+    { name: "Senso-ji Temple",    address: "Asakusa, Tokyo",              lat: 35.7148, lng: 139.7967 },
+    { name: "Tokyo Skytree",      address: "Oshiage, Tokyo",              lat: 35.7101, lng: 139.8107 },
+    { name: "Shinjuku Gyoen",     address: "Shinjuku, Tokyo",             lat: 35.6851, lng: 139.7100 },
+    { name: "Meiji Shrine",       address: "Harajuku, Tokyo",             lat: 35.6763, lng: 139.6993 },
+    { name: "Harajuku",           address: "Harajuku, Tokyo",             lat: 35.6702, lng: 139.7027 },
+    { name: "Tokyo Tower",        address: "Minato, Tokyo",               lat: 35.6586, lng: 139.7454 },
+    { name: "Akihabara",          address: "Chiyoda, Tokyo",              lat: 35.7022, lng: 139.7741 },
+    { name: "Odaiba",             address: "Minato, Tokyo",               lat: 35.6267, lng: 139.7759 },
+    { name: "Roppongi Hills",     address: "Roppongi, Tokyo",             lat: 35.6604, lng: 139.7292 },
+    { name: "Ginza",              address: "Chuo, Tokyo",                 lat: 35.6717, lng: 139.7650 },
+    { name: "Imperial Palace",    address: "Chiyoda, Tokyo",              lat: 35.6852, lng: 139.7528 },
+    { name: "Kabukicho",          address: "Shinjuku, Tokyo",             lat: 35.6959, lng: 139.7038 },
+    { name: "Tsukiji Market",     address: "Chuo, Tokyo",                 lat: 35.6654, lng: 139.7707 },
+    { name: "Ueno Park",          address: "Taito, Tokyo",                lat: 35.7157, lng: 139.7736 },
+  ],
+  "Seoul": [
+    { name: "Gyeongbokgung Palace", address: "Jongno-gu, Seoul",          lat: 37.5796, lng: 126.9770 },
+    { name: "Bukchon Hanok Village", address: "Jongno-gu, Seoul",         lat: 37.5826, lng: 126.9830 },
+    { name: "Myeongdong",           address: "Jung-gu, Seoul",            lat: 37.5635, lng: 126.9850 },
+    { name: "N Seoul Tower",        address: "Namsan, Seoul",             lat: 37.5512, lng: 126.9882 },
+    { name: "Hongdae",              address: "Mapo-gu, Seoul",            lat: 37.5563, lng: 126.9228 },
+    { name: "Insadong",             address: "Jongno-gu, Seoul",          lat: 37.5744, lng: 126.9856 },
+    { name: "Gangnam District",     address: "Gangnam-gu, Seoul",         lat: 37.4979, lng: 127.0276 },
+    { name: "Dongdaemun Market",    address: "Jung-gu, Seoul",            lat: 37.5712, lng: 127.0098 },
+  ],
+  "Bangkok": [
+    { name: "Grand Palace",         address: "Phra Nakhon, Bangkok",      lat: 13.7500, lng: 100.4913 },
+    { name: "Wat Phra Kaew",        address: "Phra Nakhon, Bangkok",      lat: 13.7516, lng: 100.4929 },
+    { name: "Wat Arun",             address: "Bangkok Yai, Bangkok",      lat: 13.7437, lng: 100.4888 },
+    { name: "Chatuchak Market",     address: "Chatuchak, Bangkok",        lat: 13.7998, lng: 100.5502 },
+    { name: "Khao San Road",        address: "Phra Nakhon, Bangkok",      lat: 13.7587, lng: 100.4976 },
+    { name: "Lumphini Park",        address: "Pathum Wan, Bangkok",       lat: 13.7313, lng: 100.5410 },
+  ],
+  "Paris": [
+    { name: "Eiffel Tower",         address: "Champ de Mars, Paris",      lat: 48.8584, lng: 2.2945 },
+    { name: "Louvre Museum",        address: "1st arrondissement, Paris", lat: 48.8606, lng: 2.3376 },
+    { name: "Notre-Dame Cathedral", address: "Île de la Cité, Paris",     lat: 48.8530, lng: 2.3499 },
+    { name: "Arc de Triomphe",      address: "Champs-Élysées, Paris",     lat: 48.8738, lng: 2.2950 },
+    { name: "Montmartre",           address: "18th arrondissement, Paris",lat: 48.8867, lng: 2.3431 },
+    { name: "Musée d'Orsay",        address: "7th arrondissement, Paris", lat: 48.8600, lng: 2.3266 },
+    { name: "Palace of Versailles", address: "Versailles, France",        lat: 48.8049, lng: 2.1204 },
+    { name: "Sacré-Cœur",          address: "Montmartre, Paris",          lat: 48.8867, lng: 2.3431 },
+  ],
+  "Bali": [
+    { name: "Tanah Lot Temple",     address: "Tabanan, Bali",             lat: -8.6215, lng: 115.0866 },
+    { name: "Ubud Monkey Forest",   address: "Ubud, Bali",                lat: -8.5189, lng: 115.2596 },
+    { name: "Kuta Beach",           address: "Kuta, Bali",                lat: -8.7228, lng: 115.1686 },
+    { name: "Uluwatu Temple",       address: "Uluwatu, Bali",             lat: -8.8291, lng: 115.0849 },
+    { name: "Seminyak Beach",       address: "Seminyak, Bali",            lat: -8.6941, lng: 115.1606 },
+    { name: "Tegallalang Rice Terraces", address: "Tegallalang, Bali",    lat: -8.4322, lng: 115.2769 },
+  ],
+  "New York": [
+    { name: "Central Park",         address: "Manhattan, New York",       lat: 40.7851, lng: -73.9683 },
+    { name: "Times Square",         address: "Midtown, New York",         lat: 40.7580, lng: -73.9855 },
+    { name: "Statue of Liberty",    address: "Liberty Island, New York",  lat: 40.6892, lng: -74.0445 },
+    { name: "Brooklyn Bridge",      address: "Brooklyn, New York",        lat: 40.7061, lng: -73.9969 },
+    { name: "Metropolitan Museum",  address: "Upper East Side, New York", lat: 40.7794, lng: -73.9632 },
+    { name: "Empire State Building",address: "Midtown, New York",         lat: 40.7484, lng: -73.9857 },
+    { name: "High Line",            address: "Chelsea, New York",         lat: 40.7480, lng: -74.0048 },
+    { name: "MOMA",                 address: "Midtown, New York",         lat: 40.7614, lng: -73.9776 },
+  ],
+};
+
 /* ── Map centered on destination — custom HTML overlay pins ── */
-function EmptyMap({ destination, spots, selectedIdx = 0, onPinClick, totalMode = false }) {
+function EmptyMap({ destination, spots, selectedIdx = 0, onPinClick, totalMode = false, onTotalPinClick }) {
   const mapRef      = useRef(null);
   const mapInstRef  = useRef(null);
   const overlaysRef = useRef([]);
+  const panRafRef   = useRef(null); // cancel in-flight pan animation
 
   // Init map once
   useEffect(() => {
@@ -103,17 +179,15 @@ function EmptyMap({ destination, spots, selectedIdx = 0, onPinClick, totalMode =
     mapInstRef.current.setZoom(coords.zoom);
   }, [destination]);
 
-  // Rebuild overlay pins whenever spots, selection, or mode changes
+  // Rebuild overlay pins only when spots list or mode changes (NOT on selectedIdx)
   useEffect(() => {
     if (!mapInstRef.current) return;
     loadGoogleMaps().then((maps) => {
       overlaysRef.current.forEach(o => o.setMap(null));
       overlaysRef.current = [];
       if (!spots || spots.length === 0) return;
-      const bounds = new maps.LatLngBounds();
       spots.forEach((spot, idx) => {
         if (!spot.lat || !spot.lng) return;
-        const isActive = !totalMode && idx === selectedIdx;
         const color = totalMode
           ? (DAY_COLORS[(spot._day - 1) % DAY_COLORS.length] || DAY_COLORS[0])
           : DAY_COLORS[0];
@@ -122,9 +196,7 @@ function EmptyMap({ destination, spots, selectedIdx = 0, onPinClick, totalMode =
         overlay.onAdd = function () {
           const div = document.createElement("div");
           div.className = "nd-gm-pin";
-          const ds = isActive ? "" : ` style="background:${color};border-color:${color}40"`;
-          const ls = isActive ? "" : ` style="background:${color};border-color:${color}40"`;
-          div.innerHTML = `<div class="nd-map-pin-dot${isActive ? " nd-map-pin-dot--active" : ""}"${ds}>${label}</div><div class="nd-map-pin-label"${ls}>${spot.name}</div>`;
+          div.innerHTML = `<div class="nd-map-pin-dot" style="background:${color};border-color:${color}40">${label}</div><div class="nd-map-pin-label" style="background:${color};border-color:${color}40">${spot.name}</div>`;
           div.style.cursor = "pointer";
           div.addEventListener("click", () => onPinClick?.(idx));
           this._div = div;
@@ -133,21 +205,69 @@ function EmptyMap({ destination, spots, selectedIdx = 0, onPinClick, totalMode =
         overlay.draw = function () {
           if (!this._div) return;
           const pt = this.getProjection().fromLatLngToDivPixel(new maps.LatLng(spot.lat, spot.lng));
-          if (pt) { this._div.style.left = `${pt.x}px`; this._div.style.top = `${pt.y}px`; }
+          if (pt) {
+            this._div.style.position = "absolute";
+            this._div.style.left = `${pt.x - 15}px`;
+            this._div.style.top = `${pt.y - 44}px`;
+          }
         };
         overlay.onRemove = function () { this._div?.parentNode?.removeChild(this._div); this._div = null; };
         overlay.setMap(mapInstRef.current);
         overlaysRef.current.push(overlay);
-        bounds.extend({ lat: spot.lat, lng: spot.lng });
       });
-      if (spots.length > 1) {
-        mapInstRef.current.fitBounds(bounds, { top: 80, bottom: 320, left: 40, right: 40 });
-      } else if (spots.length === 1) {
-        mapInstRef.current.panTo({ lat: spots[0].lat, lng: spots[0].lng });
-        mapInstRef.current.setZoom(15);
-      }
     }).catch(() => {});
-  }, [spots, selectedIdx, totalMode]);
+  }, [spots, totalMode]);
+
+  // Update active pin styling + pan map when selected card changes
+  useEffect(() => {
+    if (!mapInstRef.current || !spots?.length) return;
+    // Update active class on existing overlay divs without rebuilding
+    overlaysRef.current.forEach((o, idx) => {
+      if (!o._div) return;
+      const dot = o._div.querySelector(".nd-map-pin-dot");
+      const lbl = o._div.querySelector(".nd-map-pin-label");
+      const isActive = !totalMode && idx === selectedIdx;
+      const color = totalMode
+        ? (DAY_COLORS[(spots[idx]?._day - 1) % DAY_COLORS.length] || DAY_COLORS[0])
+        : DAY_COLORS[0];
+      if (dot) {
+        dot.className = `nd-map-pin-dot${isActive ? " nd-map-pin-dot--active" : ""}`;
+        dot.style.background = isActive ? "" : color;
+        dot.style.borderColor = isActive ? "" : `${color}40`;
+      }
+      if (lbl) {
+        lbl.style.background = isActive ? "" : color;
+        lbl.style.borderColor = isActive ? "" : `${color}40`;
+      }
+    });
+    // Smooth pan to selected spot using rAF (works for any distance, unlike panTo)
+    const target = spots[selectedIdx] || spots[0];
+    if (target) {
+      const map = mapInstRef.current;
+      const destZoom = (destination && CITY_COORDS[destination]?.zoom) || 12;
+      if (totalMode && map.getZoom() < destZoom) map.setZoom(destZoom);
+      if (!totalMode && map.getZoom() < 14) map.setZoom(14);
+
+      // Cancel any in-progress animation
+      if (panRafRef.current) cancelAnimationFrame(panRafRef.current);
+
+      const startCenter = map.getCenter();
+      const startLat = startCenter.lat();
+      const startLng = startCenter.lng();
+      const endLat = target.lat;
+      const endLng = target.lng;
+      const duration = 1800;
+      const startTime = performance.now();
+
+      function animatePan(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3); // ease-out cubic
+        map.setCenter({ lat: startLat + (endLat - startLat) * ease, lng: startLng + (endLng - startLng) * ease });
+        if (t < 1) panRafRef.current = requestAnimationFrame(animatePan);
+      }
+      panRafRef.current = requestAnimationFrame(animatePan);
+    }
+  }, [selectedIdx, spots, totalMode]);
 
   return (
     <div className="nd-map-wrap">
@@ -217,6 +337,13 @@ const SPOT_GRADIENTS = [
 ];
 const SPOT_EMOJIS = ["📍","🗺️","🏛️","🍜","🌿","🎨","🏔️","🛍️","📸","🎵"];
 
+/* Hash spot name to a stable palette index so gradient/emoji travel with the spot */
+const spotPaletteIdx = (name = "") => {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return h;
+};
+
 const BUDGET_CATS = [
   { icon: "🏨", label: "Hotel" },
   { icon: "✈️", label: "Transport" },
@@ -252,15 +379,19 @@ function ManualPlanInner() {
   const paramDuration = searchParams.get("duration") || "";
   const paramPrefs    = searchParams.get("prefs")    || "";
   const paramBudget   = searchParams.get("budget")   || ""; // e.g. "Mid-Range · $500/day"
+  const paramId       = searchParams.get("id")       || "";
 
   // Derive clean destination label (strip country, e.g. "Tokyo, Japan" → "Tokyo")
   const initDest  = paramCity ? paramCity.split(",")[0].trim() : "";
   const initDur   = paramDuration || "";
   const initPrefs = paramPrefs ? paramPrefs.split(",").map(p => p.trim()).filter(Boolean) : [];
 
-  const [destination] = useState(initDest);
-  const [duration]    = useState(initDur);
-  const [prefs]       = useState(initPrefs);
+  const [destination]           = useState(initDest);
+  const [duration, setDuration] = useState(initDur);
+  const [prefs]                 = useState(initPrefs);
+  const [durationPickerOpen, setDurationPickerOpen] = useState(false);
+  const [tripId]      = useState(() => paramId || `trip_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
+  const [loadDone,    setLoadDone]    = useState(!paramId); // false for existing trips (load from localStorage), true for new trips
 
   const numDays = parseInt(duration) || 3;
   const [tripDay, setTripDay]         = useState(0);
@@ -285,7 +416,7 @@ function ManualPlanInner() {
   const [dayPickerOpen,  setDayPickerOpen]  = useState(false);
 
   // ── Budget tracker ──
-  const [budget,        setBudget]        = useState("");
+  const [budget,        setBudget]        = useState(paramBudget || "");
   const [expenses,      setExpenses]      = useState([]); // [{cat, amount, note}]
   const [addExpOpen,    setAddExpOpen]    = useState(false);
   const [expCat,        setExpCat]        = useState("Food");
@@ -296,9 +427,73 @@ function ManualPlanInner() {
 
   // ── Map card carousel (pin↔card sync) ──
   const [selectedActIdx, setSelectedActIdx] = useState(0);
-  const trackRef  = useRef(null);
-  const swipeRef  = useRef({ startX: 0, currentX: 0, dragging: false });
-  const springRef = useRef(null);
+  const [selectedTotalIdx, setSelectedTotalIdx] = useState(0);
+  const trackRef       = useRef(null);
+  const totalTrackRef  = useRef(null);
+  const swipeRef       = useRef({ startX: 0, currentX: 0, dragging: false });
+  const springRef      = useRef(null);
+  const autoSaveReady  = useRef(false); // prevent auto-save from overwriting localStorage before load effect runs
+
+  // ── Drag-handle reorder ──
+  const [dragInfo, setDragInfo] = useState(null); // { day, fromIdx, currentIdx } — drives visual state
+  const dragStateRef = useRef(null);              // sync currentIdx for native event handlers
+  const dragCloneRef = useRef(null);              // floating card DOM clone
+
+  const startDrag = (day, idx, startY, cardEl) => {
+    if (!cardEl) return;
+    const getY = (e) => e.touches?.[0]?.clientY ?? e.clientY;
+
+    // Snapshot card geometry immediately
+    const rect = cardEl.getBoundingClientRect();
+    const cardHeight = rect.height + 8;
+    const actLen = (activities[day] || []).length;
+
+    // Create floating clone
+    const clone = cardEl.cloneNode(true);
+    clone.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px;z-index:10000;border-radius:16px;pointer-events:none;transform:scale(1.04);opacity:0.97;box-shadow:0 16px 48px rgba(0,0,0,0.6),0 0 0 2px rgba(255,255,255,0.14);`;
+    document.body.appendChild(clone);
+    dragCloneRef.current = { el: clone, initialTop: rect.top, cardHeight, actLen, fromIdx: idx };
+    dragStateRef.current = { day, fromIdx: idx, currentIdx: idx };
+    setDragInfo({ day, fromIdx: idx, currentIdx: idx });
+
+    const onMove = (e) => {
+      if (e.cancelable) e.preventDefault();
+      const y = getY(e);
+      const c = dragCloneRef.current;
+      if (!c) return;
+      const dy = y - startY;
+      c.el.style.top = `${c.initialTop + dy}px`;
+      const slotDelta = Math.round(dy / c.cardHeight);
+      const newIdx = Math.max(0, Math.min(c.actLen - 1, c.fromIdx + slotDelta));
+      if (dragStateRef.current && newIdx !== dragStateRef.current.currentIdx) {
+        dragStateRef.current = { ...dragStateRef.current, currentIdx: newIdx };
+        setDragInfo({ ...dragStateRef.current });
+      }
+    };
+
+    const onEnd = () => {
+      cleanup();
+      if (dragCloneRef.current) { dragCloneRef.current.el.remove(); dragCloneRef.current = null; }
+      const snap = dragStateRef.current;
+      dragStateRef.current = null;
+      setDragInfo(null);
+      if (snap && snap.fromIdx !== snap.currentIdx) moveSpot(snap.day, snap.fromIdx, snap.currentIdx);
+    };
+
+    const cleanup = () => {
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
+      window.removeEventListener('touchcancel', onEnd);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onEnd);
+    };
+
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onEnd);
+    window.addEventListener('touchcancel', onEnd);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
+  };
 
   function springTo(target, from, onUpdate) {
     if (springRef.current) cancelAnimationFrame(springRef.current);
@@ -326,8 +521,74 @@ function ManualPlanInner() {
     springTo(target, cur, (v) => { track.style.transform = `translateX(${v}px)`; });
   }, [selectedActIdx]);
 
+  // Animate total carousel track to selected card
+  useEffect(() => {
+    const track = totalTrackRef.current;
+    if (!track) return;
+    const wrap = track.querySelector(".nd-mapview-card-wrap");
+    if (!wrap) return;
+    const target = -selectedTotalIdx * wrap.offsetWidth;
+    const cur = parseFloat(track.style.transform?.match(/-?\d+\.?\d*/)?.[0] || 0);
+    springTo(target, cur, (v) => { track.style.transform = `translateX(${v}px)`; });
+  }, [selectedTotalIdx]);
+
   // Reset selected card when switching days
-  useEffect(() => { setSelectedActIdx(0); }, [tripDay]);
+  useEffect(() => { setSelectedActIdx(0); setSelectedTotalIdx(0); }, [tripDay]);
+
+  // ── Load saved trip from localStorage on mount (client-only) ──
+  useEffect(() => {
+    if (paramId) {
+      try {
+        const trips = JSON.parse(localStorage.getItem("opal_trips") || "[]");
+        const saved = trips.find(t => t.id === paramId);
+        if (saved) {
+          if (saved.activities) setActivities(saved.activities);
+          if (saved.budget) setBudget(saved.budget);
+          if (saved.expenses?.length) setExpenses(saved.expenses);
+        }
+      } catch (_) {}
+    }
+    setLoadDone(true); // batched with above setters — auto-save won't fire until this re-render
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Change trip duration (adds/removes day buckets) ──
+  function changeDuration(newDur) {
+    const newDays = parseInt(newDur) || 3;
+    setActivities(prev => {
+      const next = {};
+      for (let i = 1; i <= newDays; i++) next[i] = prev[i] || [];
+      return next;
+    });
+    setDuration(newDur);
+    if (tripDay > newDays) setTripDay(0);
+    setDurationPickerOpen(false);
+  }
+
+  // ── Auto-save trip to localStorage ──
+  useEffect(() => {
+    if (!loadDone) return;
+    if (!destination) return;
+    try {
+      const trips = JSON.parse(localStorage.getItem("opal_trips") || "[]");
+      const idx = trips.findIndex(t => t.id === tripId);
+      const now = Date.now();
+      const trip = {
+        id: tripId,
+        destination,
+        duration,
+        prefs,
+        budget,
+        activities,
+        expenses,
+        updatedAt: now,
+        createdAt: idx >= 0 ? trips[idx].createdAt : now,
+      };
+      if (idx >= 0) trips[idx] = trip;
+      else trips.unshift(trip);
+      localStorage.setItem("opal_trips", JSON.stringify(trips));
+    } catch (_) {}
+  }, [activities, expenses, budget, tripId, destination, duration, prefs, loadDone]);
 
   // ── Collaborators / invite ──
   const [inviteOpen,    setInviteOpen]    = useState(false);
@@ -356,7 +617,7 @@ function ManualPlanInner() {
   const CAT_QUERIES = {
     "Hotel":     { q: "hotels",               types: ["lodging"] },
     "Transport": { q: "train station airport", types: ["transit_station","airport"] },
-    "Saved":     { q: "popular attractions",  types: ["tourist_attraction"] },
+    "Top Picks": { q: "top attractions",       types: ["tourist_attraction"] },
     "Food":      { q: "restaurants",          types: ["restaurant"] },
     "Activity":  { q: "attractions things to do", types: ["tourist_attraction","amusement_park"] },
     "Shopping":  { q: "shopping mall market", types: ["shopping_mall"] },
@@ -397,15 +658,63 @@ function ManualPlanInner() {
   const addSpot = (day) => {
     setAddSheetDay(day);
     setSpotSearch("");
-    setSpotResults([]);
     setActiveCategory(null);
+    // Pre-load fallback suggestions so the sheet isn't empty
+    const fallback = (destination && CITY_FALLBACK_SPOTS[destination]) || CITY_FALLBACK_SPOTS["Tokyo"] || [];
+    setSpotResults(fallback.map(s => ({
+      place_id: null,
+      _fallback: s,
+      structured_formatting: { main_text: s.name, secondary_text: s.address },
+    })));
     setDayPickerOpen(false);
     catTapCount.current = 0;
     clearTimeout(catTapTimer.current);
     setTimeout(() => spotInputRef.current?.focus(), 120);
   };
 
-  // Live autocomplete search (optional types for category filtering)
+  // Normalize PlacesService results to autocomplete-like shape for shared rendering
+  const normalizePlaceResult = (p) => ({
+    place_id: p.place_id,
+    structured_formatting: {
+      main_text: p.name,
+      secondary_text: p.formatted_address || p.vicinity || "",
+    },
+  });
+
+  // Fallback: convert hardcoded spots to the same shape as API results
+  const buildFallback = (dest) => {
+    const spots = (dest && CITY_FALLBACK_SPOTS[dest]) || CITY_FALLBACK_SPOTS["Tokyo"] || [];
+    return spots.map(s => ({
+      place_id: null,
+      _fallback: s,
+      structured_formatting: { main_text: s.name, secondary_text: s.address },
+    }));
+  };
+
+  // Category search — uses PlacesService.textSearch; falls back to hardcoded data
+  const handleCategorySearch = (q, types) => {
+    const dest = destination; // capture synchronously before any async
+    setSpotLoading(true);
+    loadGoogleMaps().then((maps) => {
+      if (!placesSvcRef.current) placesSvcRef.current = new maps.places.PlacesService(document.createElement("div"));
+      const coords = CITY_COORDS[dest];
+      const req = {
+        query: dest ? `${q} in ${dest}` : q,
+        ...(coords ? { location: new maps.LatLng(coords.lat, coords.lng), radius: 30000 } : {}),
+        ...(types ? { type: types[0] } : {}),
+      };
+      placesSvcRef.current.textSearch(req, (results, status) => {
+        setSpotLoading(false);
+        if (status === maps.places.PlacesServiceStatus.OK && results?.length > 0) {
+          setSpotResults(results.slice(0, 10).map(normalizePlaceResult));
+        } else {
+          setSpotResults(buildFallback(dest));
+        }
+      });
+    }).catch(() => { setSpotLoading(false); setSpotResults(buildFallback(dest)); });
+  };
+
+  // Live autocomplete search for user-typed text
   const handleSpotSearch = (q, types) => {
     setSpotSearch(q);
     clearTimeout(searchTimer.current);
@@ -449,8 +758,8 @@ function ManualPlanInner() {
         // Single tap on active → restart search
         catTapCount.current = 0;
         const cfg = CAT_QUERIES[cat.label];
-        handleSpotSearch(cfg.q, cfg.types);
-        spotInputRef.current?.focus();
+        setSpotSearch(cfg.q);
+        handleCategorySearch(cfg.q, cfg.types);
       }, 280);
     } else {
       // Different tag → switch immediately
@@ -458,13 +767,32 @@ function ManualPlanInner() {
       clearTimeout(catTapTimer.current);
       setActiveCategory(cat.label);
       const cfg = CAT_QUERIES[cat.label];
-      handleSpotSearch(cfg.q, cfg.types);
-      spotInputRef.current?.focus();
+      setSpotSearch(cfg.q);
+      handleCategorySearch(cfg.q, cfg.types);
     }
   };
 
   // Select a predicted place → get details → add to activities
   const selectSpot = (pred) => {
+    // Fallback spot (no API) — add directly from hardcoded data
+    if (pred._fallback) {
+      const fb = pred._fallback;
+      const day = addSheetDay;
+      const idx = (activities[day] || []).length;
+      const TIMES = ["9:00 AM","11:00 AM","1:00 PM","3:00 PM","5:00 PM","7:00 PM","9:00 PM"];
+      setActivities(prev => ({
+        ...prev,
+        [day]: [...(prev[day] || []), {
+          _id: Date.now() + Math.random(),
+          name: fb.name, time: TIMES[idx % TIMES.length],
+          category: "attraction", address: fb.address,
+          isTicketed: false, openNow: null,
+          lat: fb.lat, lng: fb.lng,
+        }],
+      }));
+      setAddSheetDay(null); setSpotSearch(""); setSpotResults([]);
+      return;
+    }
     loadGoogleMaps().then((maps) => {
       if (!placesSvcRef.current) placesSvcRef.current = new maps.places.PlacesService(document.createElement("div"));
       placesSvcRef.current.getDetails(
@@ -476,10 +804,11 @@ function ManualPlanInner() {
           const TIMES = ["9:00 AM","11:00 AM","1:00 PM","3:00 PM","5:00 PM","7:00 PM","9:00 PM"];
           const TICKETED_TYPES = ["museum","amusement_park","zoo","aquarium","stadium","movie_theater","art_gallery","casino"];
           const isTicketed = (place.price_level > 0) || (place.types || []).some(t => TICKETED_TYPES.includes(t));
-          const openNow = place.opening_hours?.open_now ?? null; // null = unknown
+          const openNow = place.opening_hours?.isOpen?.() ?? null;
           setActivities(prev => ({
             ...prev,
             [day]: [...(prev[day] || []), {
+              _id: Date.now() + Math.random(),
               name: place.name,
               time: TIMES[idx % TIMES.length],
               category: (place.types?.[0] || "attraction").replace(/_/g, " "),
@@ -488,15 +817,12 @@ function ManualPlanInner() {
                 const parts = raw.split(",").map(s => s.trim()).filter(s => /^[\x20-\x7E]+$/.test(s));
                 return parts.length > 0 ? parts.join(", ") : raw.split(",").slice(-2).join(",").trim();
               })(),
-              isTicketed,
-              openNow,
+              isTicketed, openNow,
               lat: place.geometry.location.lat(),
               lng: place.geometry.location.lng(),
             }],
           }));
-          setAddSheetDay(null);
-          setSpotSearch("");
-          setSpotResults([]);
+          setAddSheetDay(null); setSpotSearch(""); setSpotResults([]);
         }
       );
     });
@@ -509,17 +835,35 @@ function ManualPlanInner() {
     }));
   };
 
+  const moveSpot = (day, fromIdx, toIdx) => {
+    setActivities(prev => {
+      const arr = [...(prev[day] || [])];
+      const [item] = arr.splice(fromIdx, 1);
+      arr.splice(toIdx, 0, item);
+      return { ...prev, [day]: arr };
+    });
+  };
+
+  // Memoize spots so the pin-rebuild effect only fires when activities actually change,
+  // not on every selectedIdx change (which would interrupt the panTo animation)
+  const mapSpots = useMemo(() => {
+    if (tripDay === 0) {
+      return Object.entries(activities).flatMap(([day, acts]) =>
+        acts.map(a => ({ ...a, _day: Number(day) }))
+      );
+    }
+    return activities[tripDay] || [];
+  }, [activities, tripDay]);
+
   // ── Plan / Itinerary Editor — identical structure to NearbyPage trip panel ──
   return (
     <div className="nd-shell">
       {/* Full-screen dark map — centered on destination, pins for added spots */}
       <EmptyMap
         destination={destination}
-        spots={tripDay === 0
-          ? Object.entries(activities).flatMap(([day, acts]) => acts.map(a => ({ ...a, _day: Number(day) })))
-          : (activities[tripDay] || [])}
-        selectedIdx={selectedActIdx}
-        onPinClick={(i) => { if (tripDay !== 0) setSelectedActIdx(i); }}
+        spots={mapSpots}
+        selectedIdx={tripDay === 0 ? selectedTotalIdx : selectedActIdx}
+        onPinClick={(i) => { if (tripDay === 0) setSelectedTotalIdx(i); else setSelectedActIdx(i); }}
         totalMode={tripDay === 0}
       />
 
@@ -544,6 +888,79 @@ function ManualPlanInner() {
           onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); mapExitTime.current = Date.now(); setTimeout(() => setMapMode(false), 80); }}>
           <div className="nd-mapview-bottom-handle-pill" />
         </div>
+
+        {/* Total mode — no card carousel, just show pins on the map */}
+        {false && tripDay === 0 && Object.values(activities).some(a => a.length > 0) && (() => {
+          const allSpots = Object.entries(activities).flatMap(([day, acts]) => acts.map(a => ({ ...a, _day: Number(day) })));
+          return (
+            <div className="nd-mapview-carousel"
+              onTouchStart={(e) => {
+                if (springRef.current) cancelAnimationFrame(springRef.current);
+                swipeRef.current = { startX: e.touches[0].clientX, currentX: e.touches[0].clientX, dragging: true };
+              }}
+              onTouchMove={(e) => {
+                if (!swipeRef.current.dragging) return;
+                swipeRef.current.currentX = e.touches[0].clientX;
+                const dx = swipeRef.current.currentX - swipeRef.current.startX;
+                const wrap = totalTrackRef.current?.querySelector(".nd-mapview-card-wrap");
+                const base = -selectedTotalIdx * (wrap?.offsetWidth || 375);
+                if (totalTrackRef.current) totalTrackRef.current.style.transform = `translateX(${base + dx}px)`;
+              }}
+              onTouchEnd={() => {
+                if (!swipeRef.current.dragging) return;
+                const dx = swipeRef.current.currentX - swipeRef.current.startX;
+                swipeRef.current.dragging = false;
+                let next = selectedTotalIdx;
+                if (dx < -50 && selectedTotalIdx < allSpots.length - 1) next = selectedTotalIdx + 1;
+                else if (dx > 50 && selectedTotalIdx > 0) next = selectedTotalIdx - 1;
+                if (next !== selectedTotalIdx) { setSelectedTotalIdx(next); }
+                else {
+                  const wrap = totalTrackRef.current?.querySelector(".nd-mapview-card-wrap");
+                  const target = -selectedTotalIdx * (wrap?.offsetWidth || 375);
+                  const cur = parseFloat(totalTrackRef.current?.style.transform?.match(/-?\d+\.?\d*/)?.[0] || 0);
+                  springTo(target, cur, (v) => { if (totalTrackRef.current) totalTrackRef.current.style.transform = `translateX(${v}px)`; });
+                }
+              }}
+            >
+              <div className="nd-mapview-carousel-track" ref={totalTrackRef}>
+                {allSpots.map((act, i) => (
+                  <div className="nd-mapview-card-wrap" key={i}>
+                    <div className="nd-mapview-card">
+                      <div className="nd-mapview-card-glow" />
+                      <div className="nd-mapview-card-header">
+                        <div className="nd-mapview-card-left">
+                          <div className="nd-mapview-card-icon">
+                            <span className="nd-mapview-card-emoji">{SPOT_EMOJIS[i % SPOT_EMOJIS.length]}</span>
+                          </div>
+                          <div className="nd-mapview-card-info">
+                            <p className="nd-mapview-card-name">{act.name}</p>
+                            <p className="nd-mapview-card-time">{act.time}</p>
+                          </div>
+                        </div>
+                        <div className="nd-mapview-card-right">
+                          <p className="nd-mapview-card-cat-label">Day</p>
+                          <p className="nd-mapview-card-cat-val">{act._day}</p>
+                        </div>
+                      </div>
+                      {act.address && <p className="nd-mapview-card-desc">{act.address}</p>}
+                      <div className="nd-mapview-card-actions">
+                        <button className="nd-mapview-btn-glass"
+                          onClick={() => {
+                            const q = encodeURIComponent(act.name + (act.address ? `, ${act.address}` : ""));
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, "_blank");
+                          }}>Details</button>
+                        <button className="nd-mapview-btn-solid"
+                          onClick={() => { mapExitTime.current = Date.now(); setMapMode(false); }}>
+                          View Plan
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Swipeable spot cards — spring carousel, pin↔card synced */}
         {tripDay !== 0 && (activities[tripDay] || []).length > 0 && (
@@ -708,7 +1125,7 @@ function ManualPlanInner() {
         onClick={() => { if (mapMode || Date.now() - mapExitTime.current < 800) return; setMapMode(true); }}
         onTouchEnd={(e) => { if (mapMode) { e.stopPropagation(); return; } }}
       >
-        <div className="nd-trip-panel" onClick={e => e.stopPropagation()}>
+        <div className="nd-trip-panel" onClick={e => { e.stopPropagation(); setDurationPickerOpen(false); }}>
           {/* Drag handle */}
           <div className="nd-trip-handle-row"
             onTouchStart={onPanelDragStart} onTouchEnd={onPanelDragEnd}
@@ -724,7 +1141,30 @@ function ManualPlanInner() {
               <div className="mp-trip-header-text">
                 <h2 className="mp-trip-title">{makeTripTitle(destination, prefs)}</h2>
                 <div className="mp-trip-meta">
-                  {duration && <span className="mp-trip-badge">{duration}</span>}
+                  {duration && (
+                    <div style={{ position: "relative" }} onClick={e => e.stopPropagation()}>
+                      <span
+                        className="mp-trip-badge"
+                        onClick={() => setDurationPickerOpen(o => !o)}
+                        style={{ cursor: "pointer", userSelect: "none" }}>
+                        {duration}
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" style={{ marginLeft: 4, opacity: 0.6 }}>
+                          <path d="M1.5 3L4 5.5L6.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
+                      {durationPickerOpen && (
+                        <div className="mp-sheet-day-picker" style={{ minWidth: 130 }} onClick={e => e.stopPropagation()}>
+                          {DURATIONS.map(d => (
+                            <button key={d}
+                              className={`mp-sheet-day-option${d === duration ? " mp-sheet-day-option--active" : ""}`}
+                              onClick={() => changeDuration(d)}>
+                              {d}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {paramCity && paramCity.includes(",") && (
                     <span className="mp-trip-badge mp-trip-badge--dim">
                       {paramCity.split(",").slice(1).join(",").trim()}
@@ -828,28 +1268,37 @@ function ManualPlanInner() {
                     </div>
                     <div className="nd-trip-activities">
                       {(activities[tripDay] || []).map((act, idx) => (
-                        <div key={idx}>
-                          <div className="nd-trip-rich-card">
-                            {/* Gradient photo placeholder */}
-                            <div className="mp-spot-photo" style={{ background: SPOT_GRADIENTS[idx % SPOT_GRADIENTS.length] }}>
-                              {SPOT_EMOJIS[idx % SPOT_EMOJIS.length]}
+                        <div key={act._id || (act.name + (act.lat || idx))}>
+                          {/* Drop indicator above this card */}
+                          {dragInfo?.day === tripDay && dragInfo?.currentIdx === idx && dragInfo?.fromIdx !== idx && (
+                            <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.5)", margin: "0 0 6px", transition: "opacity 0.15s" }} />
+                          )}
+                          <div
+                            className="nd-trip-overview-row"
+                            style={dragInfo?.day === tripDay && dragInfo?.fromIdx === idx ? { opacity: 0.15, transform: 'scale(0.97)', transition: 'opacity 0.15s, transform 0.15s' } : {}}
+                          >
+                            <div
+                              className="mp-drag-handle"
+                              onTouchStart={e => { e.preventDefault(); e.stopPropagation(); startDrag(tripDay, idx, e.nativeEvent.touches[0].clientY, e.currentTarget.parentElement); }}
+                              onMouseDown={e => { e.preventDefault(); e.stopPropagation(); startDrag(tripDay, idx, e.nativeEvent.clientY, e.currentTarget.parentElement); }}
+                            >
+                              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <rect x="3" y="4" width="12" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
+                                <rect x="3" y="8" width="12" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
+                                <rect x="3" y="12" width="12" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
+                              </svg>
                             </div>
-                            <div className="nd-trip-rich-content">
-                              <p className="nd-trip-rich-title">{idx + 1} · {act.name}</p>
-                              <p className="nd-trip-rich-category">{act.category}</p>
-                              <p className="nd-trip-rich-meta"><span className="nd-trip-rich-emoji">⏰</span> {act.time} · <span className="nd-trip-rich-emoji">♡</span> Save</p>
+                            <div className="nd-trip-overview-info" style={{ flex: 1 }}>
+                              <span className="nd-trip-overview-name">{idx + 1} · {act.name}</span>
+                              <span className="nd-trip-overview-time">{act.time}</span>
                             </div>
                             <button className="mp-spot-remove" onClick={e => { e.stopPropagation(); removeSpot(tripDay, idx); }}>×</button>
                           </div>
                         </div>
                       ))}
-                      {/* Add spot as a rich-card-style button */}
-                      <button className="mp-add-rich" onClick={e => { e.stopPropagation(); addSpot(tripDay); }}>
-                        <div className="mp-spot-photo" style={{ background: "rgba(255,255,255,0.06)", fontSize: 26 }}>+</div>
-                        <div className="nd-trip-rich-content">
-                          <p className="nd-trip-rich-title" style={{ opacity: 0.4, fontWeight: 600 }}>Add a spot</p>
-                          <p className="nd-trip-rich-category" style={{ opacity: 0.25 }}>Tap to add to Day {tripDay}</p>
-                        </div>
+                      {/* Add spot — matches overview row style */}
+                      <button className="mp-add-spot" onClick={e => { e.stopPropagation(); addSpot(tripDay); }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.35)' }}>+ Add a spot</span>
                       </button>
                     </div>
                   </div>
@@ -1038,7 +1487,6 @@ function ManualPlanInner() {
                   )}
                 </div>
               </div>
-              <button className="mp-sheet-close" onClick={() => setAddSheetDay(null)}>✕</button>
             </div>
 
             {/* Category action cards — horizontal scroll */}
@@ -1046,7 +1494,7 @@ function ManualPlanInner() {
               {[
                 { icon: "🏨", label: "Hotel" },
                 { icon: "✈️", label: "Transport" },
-                { icon: "⭐", label: "Saved" },
+                { icon: "⭐", label: "Top Picks" },
                 { icon: "🍽️", label: "Food" },
                 { icon: "🎯", label: "Activity" },
                 { icon: "🛍️", label: "Shopping" },
@@ -1285,6 +1733,11 @@ function ManualPlanInner() {
               value={expNote} onChange={e => setExpNote(e.target.value)} />
           </div>
         </div>
+      )}
+
+      {/* Drag active: transparent overlay blocks taps on other elements */}
+      {dragInfo && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />
       )}
     </div>
   );
