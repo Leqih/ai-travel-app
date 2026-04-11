@@ -785,163 +785,184 @@ const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
 
+const DURATION_PRESETS = [
+  { label: "Weekend", days: 2 },
+  { label: "3 Days", days: 3 },
+  { label: "5 Days", days: 5 },
+  { label: "1 Week", days: 7 },
+  { label: "10 Days", days: 10 },
+  { label: "2 Weeks", days: 14 },
+];
+
+const TICK_SPACING = 36; // px per day
+const MAX_DAYS = 30;
+
 function DurationSheet({ open, onClose, value, onSelect }) {
-  const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const currentDays = value ? parseInt(value) : null;
+  const [days, setDays] = useState(currentDays || 3);
+
+  const rulerRef = useRef(null);
+  const dragStartX = useRef(null);
+  const dragStartDays = useRef(null);
 
   useEffect(() => {
-    if (open) {
-      setViewYear(today.getFullYear());
-      setViewMonth(today.getMonth());
-      setStartDate(null);
-      setEndDate(null);
-    }
+    if (open) setDays(currentDays || 3);
   }, [open]);
 
-  const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
-    else setViewMonth(viewMonth - 1);
-  };
-  const nextMonth = () => {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
-    else setViewMonth(viewMonth + 1);
-  };
+  const label = days === 1 ? "1 Day" : `${days} Days`;
 
-  const daysInMonth = getDaysInMonth(viewYear, viewMonth);
-  const firstDay = getFirstDayOfWeek(viewYear, viewMonth);
-  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-  const handleDayClick = (day) => {
-    const clicked = new Date(viewYear, viewMonth, day);
-    if (clicked < todayDate) return; // can't select past dates
-
-    if (!startDate || (startDate && endDate)) {
-      // Start new selection
-      setStartDate(clicked);
-      setEndDate(null);
-    } else {
-      // Set end date
-      if (clicked < startDate) {
-        setEndDate(startDate);
-        setStartDate(clicked);
-      } else {
-        setEndDate(clicked);
-      }
-    }
+  const onDragStart = (clientX) => {
+    dragStartX.current = clientX;
+    dragStartDays.current = days;
   };
+  const onDragMove = (clientX) => {
+    if (dragStartX.current === null) return;
+    // drag right → more days
+    const delta = Math.round((clientX - dragStartX.current) / TICK_SPACING);
+    setDays(Math.min(MAX_DAYS, Math.max(1, dragStartDays.current + delta)));
+  };
+  const onDragEnd = () => { dragStartX.current = null; };
 
-  const isInRange = (day) => {
-    if (!startDate || !endDate) return false;
-    const d = new Date(viewYear, viewMonth, day);
-    return d >= startDate && d <= endDate;
-  };
-  const isStart = (day) => {
-    if (!startDate) return false;
-    const d = new Date(viewYear, viewMonth, day);
-    return d.getTime() === startDate.getTime();
-  };
-  const isEnd = (day) => {
-    if (!endDate) return false;
-    const d = new Date(viewYear, viewMonth, day);
-    return d.getTime() === endDate.getTime();
-  };
-  const isPast = (day) => {
-    const d = new Date(viewYear, viewMonth, day);
-    return d < todayDate;
-  };
-
-  const durationLabel = formatDuration(startDate, endDate);
-  const dayCount = startDate && endDate ? dateDiffDays(startDate, endDate) : startDate ? 1 : 0;
-
-  // Build calendar grid
-  const cells = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  // Ruler: padding of 12 ticks on each side so edges can reach center
+  const PAD = 12;
+  // offset = distance from strip start to selected tick = PAD + (days-1)
+  const rulerOffset = (PAD + days - 1) * TICK_SPACING;
 
   return (
     <BottomSheet open={open} onClose={onClose}>
       <h2 className="pl-sheet-title">Trip Duration</h2>
 
-      {/* Date range display — always visible */}
-      <div className="pl-cal-range-row">
-        <div className="pl-cal-range-date">
-          <span className="pl-cal-range-label">Start</span>
-          <span className={`pl-cal-range-value ${!startDate ? "pl-cal-range-placeholder" : ""}`}>
-            {startDate ? `${MONTH_NAMES[startDate.getMonth()].slice(0,3)} ${startDate.getDate()}` : "— —"}
-          </span>
-        </div>
-        <span className="pl-cal-range-arrow">→</span>
-        <div className="pl-cal-range-date">
-          <span className="pl-cal-range-label">End</span>
-          <span className={`pl-cal-range-value ${!endDate ? "pl-cal-range-placeholder" : ""}`}>
-            {endDate ? `${MONTH_NAMES[endDate.getMonth()].slice(0,3)} ${endDate.getDate()}` : "— —"}
-          </span>
+      {/* Value display */}
+      <div style={{ textAlign: "center", margin: "16px 0 20px" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", marginBottom: 6 }}>Days</div>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 6 }}>
+          <span style={{ fontSize: 48, fontWeight: 800, letterSpacing: -3, lineHeight: 1, color: "#fff", fontFamily: `-apple-system,"SF Pro Display","Helvetica Neue",sans-serif` }}>{days}</span>
+          <span style={{ fontSize: 18, fontWeight: 600, color: "rgba(255,255,255,0.3)", letterSpacing: -0.3 }}>{days === 1 ? "day" : "days"}</span>
         </div>
       </div>
 
-      {/* Calendar */}
-      <div className="pl-cal">
-        {/* Month nav */}
-        <div className="pl-cal-header">
-          <button className="pl-cal-nav" onClick={prevMonth}>
-            <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14 }} />
-          </button>
-          <span className="pl-cal-month">{MONTH_NAMES[viewMonth]} {viewYear}</span>
-          <button className="pl-cal-nav" onClick={nextMonth}>
-            <FontAwesomeIcon icon={faChevronRight} style={{ width: 10, height: 14 }} />
-          </button>
+      {/* Horizontal ruler */}
+      <div style={{ position: "relative", margin: "0 -28px 24px", alignSelf: "stretch", overflow: "hidden" }}>
+
+        {/* Draggable ruler track */}
+        <div
+          ref={rulerRef}
+          onMouseDown={e => onDragStart(e.clientX)}
+          onMouseMove={e => e.buttons === 1 && onDragMove(e.clientX)}
+          onMouseUp={onDragEnd}
+          onTouchStart={e => onDragStart(e.touches[0].clientX)}
+          onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX); }}
+          onTouchEnd={onDragEnd}
+          style={{
+            touchAction: "none", userSelect: "none", cursor: "ew-resize",
+            height: 120, position: "relative", overflow: "hidden",
+            background: "rgba(255,255,255,0.02)",
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+            borderBottom: "1px solid rgba(255,255,255,0.07)",
+          }}
+        >
+          {/* Left fade */}
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 72, background: "linear-gradient(90deg, rgba(14,14,18,1) 0%, rgba(14,14,18,0) 100%)", zIndex: 2, pointerEvents: "none" }} />
+          {/* Right fade */}
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 72, background: "linear-gradient(270deg, rgba(14,14,18,1) 0%, rgba(14,14,18,0) 100%)", zIndex: 2, pointerEvents: "none" }} />
+
+          {/* Center pointer triangle (pointing down from top) */}
+          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 3, pointerEvents: "none" }}>
+            <div style={{ width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: "12px solid #ff8c42" }} />
+          </div>
+          {/* Center glow line */}
+          <div style={{
+            position: "absolute", top: 12, bottom: 18, left: "50%", transform: "translateX(-50%)",
+            width: 2, borderRadius: 1,
+            background: "linear-gradient(180deg, rgba(255,140,66,0.5) 0%, rgba(255,140,66,0) 100%)",
+            zIndex: 1, pointerEvents: "none",
+          }} />
+
+          {/* Sliding tick strip */}
+          <div style={{
+            position: "absolute",
+            top: 0, bottom: 0,
+            left: `calc(50% - ${rulerOffset}px)`,
+            display: "flex",
+          }}>
+            {/* padding ticks on left */}
+            {Array.from({ length: PAD }).map((_, i) => (
+              <div key={`pl${i}`} style={{ width: TICK_SPACING, flexShrink: 0 }} />
+            ))}
+            {Array.from({ length: MAX_DAYS }).map((_, i) => {
+              const d = i + 1;
+              const isMajor = d % 5 === 0;
+              const isSel = d === days;
+              const tickH = isSel ? 64 : isMajor ? 40 : 20;
+              const tickW = isSel ? 3 : isMajor ? 2 : 1.5;
+              return (
+                <div key={d} onClick={() => setDays(d)} style={{
+                  width: TICK_SPACING, flexShrink: 0,
+                  display: "flex", flexDirection: "column", alignItems: "center",
+                  justifyContent: "flex-end", paddingBottom: 18,
+                  cursor: "pointer", height: "100%",
+                }}>
+                  <div style={{
+                    width: tickW,
+                    height: tickH,
+                    borderRadius: 2,
+                    background: isSel
+                      ? "linear-gradient(180deg, #ff8c42 0%, #ff5f1f 100%)"
+                      : isMajor
+                      ? "rgba(255,255,255,0.45)"
+                      : "rgba(255,255,255,0.15)",
+                    boxShadow: isSel ? "0 2px 12px rgba(255,140,66,0.6)" : "none",
+                    transition: "height 0.15s cubic-bezier(0.34,1.56,0.64,1), width 0.15s, background 0.15s",
+                    flexShrink: 0,
+                  }} />
+                  {(isMajor || d === 1) && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, lineHeight: 1, marginTop: 6,
+                      color: isSel ? "#ff9a52" : "rgba(255,255,255,0.25)",
+                      transition: "color 0.15s",
+                      letterSpacing: 0.2,
+                    }}>{d}</span>
+                  )}
+                </div>
+              );
+            })}
+            {/* padding ticks on right */}
+            {Array.from({ length: PAD }).map((_, i) => (
+              <div key={`pr${i}`} style={{ width: TICK_SPACING, flexShrink: 0 }} />
+            ))}
+          </div>
         </div>
 
-        {/* Weekday headers */}
-        <div className="pl-cal-weekdays">
-          {WEEKDAYS.map(w => <span key={w} className="pl-cal-weekday">{w}</span>)}
+        {/* Drag hint */}
+        <div style={{ textAlign: "center", marginTop: 8, fontSize: 10, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>
+          ← swipe to adjust →
         </div>
+      </div>
 
-        {/* Days grid */}
-        <div className="pl-cal-grid">
-          {cells.map((day, i) => {
-            if (day === null) return <span key={`e${i}`} className="pl-cal-empty" />;
-            const past = isPast(day);
-            const start = isStart(day);
-            const end = isEnd(day);
-            const inRange = isInRange(day);
-            const isToday = viewYear === today.getFullYear() && viewMonth === today.getMonth() && day === today.getDate();
-            return (
-              <button
-                key={day}
-                className={[
-                  "pl-cal-day",
-                  past && "pl-cal-day-past",
-                  start && "pl-cal-day-start",
-                  end && "pl-cal-day-end",
-                  inRange && !start && !end && "pl-cal-day-range",
-                  isToday && !start && !end && "pl-cal-day-today",
-                ].filter(Boolean).join(" ")}
-                onClick={() => handleDayClick(day)}
-                disabled={past}
-              >
-                {day}
-              </button>
-            );
-          })}
-        </div>
+      {/* Preset chips */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24, justifyContent: "center" }}>
+        {DURATION_PRESETS.map(p => {
+          const isSel = days === p.days;
+          return (
+            <button key={p.days} onClick={() => setDays(p.days)} style={{
+              padding: "8px 16px", borderRadius: 20,
+              border: isSel ? "1.5px solid rgba(255,140,66,0.5)" : "1.5px solid rgba(255,255,255,0.1)",
+              background: isSel ? "rgba(255,140,66,0.12)" : "rgba(255,255,255,0.05)",
+              color: isSel ? "#ff9a52" : "rgba(255,255,255,0.55)",
+              fontSize: 13, fontWeight: isSel ? 700 : 500,
+              cursor: "pointer", transition: "all 0.15s",
+            }}>{p.label}</button>
+          );
+        })}
       </div>
 
       <button
         className="pl-sheet-cta"
-        onClick={() => {
-          if (durationLabel) { onSelect(durationLabel); onClose(); }
-          else if (startDate) { onSelect("1 Day"); onClose(); }
-        }}
-        style={{ opacity: startDate ? 1 : 0.4, pointerEvents: startDate ? "auto" : "none" }}
+        onClick={() => { onSelect(label); onClose(); }}
       >
-        Set Timeline
+        Set {label}
         <FontAwesomeIcon icon={faArrowRight} style={{ width: 16, height: 16, color: "black" }} />
       </button>
-      <p className="pl-sheet-hint">Tap a start date, then an end date</p>
     </BottomSheet>
   );
 }

@@ -165,12 +165,13 @@ export function PicksPage() {
         <button className="picks-back" onClick={() => router.back()}>
           <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
-        <h1 className="picks-page-title">Today's Picks</h1>
-        <div className="picks-topbar-spacer" />
       </div>
 
-      {/* Subtitle */}
-      <p className="picks-subtitle">Curated travel stories & guides, refreshed daily</p>
+      {/* Page header */}
+      <div className="picks-header">
+        <h1 className="picks-page-title">Today's Picks</h1>
+        <p className="picks-subtitle">Curated travel stories & guides, refreshed daily</p>
+      </div>
 
       {/* Filter pills */}
       <div className="picks-filters">

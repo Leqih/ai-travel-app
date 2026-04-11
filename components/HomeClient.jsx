@@ -108,6 +108,19 @@ export function HomeClient() {
   const today = new Date();
   const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
+  // ── Splash screen — only on first load per session ──
+  const [splashVisible, setSplashVisible] = useState(false);
+  const [splashGone, setSplashGone] = useState(true);
+  useEffect(() => {
+    if (sessionStorage.getItem("navora_splash_seen")) return;
+    sessionStorage.setItem("navora_splash_seen", "1");
+    setSplashGone(false);
+    setSplashVisible(true);
+    const t1 = setTimeout(() => setSplashVisible(false), 1300);
+    const t2 = setTimeout(() => setSplashGone(true), 1900);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
   const [planOpen, setPlanOpen] = useState(false);
   const [cd, setCd] = useState({ days: 0, h: "00", m: "00", s: "00" });
 
@@ -200,6 +213,21 @@ export function HomeClient() {
   }, []);
 
   return (
+    <>
+    {!splashGone && (
+      <div className={`splash-screen${!splashVisible ? " splash-exit" : ""}`}>
+        <div className="splash-icon-wrap">
+          <div className="splash-icon-inner">
+            <img src="/navora-logo.svg" alt="Navora" style={{ width: 120, height: 120, objectFit: "contain" }} />
+          </div>
+        </div>
+        <div className="splash-wordmark">NAVORA</div>
+        <div className="splash-tagline">Plan your journey</div>
+        <div className="splash-bar-track">
+          <div className="splash-bar-fill" />
+        </div>
+      </div>
+    )}
     <div className="hp-shell" ref={shellRef}>
       <div className="hp-scroll">
 
@@ -572,5 +600,6 @@ export function HomeClient() {
         </div>
       </nav>
     </div>
+    </>
   );
 }

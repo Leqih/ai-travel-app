@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "nextjs-app",
-      "runtimeExecutable": "/usr/local/bin/node",
-      "runtimeArgs": ["node_modules/.bin/next", "dev", "-H", "0.0.0.0", "-p", "3000"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
       "port": 3000
     }
   ]

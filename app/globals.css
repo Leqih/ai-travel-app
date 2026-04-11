@@ -757,12 +757,10 @@ h1 {
   grid-template-columns: repeat(5, 1fr);
   gap: 0.6rem;
   padding: 0.7rem;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 999px;
-  background: rgba(18, 18, 30, 0.92);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  border: none;
+  border-radius: 20px;
+  background: #1a1a1e;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .overlay-backdrop {
@@ -1226,7 +1224,7 @@ h3,
 }
 
 .bottom-nav {
-  background: rgba(18, 18, 30, 0.92);
+  background: #1a1a1e;
 }
 
 @media (max-width: 900px) {
@@ -2646,7 +2644,7 @@ button {
   height: 100dvh;
   overflow: hidden;
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  background: #000;
+  background: #09090f;
   color: #fff;
 }
 
@@ -4435,7 +4433,7 @@ button {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(0,0,0,0.92) !important;
+  background: rgba(9,9,15,0.92) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -9272,15 +9270,16 @@ button {
 .picks-topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px 8px;
+  padding: 56px 20px 8px;
   position: sticky;
   top: 0;
   z-index: 100;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+.picks-header {
+  padding: 8px 20px 4px;
 }
 .picks-back {
   width: 44px;
@@ -9308,16 +9307,15 @@ button {
 .picks-back:hover { background: rgba(40,40,40,0.8); }
 .picks-page-title {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.3px;
 }
-.picks-topbar-spacer { width: 36px; }
 
 /* ── Subtitle ── */
 .picks-subtitle {
-  padding: 4px 20px 12px;
+  padding: 4px 0 12px;
   font-size: 13px;
   color: rgba(255,255,255,0.45);
   letter-spacing: -0.1px;
@@ -11543,7 +11541,7 @@ button {
 .pl-shell {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: #09090f;
   color: #fff;
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
   display: flex;
@@ -11824,8 +11822,8 @@ button {
 }
 .pl-city-title {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
   color: #fff;
   letter-spacing: -0.5px;
   margin: 0;
@@ -14674,3 +14672,134 @@ button {
   transition: background 0.15s;
 }
 .mp-invite-action-btn:active { background: rgba(255,255,255,0.2); }
+
+/* ─── Splash / App Loading Screen ─────────────────────────────── */
+@keyframes splash-ring-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes splash-icon-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.08); opacity: 0.85; }
+}
+@keyframes splash-bar-fill {
+  0%   { width: 0%; }
+  60%  { width: 72%; }
+  90%  { width: 92%; }
+  100% { width: 100%; }
+}
+@keyframes splash-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #09090f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.splash-screen.splash-exit {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+/* Icon ring */
+.splash-icon-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+  animation: splash-fade-in 0.5s ease 0.1s both;
+}
+.splash-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: rgba(108, 108, 255, 0.7);
+  border-right-color: rgba(255, 140, 66, 0.4);
+  animation: splash-ring-spin 1.4s linear infinite;
+}
+.splash-ring-2 {
+  position: absolute;
+  inset: -13px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  border-bottom-color: rgba(108, 108, 255, 0.25);
+  animation: splash-ring-spin 2.2s linear infinite reverse;
+}
+.splash-icon-inner {
+  width: 120px;
+  height: 120px;
+  border-radius: 22px;
+  background: transparent;
+  border: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  backdrop-filter: blur(6px);
+  animation: splash-icon-pulse 2s ease-in-out infinite;
+}
+
+/* Blob fallback (shown when logo image hasn't been added yet) */
+@keyframes blob-morph {
+  0%, 100% { border-radius: 62% 38% 46% 54% / 60% 44% 56% 40%; }
+  33%       { border-radius: 40% 60% 60% 40% / 48% 58% 42% 52%; }
+  66%       { border-radius: 54% 46% 38% 62% / 38% 56% 44% 62%; }
+}
+.splash-blob-fallback {
+  width: 64px;
+  height: 64px;
+  background: radial-gradient(ellipse at 40% 38%, #ff8c42 0%, #ff5a00 60%, #c43a00 100%);
+  box-shadow: 0 0 32px rgba(255, 90, 0, 0.55), 0 0 8px rgba(255, 140, 66, 0.4);
+  animation: blob-morph 4s ease-in-out infinite, splash-icon-pulse 2s ease-in-out infinite;
+}
+
+/* Wordmark */
+.splash-wordmark {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffb347 0%, #ff6a00 50%, #ff3c00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+  animation: splash-fade-in 0.5s ease 0.2s both;
+}
+.splash-tagline {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 40px;
+  animation: splash-fade-in 0.5s ease 0.3s both;
+}
+
+/* Progress bar */
+.splash-bar-track {
+  width: 120px;
+  height: 2px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.07);
+  overflow: hidden;
+  animation: splash-fade-in 0.5s ease 0.35s both;
+}
+.splash-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #6c6cff, #ff8c42);
+  animation: splash-bar-fill 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
