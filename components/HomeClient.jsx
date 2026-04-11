@@ -7,6 +7,9 @@ import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 
+const CITY_FLAGS = { Tokyo:"🇯🇵", Seoul:"🇰🇷", Bangkok:"🇹🇭", Bali:"🇮🇩", Paris:"🇫🇷", "New York":"🇺🇸", London:"🇬🇧", Rome:"🇮🇹", Istanbul:"🇹🇷", Dubai:"🇦🇪", Sydney:"🇦🇺", Barcelona:"🇪🇸", Kyoto:"🇯🇵", Singapore:"🇸🇬", Lisbon:"🇵🇹", Osaka:"🇯🇵" };
+const CITY_IMAGES = { Tokyo:"https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop", Seoul:"https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=600&h=400&fit=crop", Paris:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop", Bali:"https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop", Bangkok:"https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&h=400&fit=crop", Osaka:"https://images.unsplash.com/photo-1565559204102-f59129a70ae2?w=600&h=400&fit=crop" };
+
 /* ─── Data ──────────────────────────────────────────────────────── */
 const PLAN = [
   { time: "09:00", icon: "✈️", title: "Arrive Narita T3",  note: "JL 7" },
@@ -88,13 +91,11 @@ const NAV_ITEMS = [
   { icon: faCircleUser,  label: "Profile",   href: "/profile" },
 ];
 
-const TRIP_DATE = new Date("2026-03-20T09:00:00");
 const DEST_IMG  = "https://picsum.photos/seed/japan-fuji-hero/700/400";
 const TODAY_FEATURED_IMG = "https://picsum.photos/seed/iran-isfahan/700/400";
 const TODAY_THUMBS = [
   "https://picsum.photos/seed/iran-bazaar/120/100",
   "https://picsum.photos/seed/iran-mosque/120/100",
-  "https://picsum.photos/seed/iran-people/120/100",
 ];
 
 function pad(n) { return String(n).padStart(2, "0"); }
@@ -107,12 +108,85 @@ export function HomeClient() {
   const today = new Date();
   const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
+  // ── Splash screen — only on first load per session ──
+  const [splashVisible, setSplashVisible] = useState(false);
+  const [splashGone, setSplashGone] = useState(true);
+  useEffect(() => {
+    if (sessionStorage.getItem("navora_splash_seen")) return;
+    sessionStorage.setItem("navora_splash_seen", "1");
+    setSplashGone(false);
+    setSplashVisible(true);
+    const t1 = setTimeout(() => setSplashVisible(false), 1300);
+    const t2 = setTimeout(() => setSplashGone(true), 1900);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
   const [planOpen, setPlanOpen] = useState(false);
   const [cd, setCd] = useState({ days: 0, h: "00", m: "00", s: "00" });
 
+  // ── Countdown config (trip + date) ──
+  const [cdConfig, setCdConfig] = useState({ tripId: null, tripName: "My Trip", startDate: "" });
+  const [savedTrips, setSavedTrips] = useState([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerTripId, setPickerTripId] = useState(null);
+  const [pickerDate, setPickerDate] = useState("");
+  const [calYear, setCalYear] = useState(new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(new Date().getMonth());
+
+  // Load from localStorage on mount
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem("opal_countdown");
+      if (saved) setCdConfig(JSON.parse(saved));
+      setSavedTrips(JSON.parse(localStorage.getItem("opal_trips") || "[]"));
+    } catch (_) {}
+  }, []);
+
+  // Reload trips when picker opens
+  useEffect(() => {
+    if (!pickerOpen) return;
+    try {
+      const trips = JSON.parse(localStorage.getItem("opal_trips") || "[]");
+      setSavedTrips(trips);
+      // Always start fresh — user must pick a trip first
+      setPickerTripId(null);
+      setPickerDate("");
+      const d = new Date();
+      setCalYear(d.getFullYear());
+      setCalMonth(d.getMonth());
+    } catch (_) {}
+  }, [pickerOpen]);
+
+  function prevMonth() {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
+    else setCalMonth(m => m - 1);
+  }
+  function nextMonth() {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
+    else setCalMonth(m => m + 1);
+  }
+
+  function saveCountdown() {
+    if (!pickerTripId || !pickerDate) return;
+    const trip = savedTrips.find(t => t.id === pickerTripId);
+    const newConfig = { tripId: pickerTripId, tripName: trip?.destination || "My Trip", startDate: pickerDate };
+    setCdConfig(newConfig);
+    localStorage.setItem("opal_countdown", JSON.stringify(newConfig));
+    // Also write startDate back to the trip in opal_trips
+    try {
+      const trips = JSON.parse(localStorage.getItem("opal_trips") || "[]");
+      const idx = trips.findIndex(t => t.id === pickerTripId);
+      if (idx >= 0) { trips[idx].startDate = pickerDate; localStorage.setItem("opal_trips", JSON.stringify(trips)); }
+    } catch (_) {}
+    setPickerOpen(false);
+  }
+
+  // Countdown tick using dynamic startDate
+  useEffect(() => {
+    if (!cdConfig.startDate) { setCd({ days: 0, h: "00", m: "00", s: "00" }); return; }
+    const target = new Date(cdConfig.startDate + "T09:00:00");
     function tick() {
-      const diff = TRIP_DATE - new Date();
+      const diff = target - new Date();
       if (diff <= 0) { setCd({ days: 0, h: "00", m: "00", s: "00" }); return; }
       setCd({
         days: Math.floor(diff / 86400000),
@@ -124,7 +198,7 @@ export function HomeClient() {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [cdConfig.startDate]);
 
   const shellRef = useRef(null);
   useEffect(() => {
@@ -139,6 +213,21 @@ export function HomeClient() {
   }, []);
 
   return (
+    <>
+    {!splashGone && (
+      <div className={`splash-screen${!splashVisible ? " splash-exit" : ""}`}>
+        <div className="splash-icon-wrap">
+          <div className="splash-icon-inner">
+            <img src="/navora-logo.svg" alt="Navora" style={{ width: 120, height: 120, objectFit: "contain" }} />
+          </div>
+        </div>
+        <div className="splash-wordmark">NAVORA</div>
+        <div className="splash-tagline">Plan your journey</div>
+        <div className="splash-bar-track">
+          <div className="splash-bar-fill" />
+        </div>
+      </div>
+    )}
     <div className="hp-shell" ref={shellRef}>
       <div className="hp-scroll">
 
@@ -156,23 +245,65 @@ export function HomeClient() {
           </div>
 
           {/* ── Countdown hero card (expandable) ── */}
-          <div className="hp-cd-card">
-            <img className="hp-cd-img" src={DEST_IMG} alt="Destination" />
+          <div className={`hp-cd-card${pickerOpen ? " hp-cd-picker-open" : ""}`}>
+            <img className="hp-cd-img" src={CITY_IMAGES[cdConfig.tripName] || DEST_IMG} alt="Destination" />
             <div className="hp-cd-overlay" />
 
             {/* Countdown view */}
-            <div className={`hp-cd-count-view${planOpen ? " hp-cd-hidden" : ""}`}>
+            <div className={`hp-cd-count-view${planOpen || pickerOpen ? " hp-cd-hidden" : ""}`}>
               <div className="hp-cd-top">
-                <span className="hp-cd-trip">Trip to Japan</span>
-                <span className="hp-cd-badge">March 20</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span className="hp-cd-trip">
+                    {cdConfig.tripName
+                      ? `${CITY_FLAGS[cdConfig.tripName] || "✈️"} ${cdConfig.tripName.toUpperCase()}`
+                      : "✈️ MY TRIP"}
+                  </span>
+                  {(() => {
+                    const trip = savedTrips.find(t => t.id === cdConfig.tripId);
+                    if (!trip) return null;
+                    const stops = Object.values(trip.activities || {}).flat().length;
+                    return (
+                      <span style={{
+                        fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 600,
+                        letterSpacing: 0.2, whiteSpace: "nowrap",
+                      }}>
+                        {trip.duration}{stops > 0 ? ` · ${stops} stops` : ""}
+                      </span>
+                    );
+                  })()}
+                </div>
+                <button
+                  onClick={() => setPickerOpen(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    borderRadius: 16, padding: "4px 11px", cursor: "pointer",
+                    color: cdConfig.startDate ? "rgba(255,255,255,0.85)" : "#ff9a52",
+                    fontSize: 11, fontWeight: 600, letterSpacing: 0.2,
+                  }}>
+                  {cdConfig.startDate
+                    ? <>{new Date(cdConfig.startDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })} <span style={{ opacity: 0.6, fontSize: 10 }}>✎</span></>
+                    : "Set dates ›"}
+                </button>
               </div>
-              <div className="hp-cd-main">In {cd.days} days</div>
+              <div className="hp-cd-main">
+                {cdConfig.startDate ? `In ${cd.days} days` : "No date set"}
+              </div>
               <div className="hp-cd-timer">
-                <span className="hp-cd-digits">{cd.h}</span>
+                <div className="hp-cd-timer-unit">
+                  <span className="hp-cd-digits">{cd.h}</span>
+                  <span className="hp-cd-unit-label">HRS</span>
+                </div>
                 <span className="hp-cd-sep">:</span>
-                <span className="hp-cd-digits">{cd.m}</span>
+                <div className="hp-cd-timer-unit">
+                  <span className="hp-cd-digits">{cd.m}</span>
+                  <span className="hp-cd-unit-label">MIN</span>
+                </div>
                 <span className="hp-cd-sep">:</span>
-                <span className="hp-cd-digits">{cd.s}</span>
+                <div className="hp-cd-timer-unit">
+                  <span className="hp-cd-digits">{cd.s}</span>
+                  <span className="hp-cd-unit-label">SEC</span>
+                </div>
               </div>
               {/* Toggle to plan */}
               <button className="hp-cd-plan-toggle" onClick={() => setPlanOpen(true)}>
@@ -180,6 +311,135 @@ export function HomeClient() {
                 <span className="hp-cd-toggle-arrow">›</span>
               </button>
             </div>
+
+            {/* ── Trip + date picker overlay ── */}
+            {pickerOpen && (<>
+              {/* Full-card backdrop — covers image bleed below content */}
+              <div style={{ position: "absolute", inset: 0, background: "rgba(9,9,15,0.92)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", zIndex: 9, animation: "cd-backdrop-in 0.28s ease" }} />
+              <div style={{
+                position: "relative", zIndex: 10,
+                display: "flex", flexDirection: "column",
+                padding: "14px 16px 16px",
+                animation: "cd-picker-in 0.28s cubic-bezier(0.34,1.56,0.64,1)",
+              }}>
+                {/* Header */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <span style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}>Set Countdown</span>
+                  <button onClick={() => setPickerOpen(false)} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "50%", width: 26, height: 26, color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer", lineHeight: 1 }}>✕</button>
+                </div>
+
+                {/* Trip selector */}
+                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 600, letterSpacing: 0.8, margin: "0 0 6px", textTransform: "uppercase" }}>Choose trip</p>
+                {savedTrips.length === 0 ? (
+                  <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginBottom: 10, padding: "8px 0" }}>No saved trips — add one from Discover</div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 10 }}>
+                    {savedTrips.map(t => {
+                      const sel = pickerTripId === t.id;
+                      return (
+                        <button key={t.id} onClick={() => setPickerTripId(t.id)} style={{
+                          display: "flex", alignItems: "center", gap: 10,
+                          padding: "8px 10px", borderRadius: 12, cursor: "pointer",
+                          background: sel ? "rgba(255,140,66,0.12)" : "rgba(255,255,255,0.04)",
+                          border: sel ? "1px solid rgba(255,140,66,0.3)" : "1px solid rgba(255,255,255,0.07)",
+                          textAlign: "left", transition: "background 0.15s",
+                        }}>
+                          <div style={{
+                            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                            background: sel ? "rgba(255,140,66,0.2)" : "rgba(255,255,255,0.06)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 16,
+                          }}>
+                            {CITY_FLAGS[t.destination] || "✈️"}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ color: sel ? "#fff" : "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: 700 }}>{t.destination}</div>
+                            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>{t.duration} · {Object.values(t.activities || {}).flat().length} stops</div>
+                          </div>
+                          {sel && (
+                            <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#ff8c42", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <span style={{ color: "#fff", fontSize: 10, fontWeight: 800 }}>✓</span>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Custom date picker — only shown after trip is selected */}
+                {!pickerTripId && (
+                  <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, textAlign: "center", padding: "6px 0 2px", fontStyle: "italic" }}>← pick a trip to set the date</p>
+                )}
+                {pickerTripId && (<div style={{ animation: "cd-cal-in 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 600, letterSpacing: 0.8, margin: "0 0 8px", textTransform: "uppercase" }}>Start date</p>
+                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", padding: "10px 8px 8px", marginBottom: 10 }}>
+                    {/* Month/year nav */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, padding: "0 2px" }}>
+                      <button onClick={prevMonth} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: 8, width: 28, height: 28, color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>‹</button>
+                      <span style={{ color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>
+                        {["January","February","March","April","May","June","July","August","September","October","November","December"][calMonth]} {calYear}
+                      </span>
+                      <button onClick={nextMonth} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: 8, width: 28, height: 28, color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>›</button>
+                    </div>
+                    {/* Day-of-week headers */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 4 }}>
+                      {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
+                        <div key={d} style={{ textAlign: "center", fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.3)", padding: "2px 0" }}>{d}</div>
+                      ))}
+                    </div>
+                    {/* Day cells */}
+                    {(() => {
+                      const firstDay = new Date(calYear, calMonth, 1).getDay();
+                      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+                      const cells = [];
+                      for (let i = 0; i < firstDay; i++) cells.push(null);
+                      for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+                      const selD = pickerDate ? new Date(pickerDate + "T00:00:00") : null;
+                      const todayNow = new Date();
+                      return (
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 1 }}>
+                          {cells.map((day, idx) => {
+                            if (!day) return <div key={`e-${idx}`} />;
+                            const isSel = selD && selD.getFullYear() === calYear && selD.getMonth() === calMonth && selD.getDate() === day;
+                            const isToday = todayNow.getFullYear() === calYear && todayNow.getMonth() === calMonth && todayNow.getDate() === day;
+                            return (
+                              <button key={day} onClick={() => {
+                                const m = String(calMonth + 1).padStart(2, "0");
+                                const dd = String(day).padStart(2, "0");
+                                setPickerDate(`${calYear}-${m}-${dd}`);
+                              }} style={{
+                                background: isSel ? "#ff8c42" : isToday ? "rgba(255,140,66,0.18)" : "transparent",
+                                border: isToday && !isSel ? "1px solid rgba(255,140,66,0.35)" : "1px solid transparent",
+                                borderRadius: 7, height: 28, cursor: "pointer",
+                                color: isSel ? "#fff" : isToday ? "#ff9a52" : "rgba(255,255,255,0.75)",
+                                fontSize: 11, fontWeight: isSel ? 700 : 400,
+                              }}>{day}</button>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  {/* Confirm button */}
+                  <button
+                    onClick={saveCountdown}
+                    disabled={!pickerDate}
+                    style={{
+                      width: "100%", padding: "11px 0", borderRadius: 12,
+                      background: pickerDate ? "linear-gradient(135deg, #ff8c42, #ff5f1f)" : "rgba(255,255,255,0.07)",
+                      border: "none", cursor: pickerDate ? "pointer" : "default",
+                      color: pickerDate ? "#fff" : "rgba(255,255,255,0.2)",
+                      fontSize: 13, fontWeight: 700, letterSpacing: 0.3,
+                    }}>
+                    {pickerDate
+                      ? `Set Countdown · ${new Date(pickerDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} ›`
+                      : "Pick a date above"}
+                  </button>
+                </div>)}
+              </div>
+            </>)}
+
 
             {/* Today's plan view */}
             <div className={`hp-cd-plan-view${planOpen ? " hp-cd-plan-open" : ""}`}>
@@ -340,5 +600,6 @@ export function HomeClient() {
         </div>
       </nav>
     </div>
+    </>
   );
 }

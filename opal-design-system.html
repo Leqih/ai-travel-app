@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Opal Design System — Travel Planner</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:#09090F;
+    color:#fff;
+    font-family:-apple-system,"SF Pro Display","Helvetica Neue",Inter,sans-serif;
+    width:1440px;
+    padding:64px;
+  }
+
+  /* ── PAGE TITLE ── */
+  .ds-page-title{
+    display:flex;align-items:flex-end;gap:24px;
+    padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,0.08);
+    margin-bottom:80px;
+  }
+  .ds-page-title h1{font-size:52px;font-weight:700;letter-spacing:-1px;line-height:1;}
+  .ds-page-title .ds-tagline{font-size:16px;color:rgba(255,255,255,0.4);padding-bottom:6px;}
+  .ds-logo{
+    width:52px;height:52px;border-radius:16px;
+    background:linear-gradient(135deg,#ff8c42,#ff5f1f);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;flex-shrink:0;
+    box-shadow:0 0 0 4px rgba(255,95,31,0.2),0 8px 24px rgba(255,95,31,0.4);
+  }
+
+  /* ── SECTION ── */
+  .ds-section{margin-bottom:80px;}
+  .ds-section-head{
+    display:flex;align-items:baseline;gap:16px;
+    margin-bottom:8px;
+  }
+  .ds-section-head h2{font-size:24px;font-weight:700;}
+  .ds-section-head span{font-size:13px;color:rgba(255,255,255,0.35);}
+  .ds-rule{height:1px;background:rgba(255,255,255,0.07);margin-bottom:40px;}
+
+  /* ── GRID HELPERS ── */
+  .ds-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
+  .ds-col{display:flex;flex-direction:column;gap:8px;}
+  .ds-label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase;}
+
+  /* ─────────────────────────────────────────────
+     A. COLOR PALETTE
+  ───────────────────────────────────────────── */
+  .color-grid{display:flex;flex-wrap:wrap;gap:20px;}
+  .color-swatch{width:160px;}
+  .color-swatch-box{height:72px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);}
+  .color-swatch-name{font-size:12px;font-weight:600;margin-top:10px;color:rgba(255,255,255,0.8);}
+  .color-swatch-hex{font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;}
+  .color-group-label{width:100%;font-size:11px;font-weight:700;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase;padding-top:8px;}
+
+  /* ─────────────────────────────────────────────
+     B. TYPOGRAPHY
+  ───────────────────────────────────────────── */
+  .type-row{
+    display:flex;align-items:baseline;gap:0;
+    padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .type-meta{width:180px;flex-shrink:0;}
+  .type-meta-name{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;}
+  .type-meta-spec{font-size:10px;color:rgba(255,255,255,0.2);margin-top:3px;}
+  .type-sample{flex:1;}
+
+  /* ─────────────────────────────────────────────
+     C. SPACING
+  ───────────────────────────────────────────── */
+  .spacing-row{display:flex;gap:0;align-items:flex-end;}
+  .spacing-item{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-right:40px;}
+  .spacing-box{background:rgba(255,95,31,0.6);border-radius:3px;}
+  .spacing-val{font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);}
+
+  /* ─────────────────────────────────────────────
+     D. BORDER RADIUS
+  ───────────────────────────────────────────── */
+  .radius-row{display:flex;gap:32px;align-items:flex-end;}
+  .radius-item{display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+  .radius-box{width:64px;height:64px;background:#1A1A1E;border:1px solid rgba(255,255,255,0.12);}
+  .radius-val{font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);}
+
+  /* ─────────────────────────────────────────────
+     E. COMPONENTS — BOTTOM NAV BAR
+  ───────────────────────────────────────────── */
+  .comp-bg-dark{background:#09090F;padding:32px;border-radius:16px;border:1px solid rgba(255,255,255,0.06);}
+  .comp-bg-mid{background:#0F0F18;padding:32px;border-radius:16px;border:1px solid rgba(255,255,255,0.06);}
+
+  .nav-bar-demo{
+    background:#09090F;
+    padding:0 16px 20px;
+    display:flex;align-items:flex-end;justify-content:center;
+    width:390px;
+  }
+  .nav-pill{
+    background:#1A1A1E;
+    border-radius:20px;
+    padding:6px 8px;
+    display:flex;align-items:center;
+    width:100%;max-width:360px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:6px 0;color:rgba(255,255,255,0.28);cursor:pointer;
+    font-size:10px;font-weight:500;
+    transition:color 0.18s;
+  }
+  .nav-item.active{color:#fff;}
+  .nav-item svg{width:20px;height:20px;}
+  .nav-center-wrap{flex:1;display:flex;justify-content:center;}
+  .nav-center-btn{
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg,#ff8c42,#ff5f1f);
+    display:flex;align-items:center;justify-content:center;
+    margin-top:-20px;
+    box-shadow:0 0 0 4px #1A1A1E,0 6px 20px rgba(255,95,31,0.55),0 2px 8px rgba(0,0,0,0.4);
+    cursor:pointer;
+  }
+  .nav-center-btn svg{width:18px;height:18px;color:#fff;}
+
+  /* Nav states side by side */
+  .nav-states{display:flex;gap:40px;align-items:flex-end;}
+  .nav-state-wrap{display:flex;flex-direction:column;gap:12px;}
+
+  /* ─────────────────────────────────────────────
+     F. TRIP COUNTDOWN CARD
+  ───────────────────────────────────────────── */
+  .cd-card{
+    width:358px;height:178px;border-radius:20px;overflow:hidden;
+    position:relative;background:#1a1a28;flex-shrink:0;
+  }
+  .cd-card-img{
+    position:absolute;inset:0;
+    background:linear-gradient(160deg,#2a3a2e 0%,#1a1020 100%);
+  }
+  .cd-card-img-inner{
+    width:100%;height:100%;
+    background:url('https://picsum.photos/seed/japan-fuji/400/200') center/cover no-repeat;
+  }
+  .cd-card-overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.75) 100%);
+  }
+  .cd-card-content{position:absolute;inset:0;padding:16px 20px;}
+  .cd-card-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .cd-trip-name{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);}
+  .cd-date-badge{
+    background:rgba(20,20,20,0.7);backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px;padding:3px 10px;
+    font-size:11px;font-weight:700;color:#fff;
+  }
+  .cd-main{font-size:28px;font-weight:700;color:#fff;margin-top:8px;letter-spacing:-0.5px;}
+  .cd-timer{
+    position:absolute;bottom:42px;left:20px;right:20px;height:44px;
+    background:rgba(20,20,20,0.7);backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.08);border-radius:20px;
+    display:flex;align-items:center;justify-content:center;gap:4px;
+  }
+  .cd-digits{font-family:'Courier New',monospace;font-size:22px;color:#fff;letter-spacing:3px;text-shadow:0 0 8px rgba(255,255,255,0.4);}
+  .cd-sep{font-size:20px;color:rgba(255,255,255,0.5);font-weight:300;}
+  .cd-toggle{
+    position:absolute;bottom:14px;left:20px;
+    font-size:13px;font-weight:600;color:#fff;
+    display:flex;align-items:center;gap:4px;
+  }
+
+  /* ─────────────────────────────────────────────
+     G. FILTER TABS
+  ───────────────────────────────────────────── */
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .filter-tab{
+    padding:8px 16px;border-radius:20px;border:none;cursor:pointer;
+    font-size:13px;font-weight:500;
+    display:flex;align-items:center;gap:6px;
+    background:#1A1A1E;color:rgba(255,255,255,0.55);
+    font-family:inherit;
+  }
+  .filter-tab.active{background:#fff;color:#09090F;font-weight:700;}
+  .filter-tab sup{font-size:10px;font-weight:700;}
+  .filter-sort{
+    width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+    background:#1A1A1E;color:rgba(255,255,255,0.6);
+    font-size:16px;display:flex;align-items:center;justify-content:center;
+    font-family:inherit;
+  }
+
+  /* ─────────────────────────────────────────────
+     H. DISCOVER CARD
+  ───────────────────────────────────────────── */
+  .discover-card{
+    width:480px;
+    background:#1A1A1E;border-radius:20px;
+    padding:20px;position:relative;overflow:hidden;
+  }
+  .discover-card-social{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .discover-avatars{display:flex;}
+  .discover-avatar{
+    width:22px;height:22px;border-radius:50%;margin-right:-6px;
+    border:1.5px solid #1A1A1E;overflow:hidden;
+    background:#333;
+  }
+  .discover-avatar img{width:100%;height:100%;object-fit:cover;}
+  .discover-social-text{font-size:12px;color:rgba(255,255,255,0.5);margin-left:12px;}
+  .discover-title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;}
+  .discover-title-text h3{font-size:20px;font-weight:700;line-height:1.25;}
+  .discover-title-text p{font-size:13px;color:rgba(255,255,255,0.45);margin-top:4px;}
+  .discover-thumb{
+    width:72px;height:72px;border-radius:14px;overflow:hidden;flex-shrink:0;
+    background:#2a2a3e;
+  }
+  .discover-thumb img{width:100%;height:100%;object-fit:cover;}
+  .discover-tags{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .discover-tag{
+    padding:5px 12px;border-radius:20px;
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+    font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);
+  }
+  .discover-bottom{display:flex;gap:10px;align-items:center;}
+  .discover-likes{
+    padding:8px 14px;border-radius:12px;
+    background:rgba(255,255,255,0.08);
+    font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);
+    display:flex;align-items:center;gap:6px;
+  }
+  .discover-cta{
+    flex:1;padding:12px;border-radius:14px;border:none;cursor:pointer;
+    background:#fff;color:#09090F;
+    font-size:14px;font-weight:700;font-family:inherit;
+    text-align:center;
+  }
+
+  /* ─────────────────────────────────────────────
+     I. DAY TABS
+  ───────────────────────────────────────────── */
+  .day-tabs{display:flex;gap:10px;}
+  .day-tab{
+    width:72px;height:64px;border-radius:16px;border:none;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.1);
+    font-family:inherit;color:rgba(255,255,255,0.55);
+  }
+  .day-tab.active{background:#fff;color:#09090F;border-color:transparent;}
+  .day-tab.active .day-num{color:#09090F;}
+  .day-tab.active .day-lbl{color:rgba(0,0,0,0.5);}
+  .day-num{font-size:18px;font-weight:700;}
+  .day-total{font-size:15px;font-weight:700;}
+  .day-lbl{font-size:9px;font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.35);}
+
+  /* ─────────────────────────────────────────────
+     J. PLANNER PILL (inline input)
+  ───────────────────────────────────────────── */
+  .planner-card{
+    background:#1C1C2A;border-radius:20px;padding:32px 36px;
+    max-width:500px;
+  }
+  .pl-prompt{font-size:22px;font-weight:600;line-height:1.7;color:rgba(255,255,255,0.85);}
+  .pl-pill{
+    display:inline-flex;align-items:center;padding:4px 14px;
+    border-radius:20px;border:1.5px solid rgba(255,255,255,0.2);
+    background:rgba(255,255,255,0.06);
+    font-size:18px;font-weight:500;color:rgba(255,255,255,0.55);
+    cursor:pointer;margin:0 4px;vertical-align:middle;
+    font-family:inherit;
+  }
+  .pl-pill.filled{
+    background:rgba(255,140,66,0.15);
+    border-color:rgba(255,140,66,0.4);
+    color:#ff8c42;
+  }
+
+  /* ─────────────────────────────────────────────
+     K. GLASS BADGE
+  ───────────────────────────────────────────── */
+  .glass-badge{
+    display:inline-flex;align-items:center;
+    background:rgba(20,20,20,0.7);backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;padding:4px 12px;
+    font-size:11px;font-weight:700;color:#fff;
+  }
+  .glass-badge.active{
+    border-color:rgba(255,95,31,0.6);
+    color:#ff8c42;
+  }
+
+  /* ─────────────────────────────────────────────
+     L. ITINERARY ROW
+  ───────────────────────────────────────────── */
+  .itinerary-list{display:flex;flex-direction:column;gap:0;width:360px;}
+  .itinerary-row{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;
+    background:#1A1A1E;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    cursor:pointer;
+  }
+  .itinerary-row:first-child{border-radius:14px 14px 0 0;}
+  .itinerary-row:last-child{border-radius:0 0 14px 14px;border-bottom:none;}
+  .itin-time{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);width:56px;flex-shrink:0;}
+  .itin-name{flex:1;font-size:14px;font-weight:600;color:#fff;}
+  .itin-chevron{font-size:16px;color:rgba(255,255,255,0.2);}
+
+  /* ─────────────────────────────────────────────
+     M. DETAIL CARD GRID
+  ───────────────────────────────────────────── */
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:360px;}
+  .detail-card{
+    background:#1A1A1E;border-radius:16px;
+    padding:18px 16px;cursor:pointer;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .detail-card-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;}
+  .detail-card-sub{font-size:12px;color:rgba(255,255,255,0.35);line-height:1.4;}
+
+  /* ─────────────────────────────────────────────
+     N. TOGGLE BUTTONS
+  ───────────────────────────────────────────── */
+  .toggle-row{display:flex;gap:8px;}
+  .toggle-btn{
+    padding:10px 18px;border-radius:20px;border:none;cursor:pointer;
+    font-size:13px;font-weight:600;font-family:inherit;
+    background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);
+  }
+  .toggle-btn.active{background:#fff;color:#09090F;}
+
+  /* ─────────────────────────────────────────────
+     O. COMPONENT STATES ANNOTATION
+  ───────────────────────────────────────────── */
+  .states-wrap{display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;}
+  .state-item{display:flex;flex-direction:column;gap:10px;align-items:flex-start;}
+  .state-badge{
+    font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+    color:rgba(255,95,31,0.8);
+    background:rgba(255,95,31,0.1);border:1px solid rgba(255,95,31,0.2);
+    padding:3px 8px;border-radius:6px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     PAGE TITLE
+══════════════════════════════════════════ -->
+<div class="ds-page-title">
+  <div class="ds-logo">🧭</div>
+  <div>
+    <h1>Opal Design System</h1>
+    <p class="ds-tagline">Travel Planner App  ·  Component Library &amp; Visual Language</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     A. COLOR PALETTE
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head">
+    <h2>Color Palette</h2>
+    <span>Primary · Secondary · Background · Feedback — applied as Figma styles</span>
+  </div>
+  <div class="ds-rule"></div>
+
+  <div class="color-grid">
+    <div class="color-group-label">Primary</div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:linear-gradient(135deg,#ff8c42,#ff5f1f);"></div>
+      <div class="color-swatch-name">Orange / Primary</div>
+      <div class="color-swatch-hex">#FF5F1F → #FF8C42</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#ff8c42;"></div>
+      <div class="color-swatch-name">Orange Light</div>
+      <div class="color-swatch-hex">#FF8C42</div>
+    </div>
+
+    <div class="color-group-label">Secondary</div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#4361EE;"></div>
+      <div class="color-swatch-name">Blue / Secondary</div>
+      <div class="color-swatch-hex">#4361EE</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#112852;"></div>
+      <div class="color-swatch-name">Blue Dark</div>
+      <div class="color-swatch-hex">#112852</div>
+    </div>
+
+    <div class="color-group-label">Backgrounds</div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#09090F;border:1px solid rgba(255,255,255,0.1);"></div>
+      <div class="color-swatch-name">BG / Shell</div>
+      <div class="color-swatch-hex">#09090F</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#1A1A1E;"></div>
+      <div class="color-swatch-name">BG / Surface</div>
+      <div class="color-swatch-hex">#1A1A1E</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#1A1A28;"></div>
+      <div class="color-swatch-name">BG / Surface-2</div>
+      <div class="color-swatch-hex">#1A1A28</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#1C1C2C;"></div>
+      <div class="color-swatch-name">BG / Card</div>
+      <div class="color-swatch-hex">#1C1C2C</div>
+    </div>
+
+    <div class="color-group-label">Text</div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#FFFFFF;"></div>
+      <div class="color-swatch-name">Text / Primary</div>
+      <div class="color-swatch-hex">#FFFFFF</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:rgba(255,255,255,0.6);"></div>
+      <div class="color-swatch-name">Text / Secondary</div>
+      <div class="color-swatch-hex">#FFFFFF 60%</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:rgba(255,255,255,0.28);"></div>
+      <div class="color-swatch-name">Text / Inactive</div>
+      <div class="color-swatch-hex">#FFFFFF 28%</div>
+    </div>
+
+    <div class="color-group-label">Feedback</div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#22C55E;"></div>
+      <div class="color-swatch-name">Success</div>
+      <div class="color-swatch-hex">#22C55E</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#EF4444;"></div>
+      <div class="color-swatch-name">Error</div>
+      <div class="color-swatch-hex">#EF4444</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch-box" style="background:#F59E0B;"></div>
+      <div class="color-swatch-name">Warning</div>
+      <div class="color-swatch-hex">#F59E0B</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     B. TYPOGRAPHY
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head">
+    <h2>Typography</h2>
+    <span>SF Pro Display / -apple-system — all text as Figma styles</span>
+  </div>
+  <div class="ds-rule"></div>
+
+  <div class="type-row">
+    <div class="type-meta"><div class="type-meta-name">Display</div><div class="type-meta-spec">30px / Bold / −0.5px</div></div>
+    <div class="type-sample" style="font-size:30px;font-weight:700;letter-spacing:-0.5px;">Good Afternoon</div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><div class="type-meta-name">H1 Heading</div><div class="type-meta-spec">24px / Bold / −0.3px</div></div>
+    <div class="type-sample" style="font-size:24px;font-weight:700;letter-spacing:-0.3px;">Tokyo Trip — 7 Days</div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><div class="type-meta-name">H2 Subheading</div><div class="type-meta-spec">20px / SemiBold</div></div>
+    <div class="type-sample" style="font-size:20px;font-weight:600;">Today's Pick</div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><div class="type-meta-name">Body / Large</div><div class="type-meta-spec">16px / Regular</div></div>
+    <div class="type-sample" style="font-size:16px;font-weight:400;color:rgba(255,255,255,0.7);">Discover cafes, temples and hidden gems near you</div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><div class="type-meta-name">Body / Small</div><div class="type-meta-spec">14px / Regular</div></div>
+    <div class="type-sample" style="font-size:14px;font-weight:400;color:rgba(255,255,255,0.5);">Updated 2 hours ago  ·  0.3 km away</div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><div class="type-meta-name">Label</div><div class="type-meta-spec">11px / Bold / +0.2px</div></div>
+    <div class="type-sample" style="font-size:11px;font-weight:700;letter-spacing:0.2px;color:rgba(255,255,255,0.6);">OPEN NOW  ·  DAY 3</div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><div class="type-meta-name">Caption</div><div class="type-meta-spec">10px / Medium</div></div>
+    <div class="type-sample" style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.4);">Tap to add this spot to your travel plan</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     C. SPACING & BORDER RADIUS
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Spacing &amp; Radius</h2><span>Base-4 spacing system · consistent corner radii</span></div>
+  <div class="ds-rule"></div>
+  <div class="ds-row" style="gap:64px;">
+    <div class="ds-col">
+      <div class="ds-label">Spacing Scale</div>
+      <div class="spacing-row" style="margin-top:16px;">
+        <div class="spacing-item"><div class="spacing-box" style="width:4px;height:4px;"></div><div class="spacing-val">4</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:8px;height:8px;"></div><div class="spacing-val">8</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:12px;height:12px;"></div><div class="spacing-val">12</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:16px;height:16px;"></div><div class="spacing-val">16</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:20px;height:20px;"></div><div class="spacing-val">20</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:24px;height:24px;"></div><div class="spacing-val">24</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:32px;height:32px;"></div><div class="spacing-val">32</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:48px;height:48px;"></div><div class="spacing-val">48</div></div>
+        <div class="spacing-item"><div class="spacing-box" style="width:64px;height:64px;"></div><div class="spacing-val">64</div></div>
+      </div>
+    </div>
+    <div class="ds-col">
+      <div class="ds-label">Border Radius</div>
+      <div class="radius-row" style="margin-top:16px;">
+        <div class="radius-item"><div class="radius-box" style="border-radius:4px;"></div><div class="radius-val">4px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:8px;"></div><div class="radius-val">8px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:12px;"></div><div class="radius-val">12px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:16px;"></div><div class="radius-val">16px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:20px;"></div><div class="radius-val">20px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:32px;"></div><div class="radius-val">32px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:999px;"></div><div class="radius-val">Pill</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     D. COMPONENT: BOTTOM NAVIGATION BAR
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Bottom Navigation Bar</h2><span>Component · State=Default / Active</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">State: Default</div>
+        <div class="nav-bar-demo">
+          <div class="nav-pill">
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Home
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              Discover
+            </div>
+            <div class="nav-center-wrap">
+              <div class="nav-center-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.12 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              My Trips
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profile
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">State: Active (Home)</div>
+        <div class="nav-bar-demo">
+          <div class="nav-pill">
+            <div class="nav-item active">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              Home
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              Discover
+            </div>
+            <div class="nav-center-wrap">
+              <div class="nav-center-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1-2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z"/><path d="M15 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
+              My Trips
+            </div>
+            <div class="nav-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profile
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     E. COMPONENT: TRIP COUNTDOWN CARD
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Trip Countdown Card</h2><span>Component · State=Default / Expanded</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">State: Default</div>
+        <div class="cd-card">
+          <div class="cd-card-img"><div class="cd-card-img-inner"></div></div>
+          <div class="cd-card-overlay"></div>
+          <div class="cd-card-content">
+            <div class="cd-card-top">
+              <span class="cd-trip-name">Trip to Japan</span>
+              <span class="cd-date-badge">March 20</span>
+            </div>
+            <div class="cd-main">In 0 days</div>
+            <div class="cd-timer">
+              <span class="cd-digits">00</span>
+              <span class="cd-sep">:</span>
+              <span class="cd-digits">00</span>
+              <span class="cd-sep">:</span>
+              <span class="cd-digits">00</span>
+            </div>
+            <div class="cd-toggle">Day 1 Itinerary <span style="font-size:16px;">›</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">State: Expanded (Itinerary)</div>
+        <div class="cd-card">
+          <div class="cd-card-img"><div class="cd-card-img-inner"></div></div>
+          <div class="cd-card-overlay"></div>
+          <div class="cd-card-content" style="padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-size:14px;font-weight:700;">Day 1 · Tokyo</span>
+              <span style="font-size:18px;color:rgba(255,255,255,0.5);cursor:pointer;">✕</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);width:44px;">09:00</span>
+                <span>✈️</span>
+                <div><div style="font-size:12px;font-weight:600;">Arrive Narita T3</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">JL 7</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);width:44px;">13:00</span>
+                <span>🏯</span>
+                <div><div style="font-size:12px;font-weight:600;">Senso-ji Temple</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">Asakusa</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);width:44px;">18:00</span>
+                <span>🍜</span>
+                <div><div style="font-size:12px;font-weight:600;">Shibuya Food Tour</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">Meet at Hachiko</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     F. COMPONENT: FILTER TAB
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Filter Tab</h2><span>Component · State=Default / Active</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">State: Active</div>
+        <button class="filter-tab active"><span class="nd-filter-label">All</span><sup>284</sup></button>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">State: Default</div>
+        <button class="filter-tab">Culture <sup>48</sup></button>
+      </div>
+      <div class="state-item" style="margin-top:0;">
+        <div class="state-badge">Full Row Example</div>
+        <div class="filter-row" style="margin-top:0;">
+          <button class="filter-sort">≡</button>
+          <button class="filter-tab active">All <sup>284</sup></button>
+          <button class="filter-tab">Culture <sup>48</sup></button>
+          <button class="filter-tab">Food <sup>73</sup></button>
+          <button class="filter-tab">Nature <sup>39</sup></button>
+          <button class="filter-tab">Art <sup>27</sup></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     G. COMPONENT: DISCOVER CARD
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Discover Card</h2><span>Component · State=Default / Selected</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">State: Default</div>
+        <div class="discover-card">
+          <div class="discover-card-social">
+            <div class="discover-avatars">
+              <div class="discover-avatar"><img src="https://picsum.photos/seed/u1/24" alt=""/></div>
+              <div class="discover-avatar"><img src="https://picsum.photos/seed/u2/24" alt=""/></div>
+              <div class="discover-avatar"><img src="https://picsum.photos/seed/u3/24" alt=""/></div>
+            </div>
+            <span class="discover-social-text">73+ users have added</span>
+          </div>
+          <div class="discover-title-row">
+            <div class="discover-title-text">
+              <h3>Tokyo in 72 Hours ⚡</h3>
+              <p>Iconic landmarks · City highlights</p>
+            </div>
+            <div class="discover-thumb"><img src="https://picsum.photos/seed/tokyo/72" alt=""/></div>
+          </div>
+          <div class="discover-tags">
+            <span class="discover-tag">Japan</span>
+            <span class="discover-tag">3 Days</span>
+          </div>
+          <div class="discover-bottom">
+            <div class="discover-likes">🔖 892</div>
+            <button class="discover-cta">+ Add to Trip</button>
+          </div>
+        </div>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">State: Selected</div>
+        <div class="discover-card" style="border:2px solid rgba(255,95,31,0.6);box-shadow:0 0 24px rgba(255,95,31,0.2);">
+          <div class="discover-card-social">
+            <div class="discover-avatars">
+              <div class="discover-avatar"><img src="https://picsum.photos/seed/u4/24" alt=""/></div>
+              <div class="discover-avatar"><img src="https://picsum.photos/seed/u5/24" alt=""/></div>
+            </div>
+            <span class="discover-social-text">41+ users have added</span>
+          </div>
+          <div class="discover-title-row">
+            <div class="discover-title-text">
+              <h3>Eat Like a Local 🍣</h3>
+              <p>Sushi · Ramen · Street food</p>
+            </div>
+            <div class="discover-thumb"><img src="https://picsum.photos/seed/food/72" alt=""/></div>
+          </div>
+          <div class="discover-tags">
+            <span class="discover-tag">Japan</span>
+            <span class="discover-tag">Food</span>
+          </div>
+          <div class="discover-bottom">
+            <div class="discover-likes">🔖 634</div>
+            <button class="discover-cta" style="background:linear-gradient(135deg,#ff8c42,#ff5f1f);color:#fff;">✓ Added</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     H. COMPONENT: DAY TAB
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Day Tab</h2><span>Component · State=Default / Active</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">State: Active (Total)</div>
+        <div class="day-tabs">
+          <button class="day-tab active"><div class="day-total">Total</div></button>
+        </div>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">State: Default</div>
+        <div class="day-tabs">
+          <button class="day-tab"><div class="day-num">2</div><div class="day-lbl">DAY</div></button>
+        </div>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">Full Row Example</div>
+        <div class="day-tabs">
+          <button class="day-tab active"><div class="day-total">Total</div></button>
+          <button class="day-tab"><div class="day-num">1</div><div class="day-lbl">DAY</div></button>
+          <button class="day-tab"><div class="day-num">2</div><div class="day-lbl">DAY</div></button>
+          <button class="day-tab"><div class="day-num">3</div><div class="day-lbl">DAY</div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     I. COMPONENT: PLANNER PILL
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Planner Pill</h2><span>Component · State=Empty / Filled</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">State: Empty</div>
+        <button class="pl-pill">City/Region</button>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">State: Filled</div>
+        <button class="pl-pill filled">Tokyo, Japan</button>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">In Context</div>
+        <div class="planner-card">
+          <p class="pl-prompt">
+            I want to explore <button class="pl-pill filled">Tokyo</button><br/>
+            prefer a <button class="pl-pill">Budget</button> budget,<br/>
+            my travel style is <button class="pl-pill">Type of Group</button><br/>
+            for <button class="pl-pill">Duration</button> ....
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     J. COMPONENT: GLASS BADGE
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Glass Badge</h2><span>Component · State=Default / Active</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">State: Default</div>
+        <span class="glass-badge">March 20</span>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">State: Active</div>
+        <span class="glass-badge active">March 20</span>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">Variants</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="glass-badge">March 20</span>
+          <span class="glass-badge">OPEN NOW</span>
+          <span class="glass-badge">Day 1</span>
+          <span class="glass-badge active">Selected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     K. COMPONENT: ITINERARY ROW
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Itinerary Row</h2><span>Component · list item for trip overview</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="itinerary-list">
+      <div class="itinerary-row"><span class="itin-time">9:00 AM</span><span class="itin-name">Shibuya Crossing</span><span class="itin-chevron">›</span></div>
+      <div class="itinerary-row"><span class="itin-time">12:00 PM</span><span class="itin-name">Tokyo Tower</span><span class="itin-chevron">›</span></div>
+      <div class="itinerary-row"><span class="itin-time">3:00 PM</span><span class="itin-name">Meiji Shrine</span><span class="itin-chevron">›</span></div>
+      <div class="itinerary-row"><span class="itin-time">6:00 PM</span><span class="itin-name">Harajuku</span><span class="itin-chevron">›</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     L. COMPONENT: DETAIL CARD + TOGGLE
+══════════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-head"><h2>Detail Card &amp; Toggle</h2><span>Components · trip details grid + overview/details toggle</span></div>
+  <div class="ds-rule"></div>
+  <div class="comp-bg-dark">
+    <div class="states-wrap">
+      <div class="state-item">
+        <div class="state-badge">Toggle — Overview Active</div>
+        <div class="toggle-row">
+          <button class="toggle-btn active">🗺️ Overview</button>
+          <button class="toggle-btn">📝 Details</button>
+        </div>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">Toggle — Details Active</div>
+        <div class="toggle-row">
+          <button class="toggle-btn">🗺️ Overview</button>
+          <button class="toggle-btn active">📝 Details</button>
+        </div>
+      </div>
+      <div class="state-item">
+        <div class="state-badge">Detail Cards Grid</div>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <div class="detail-card-title">Notes</div>
+            <div class="detail-card-sub">Record your travel ideas</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title">Packing List</div>
+            <div class="detail-card-sub">Viewing others' packing lists</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
