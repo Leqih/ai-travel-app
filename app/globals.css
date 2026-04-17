@@ -13266,15 +13266,13 @@ button {
 
 /* Action buttons */
 .pl-actions {
-  position: fixed;
-  bottom: 80px;
-  left: 0;
-  right: 0;
-  z-index: 20;
+  position: relative;
+  z-index: 3;
   display: flex;
   align-items: stretch;
   justify-content: center;
   gap: 0;
+  margin-top: 20px;
   padding: 0 24px;
   flex-shrink: 0;
 }
