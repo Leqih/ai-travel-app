@@ -11564,7 +11564,6 @@ button {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-bottom: 100px;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -13267,14 +13266,16 @@ button {
 
 /* Action buttons */
 .pl-actions {
-  position: relative;
-  z-index: 3;
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: flex;
   align-items: stretch;
   justify-content: center;
   gap: 0;
-  margin-top: auto;
-  padding: 16px 24px 100px;
+  padding: 0 24px;
   flex-shrink: 0;
 }
 .pl-btn-inspire {
