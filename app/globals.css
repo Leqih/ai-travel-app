@@ -11601,7 +11601,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 56px 24px 12px;
+  padding: 40px 24px 8px;
 }
 .pl-back {
   width: 44px;
@@ -11633,11 +11633,11 @@ button {
 .pl-heading {
   position: relative;
   z-index: 2;
-  padding: 24px 24px 0;
+  padding: 12px 24px 0;
 }
 .pl-title {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1.15;
   color: #fff;
@@ -11646,7 +11646,7 @@ button {
 }
 .pl-vacation-wrap {
   position: relative;
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   z-index: 5;
 }
 .pl-vacation-btn {
@@ -11660,7 +11660,7 @@ button {
 }
 .pl-vacation {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--coral);
   line-height: 1.2;
@@ -11722,13 +11722,13 @@ button {
 .pl-card {
   position: relative;
   z-index: 10;
-  margin: 32px 20px 0;
+  margin: 16px 20px 0;
   background: linear-gradient(180deg, rgba(20,20,20,0.3) 0%, rgba(20,20,20,0.85) 40%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: none;
   border-radius: 24px;
-  padding: 40px 28px 52px;
+  padding: 28px 28px 36px;
   flex-shrink: 0;
   overflow: visible;
 }
@@ -11742,7 +11742,7 @@ button {
 }
 .pl-prompt-line {
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 /* ── Pills (inline in card) ── */
@@ -13273,7 +13273,7 @@ button {
   align-items: stretch;
   justify-content: center;
   gap: 0;
-  margin-top: 16px;
+  margin-top: 12px;
   padding: 0 24px 100px;
   flex-shrink: 0;
 }
