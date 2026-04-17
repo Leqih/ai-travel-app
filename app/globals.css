@@ -12191,6 +12191,34 @@ button {
   margin: 0;
 }
 
+/* Country / section headers in search results */
+.pl-city-section-hd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 6px;
+  margin-top: 4px;
+}
+.pl-city-section-hd:first-child { margin-top: 0; }
+.pl-city-section-flag {
+  font-size: 16px;
+  line-height: 1;
+}
+.pl-city-section-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex: 1;
+}
+.pl-city-section-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,140,66,0.8);
+  letter-spacing: 0.3px;
+}
+
 .pl-sheet-hint {
   font-size: 12px;
   color: rgba(255,255,255,0.4);

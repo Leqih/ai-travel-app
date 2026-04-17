@@ -150,15 +150,41 @@ function CitySheet({ open, onClose, value, onSelect }) {
 
   const isSearchMode = focused || query.trim().length > 0;
 
-  const filtered = useMemo(() =>
-    query.trim()
-      ? CITY_OPTIONS.filter(c =>
-          c.label.toLowerCase().includes(query.toLowerCase()) ||
-          c.country.toLowerCase().includes(query.toLowerCase())
-        )
-      : CITY_OPTIONS,
-    [query]
-  );
+  // Returns { sections: [{type,label,cities}] } when searching, null when idle
+  const searchResult = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return null;
+
+    // Which countries partially match the query?
+    const matchedCountries = [
+      ...new Set(
+        CITY_OPTIONS
+          .filter(c => c.country.toLowerCase().includes(q))
+          .map(c => c.country)
+      ),
+    ];
+
+    const sections = [];
+
+    // Country sections — all cities in that country, sorted A→Z
+    matchedCountries.forEach(country => {
+      const cities = CITY_OPTIONS
+        .filter(c => c.country === country)
+        .sort((a, b) => a.label.localeCompare(b.label));
+      sections.push({ type: "country", label: country, cities });
+    });
+
+    // City-name matches not already covered by a country section
+    const coveredCodes = new Set(sections.flatMap(s => s.cities.map(c => c.code)));
+    const cityMatches = CITY_OPTIONS.filter(
+      c => c.label.toLowerCase().includes(q) && !coveredCodes.has(c.code)
+    );
+    if (cityMatches.length > 0) {
+      sections.unshift({ type: "cities", label: "Cities", cities: cityMatches });
+    }
+
+    return { sections, total: sections.reduce((n, s) => n + s.cities.length, 0) };
+  }, [query]);
 
   // Reset on open
   useEffect(() => {
@@ -200,7 +226,11 @@ function CitySheet({ open, onClose, value, onSelect }) {
       {/* Header */}
       <div className="pl-city-header">
         <h2 className="pl-city-title">
-          {isSearchMode ? "Search Destinations" : "Explore Cities"}
+          {isSearchMode
+            ? searchResult
+              ? `${searchResult.total} destination${searchResult.total !== 1 ? "s" : ""}`
+              : "Search Destinations"
+            : "Explore Cities"}
         </h2>
       </div>
 
@@ -224,26 +254,52 @@ function CitySheet({ open, onClose, value, onSelect }) {
         )}
       </div>
 
-      {/* SEARCH MODE — flat list */}
+      {/* SEARCH MODE — sectioned list */}
       {isSearchMode ? (
         <div className="pl-city-list">
-          {filtered.length > 0 ? filtered.map(city => (
-            <button
-              key={city.code}
-              className={`pl-city-list-item${selected === city.label ? " pl-city-list-item--active" : ""}`}
-              onClick={() => pickCity(city)}
-            >
-              <span className="pl-city-list-emoji">{city.emoji}</span>
-              <div className="pl-city-list-info">
-                <span className="pl-city-list-name">{city.label}</span>
-                <span className="pl-city-list-country">{city.country}</span>
-              </div>
-              {selected === city.label && (
-                <FontAwesomeIcon icon={faCheck} className="pl-city-list-check" />
-              )}
-            </button>
-          )) : (
+          {!searchResult || searchResult.total === 0 ? (
             <p className="pl-city-list-empty">No destinations found for "{query}"</p>
+          ) : (
+            searchResult.sections.map((section, si) => (
+              <div key={si}>
+                {/* Section header */}
+                <div className="pl-city-section-hd">
+                  {section.type === "country" ? (
+                    <>
+                      <span className="pl-city-section-flag">
+                        {section.cities[0]?.emoji}
+                      </span>
+                      <span className="pl-city-section-name">{section.label}</span>
+                      <span className="pl-city-section-count">
+                        {section.cities.length} {section.cities.length === 1 ? "city" : "cities"} · A–Z
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="pl-city-section-name">Cities</span>
+                      <span className="pl-city-section-count">{section.cities.length} result{section.cities.length > 1 ? "s" : ""}</span>
+                    </>
+                  )}
+                </div>
+                {/* City rows */}
+                {section.cities.map(city => (
+                  <button
+                    key={city.code}
+                    className={`pl-city-list-item${selected === city.label ? " pl-city-list-item--active" : ""}`}
+                    onClick={() => pickCity(city)}
+                  >
+                    <span className="pl-city-list-emoji">{city.emoji}</span>
+                    <div className="pl-city-list-info">
+                      <span className="pl-city-list-name">{city.label}</span>
+                      <span className="pl-city-list-country">{city.country}</span>
+                    </div>
+                    {selected === city.label && (
+                      <FontAwesomeIcon icon={faCheck} className="pl-city-list-check" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            ))
           )}
         </div>
       ) : (
