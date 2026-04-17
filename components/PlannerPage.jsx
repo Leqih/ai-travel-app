@@ -1078,29 +1078,34 @@ export function PlannerPage() {
 
       {/* Mad-libs card */}
       <div className="pl-card">
-        <p className="pl-prompt">
-          I want to explore{" "}
-          <button className={`pl-pill ${city ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("city")}>
-            <span className="pl-pill-text">{city || "City/Region"}</span>
-          </button>
-          <br/>
-          prefer a{" "}
-          <button className={`pl-pill ${budget ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("budget")}>
-            <span className="pl-pill-text">{budget || "Budget"}</span>
-          </button>
-          {" "}budget,
-          <br/>
-          my travel style is{" "}
-          <button className={`pl-pill ${style ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("style")}>
-            <span className="pl-pill-text">{style || "Type of Group"}</span>
-          </button>
-          <br/>
-          for{" "}
-          <button className={`pl-pill ${duration ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("duration")}>
-            <span className="pl-pill-text">{duration || "Duration"}</span>
-          </button>
-          {" "}....
-        </p>
+        <div className="pl-prompt">
+          <div className="pl-prompt-line">
+            I want to explore{" "}
+            <button className={`pl-pill ${city ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("city")}>
+              <span className="pl-pill-text">{city || "City/Region"}</span>
+            </button>
+          </div>
+          <div className="pl-prompt-line">
+            prefer a{" "}
+            <button className={`pl-pill ${budget ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("budget")}>
+              <span className="pl-pill-text">{budget || "Budget"}</span>
+            </button>
+            {" "}budget,
+          </div>
+          <div className="pl-prompt-line">
+            my travel style is{" "}
+            <button className={`pl-pill ${style ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("style")}>
+              <span className="pl-pill-text">{style || "Type of Group"}</span>
+            </button>
+          </div>
+          <div className="pl-prompt-line" style={{ marginBottom: 0 }}>
+            for{" "}
+            <button className={`pl-pill ${duration ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("duration")}>
+              <span className="pl-pill-text">{duration || "Duration"}</span>
+            </button>
+            {" "}....
+          </div>
+        </div>
       </div>
 
       {/* Validation hint */}
