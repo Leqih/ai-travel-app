@@ -8,7 +8,7 @@ import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faChevronLeft, faChevronRight, faChevronDown, faCreditCard, faHouse, faCompass, faPlane, faCircleUser, faPlus, faMagnifyingGlass, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 const CircularGallery = dynamic(() => import("./CircularGallery"), { ssr: false });
-const PixelBlast = dynamic(() => import("./PixelBlast"), { ssr: false });
+const Aurora = dynamic(() => import("./Aurora"), { ssr: false });
 
 const TRAVEL_TYPES = ["Vacation", "Adventure", "Relaxation", "Cultural", "Romantic", "Business", "Road Trip", "Backpacking"];
 
@@ -1078,26 +1078,13 @@ export function PlannerPage() {
 
   return (
     <div className="pl-shell" ref={shellRef}>
-      {/* PixelBlast background */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.5 }}>
-        <PixelBlast
-          variant="square"
-          pixelSize={4}
-          color="#ff6a00"
-          patternScale={2}
-          patternDensity={1.2}
-          pixelSizeJitter={0}
-          enableRipples
-          rippleSpeed={0.4}
-          rippleThickness={0.12}
-          rippleIntensityScale={1.5}
-          liquid={false}
-          liquidStrength={0.12}
-          liquidRadius={1.2}
-          liquidWobbleSpeed={5}
+      {/* Aurora background */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+        <Aurora
+          colorStops={["#F97316", "#97a1cf", "#5227FF"]}
+          blend={0.5}
+          amplitude={1.0}
           speed={0.5}
-          edgeFade={0.1}
-          transparent
         />
       </div>
 
