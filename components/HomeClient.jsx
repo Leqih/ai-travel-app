@@ -122,6 +122,7 @@ export function HomeClient() {
   }, []);
 
   const [planOpen, setPlanOpen] = useState(false);
+  const [planDay, setPlanDay]   = useState(1);
   const [cd, setCd] = useState({ days: 0, h: "00", m: "00", s: "00" });
 
   // ── Countdown config (trip + date) ──
@@ -302,8 +303,17 @@ export function HomeClient() {
                       <span className="hp-cd-unit-label">SEC</span>
                     </div>
                   </div>
-                  <button className="hp-cd-plan-toggle" onClick={() => setPlanOpen(true)}>
-                    <span>Day 1 Itinerary</span>
+                  <button className="hp-cd-plan-toggle" onClick={() => { setPlanOpen(true); setPlanDay(1); }}>
+                    <span>
+                      {(() => {
+                        const t = savedTrips.find(tr => tr.id === cdConfig.tripId);
+                        const total = parseInt(t?.duration) || 1;
+                        const totalActs = Object.values(t?.activities || {}).flat().length;
+                        return total > 1
+                          ? `${total}-Day Itinerary · ${totalActs} places`
+                          : `Day 1 Itinerary${totalActs > 0 ? ` · ${totalActs} places` : ""}`;
+                      })()}
+                    </span>
                     <span className="hp-cd-toggle-arrow">›</span>
                   </button>
                 </>
@@ -482,25 +492,63 @@ export function HomeClient() {
             </>)}
 
 
-            {/* Today's plan view */}
-            <div className={`hp-cd-plan-view${planOpen ? " hp-cd-plan-open" : ""}`}>
-              <div className="hp-cd-plan-header">
-                <span className="hp-cd-plan-title">Day 1 · Tokyo</span>
-                <button className="hp-cd-plan-close" onClick={() => setPlanOpen(false)}>✕</button>
-              </div>
-              <div className="hp-cd-plan-list">
-                {PLAN.map((item, i) => (
-                  <div key={i} className="hp-cd-plan-row">
-                    <span className="hp-cd-plan-time">{item.time}</span>
-                    <span className="hp-cd-plan-icon">{item.icon}</span>
-                    <div className="hp-cd-plan-info">
-                      <span className="hp-cd-plan-name">{item.title}</span>
-                      <span className="hp-cd-plan-note">{item.note}</span>
-                    </div>
+            {/* Today's plan view — dynamic from saved trip */}
+            {(() => {
+              const linkedTrip = savedTrips.find(t => t.id === cdConfig.tripId);
+              const totalDays  = parseInt(linkedTrip?.duration) || 1;
+              const dayActs    = (linkedTrip?.activities?.[planDay] || []);
+              const CAT_EMOJI  = { attraction:"🏛️", food:"🍜", restaurant:"🍽️", nature:"🌿", shopping:"🛍️", accommodation:"🏨", transport:"🚃", nightlife:"🍸", art:"🎨", default:"📍" };
+              return (
+                <div className={`hp-cd-plan-view${planOpen ? " hp-cd-plan-open" : ""}`}>
+                  <div className="hp-cd-plan-header">
+                    <span className="hp-cd-plan-title">
+                      Day {planDay} · {cdConfig.tripName || "Trip"}
+                    </span>
+                    <button className="hp-cd-plan-close" onClick={() => setPlanOpen(false)}>✕</button>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  {/* Day tabs */}
+                  {totalDays > 1 && (
+                    <div style={{ display: "flex", gap: 6, padding: "0 14px 10px", overflowX: "auto", scrollbarWidth: "none" }}>
+                      {Array.from({ length: totalDays }, (_, i) => i + 1).map(d => (
+                        <button key={d} onClick={() => setPlanDay(d)} style={{
+                          flexShrink: 0,
+                          height: 26, padding: "0 12px", borderRadius: 14, border: "none", cursor: "pointer",
+                          fontSize: 11, fontWeight: 700, letterSpacing: 0.2,
+                          background: planDay === d ? "#ff8c42" : "rgba(255,255,255,0.08)",
+                          color: planDay === d ? "#fff" : "rgba(255,255,255,0.45)",
+                          transition: "background 0.15s, color 0.15s",
+                        }}>
+                          Day {d}
+                          {(linkedTrip?.activities?.[d] || []).length > 0 && (
+                            <span style={{ marginLeft: 4, opacity: 0.7 }}>·{(linkedTrip.activities[d]).length}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="hp-cd-plan-list">
+                    {dayActs.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "14px 0 8px", color: "rgba(255,255,255,0.3)", fontSize: 12 }}>
+                        No places added for Day {planDay} yet
+                      </div>
+                    ) : (
+                      dayActs.map((act, i) => (
+                        <div key={act._id || i} className="hp-cd-plan-row">
+                          <span className="hp-cd-plan-time">{act.time || "—"}</span>
+                          <span className="hp-cd-plan-icon">{CAT_EMOJI[act.category] || CAT_EMOJI.default}</span>
+                          <div className="hp-cd-plan-info">
+                            <span className="hp-cd-plan-name">{act.name}</span>
+                            <span className="hp-cd-plan-note">{act.address?.split(",").slice(0, 2).join(",") || act.category || ""}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 

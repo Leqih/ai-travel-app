@@ -7017,7 +7017,7 @@ button {
 
 /* ── Countdown card: expandable plan ── */
 .hp-cd-card { height: 210px; transition: height 0.38s cubic-bezier(0.4,0,0.2,1); }
-.hp-cd-card:has(.hp-cd-plan-open) { height: 260px; }
+.hp-cd-card:has(.hp-cd-plan-open) { height: 300px; }
 .hp-cd-card.hp-cd-picker-open { height: fit-content; }
 
 @keyframes cd-picker-in {
@@ -7067,7 +7067,7 @@ button {
   border: none !important; background: none !important; padding: 0 !important;
   box-shadow: none !important; border-radius: 0 !important; cursor: pointer;
 }
-.hp-cd-plan-list { display: flex; flex-direction: column; gap: 0; }
+.hp-cd-plan-list { display: flex; flex-direction: column; gap: 0; overflow-y: auto; max-height: 180px; scrollbar-width: none; }
 .hp-cd-plan-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
 .hp-cd-plan-row:last-child { border-bottom: none; }
 .hp-cd-plan-time { font-size: 11px; color: rgba(255,255,255,0.35); min-width: 36px; font-variant-numeric: tabular-nums; }
