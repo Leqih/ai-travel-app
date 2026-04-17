@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
+import dynamic from "next/dynamic";
+const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 
 const CITY_FLAGS = { Tokyo:"🇯🇵", Seoul:"🇰🇷", Bangkok:"🇹🇭", Bali:"🇮🇩", Paris:"🇫🇷", "New York":"🇺🇸", London:"🇬🇧", Rome:"🇮🇹", Istanbul:"🇹🇷", Dubai:"🇦🇪", Sydney:"🇦🇺", Barcelona:"🇪🇸", Kyoto:"🇯🇵", Singapore:"🇸🇬", Lisbon:"🇵🇹", Osaka:"🇯🇵" };
 const CITY_IMAGES = { Tokyo:"https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop", Seoul:"https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=600&h=400&fit=crop", Paris:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop", Bali:"https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop", Bangkok:"https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&h=400&fit=crop", Osaka:"https://images.unsplash.com/photo-1565559204102-f59129a70ae2?w=600&h=400&fit=crop" };
@@ -91,11 +93,11 @@ const NAV_ITEMS = [
   { icon: faCircleUser,  label: "Profile",   href: "/profile" },
 ];
 
-const DEST_IMG  = "https://picsum.photos/seed/japan-fuji-hero/700/400";
-const TODAY_FEATURED_IMG = "https://picsum.photos/seed/iran-isfahan/700/400";
+const DEST_IMG  = "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=700&h=400&fit=crop";
+const TODAY_FEATURED_IMG = "https://images.unsplash.com/photo-1543832923-44667a44c804?w=800&h=450&fit=crop";
 const TODAY_THUMBS = [
-  "https://picsum.photos/seed/iran-bazaar/120/100",
-  "https://picsum.photos/seed/iran-mosque/120/100",
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=240&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=240&h=200&fit=crop",
 ];
 
 function pad(n) { return String(n).padStart(2, "0"); }
@@ -122,6 +124,7 @@ export function HomeClient() {
   }, []);
 
   const [planOpen, setPlanOpen] = useState(false);
+  const [planDay, setPlanDay]   = useState(1);
   const [cd, setCd] = useState({ days: 0, h: "00", m: "00", s: "00" });
 
   // ── Countdown config (trip + date) ──
@@ -241,7 +244,7 @@ export function HomeClient() {
               </div>
               <div className="hp-greeting">Good <strong>{greeting}</strong></div>
             </div>
-            <div className="hp-avatar" />
+            <div className="hp-avatar"><img src="/memojis/10.png" alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
           </div>
 
           {/* ── Countdown hero card (expandable) ── */}
@@ -251,65 +254,115 @@ export function HomeClient() {
 
             {/* Countdown view */}
             <div className={`hp-cd-count-view${planOpen || pickerOpen ? " hp-cd-hidden" : ""}`}>
-              <div className="hp-cd-top">
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span className="hp-cd-trip">
-                    {cdConfig.tripName
-                      ? `${CITY_FLAGS[cdConfig.tripName] || "✈️"} ${cdConfig.tripName.toUpperCase()}`
-                      : "✈️ MY TRIP"}
-                  </span>
-                  {(() => {
-                    const trip = savedTrips.find(t => t.id === cdConfig.tripId);
-                    if (!trip) return null;
-                    const stops = Object.values(trip.activities || {}).flat().length;
-                    return (
-                      <span style={{
-                        fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 600,
-                        letterSpacing: 0.2, whiteSpace: "nowrap",
-                      }}>
-                        {trip.duration}{stops > 0 ? ` · ${stops} stops` : ""}
+              {cdConfig.startDate ? (
+                <>
+                  {/* Active countdown — show trip name + date + timer */}
+                  <div className="hp-cd-top">
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span className="hp-cd-trip">
+                        {CITY_FLAGS[cdConfig.tripName] || "✈️"} {cdConfig.tripName.toUpperCase()}
                       </span>
-                    );
-                  })()}
+                      {(() => {
+                        const trip = savedTrips.find(t => t.id === cdConfig.tripId);
+                        if (!trip) return null;
+                        const stops = Object.values(trip.activities || {}).flat().length;
+                        return (
+                          <span style={{
+                            fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 600,
+                            letterSpacing: 0.2, whiteSpace: "nowrap",
+                          }}>
+                            {trip.duration}{stops > 0 ? ` · ${stops} stops` : ""}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                    <button
+                      onClick={() => setPickerOpen(true)}
+                      style={{
+                        background: "none", border: "none",
+                        borderRadius: 16, padding: "4px 11px", cursor: "pointer",
+                        color: "rgba(255,255,255,0.85)",
+                        fontSize: 11, fontWeight: 600, letterSpacing: 0.2,
+                      }}>
+                      {new Date(cdConfig.startDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      {" "}<span style={{ opacity: 0.6, fontSize: 10 }}>✎</span>
+                    </button>
+                  </div>
+                  <div className="hp-cd-main">{`In ${cd.days} days`}</div>
+                  <div className="hp-cd-timer">
+                    <div className="hp-cd-timer-unit">
+                      <span className="hp-cd-digits">{cd.h}</span>
+                      <span className="hp-cd-unit-label">HRS</span>
+                    </div>
+                    <span className="hp-cd-sep">:</span>
+                    <div className="hp-cd-timer-unit">
+                      <span className="hp-cd-digits">{cd.m}</span>
+                      <span className="hp-cd-unit-label">MIN</span>
+                    </div>
+                    <span className="hp-cd-sep">:</span>
+                    <div className="hp-cd-timer-unit">
+                      <span className="hp-cd-digits">{cd.s}</span>
+                      <span className="hp-cd-unit-label">SEC</span>
+                    </div>
+                  </div>
+                  <button className="hp-cd-plan-toggle" onClick={() => { setPlanOpen(true); setPlanDay(1); }}>
+                    <span>
+                      {(() => {
+                        const t = savedTrips.find(tr => tr.id === cdConfig.tripId);
+                        const total = parseInt(t?.duration) || 1;
+                        const totalActs = Object.values(t?.activities || {}).flat().length;
+                        return total > 1
+                          ? `${total}-Day Itinerary · ${totalActs} places`
+                          : `Day 1 Itinerary${totalActs > 0 ? ` · ${totalActs} places` : ""}`;
+                      })()}
+                    </span>
+                    <span className="hp-cd-toggle-arrow">›</span>
+                  </button>
+                </>
+              ) : (
+                /* Empty state — no redundant top row, single clean CTA */
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "flex-end", height: "100%", padding: "16px 16px 18px" }}>
+                  <div style={{ marginBottom: 6 }}>
+                    <span style={{
+                      display: "inline-block",
+                      background: "rgba(255,140,66,0.15)", border: "1px solid rgba(255,140,66,0.3)",
+                      borderRadius: 20, padding: "3px 10px",
+                      color: "#ff9a52", fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
+                    }}>
+                      {savedTrips.length > 0 ? `${savedTrips.length} trip${savedTrips.length > 1 ? "s" : ""} planned` : "Get started"}
+                    </span>
+                  </div>
+                  <div style={{ color: "#fff", fontSize: 24, fontWeight: 900, lineHeight: 1.15, letterSpacing: -0.5, marginBottom: 6 }}>
+                    {savedTrips.length > 0 ? "Where to\nnext?" : "Plan your\nfirst trip"}
+                  </div>
+                  <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, lineHeight: 1.5, marginBottom: 14 }}>
+                    {savedTrips.length > 0
+                      ? "Pick a trip and set a date to start your countdown"
+                      : "Create an itinerary and start counting down"}
+                  </div>
+                  {savedTrips.length > 0 ? (
+                    <button
+                      onClick={() => setPickerOpen(true)}
+                      style={{
+                        background: "#ff8c42", border: "none",
+                        color: "#000", fontSize: 13, fontWeight: 800,
+                        padding: "10px 22px", borderRadius: 22, cursor: "pointer",
+                        letterSpacing: 0.2,
+                      }}>
+                      Set countdown ›
+                    </button>
+                  ) : (
+                    <Link href="/planner" style={{
+                      background: "#ff8c42", textDecoration: "none",
+                      color: "#000", fontSize: 13, fontWeight: 800,
+                      padding: "10px 22px", borderRadius: 22,
+                      letterSpacing: 0.2,
+                    }}>
+                      Start planning ›
+                    </Link>
+                  )}
                 </div>
-                <button
-                  onClick={() => setPickerOpen(true)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    borderRadius: 16, padding: "4px 11px", cursor: "pointer",
-                    color: cdConfig.startDate ? "rgba(255,255,255,0.85)" : "#ff9a52",
-                    fontSize: 11, fontWeight: 600, letterSpacing: 0.2,
-                  }}>
-                  {cdConfig.startDate
-                    ? <>{new Date(cdConfig.startDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })} <span style={{ opacity: 0.6, fontSize: 10 }}>✎</span></>
-                    : "Set dates ›"}
-                </button>
-              </div>
-              <div className="hp-cd-main">
-                {cdConfig.startDate ? `In ${cd.days} days` : "No date set"}
-              </div>
-              <div className="hp-cd-timer">
-                <div className="hp-cd-timer-unit">
-                  <span className="hp-cd-digits">{cd.h}</span>
-                  <span className="hp-cd-unit-label">HRS</span>
-                </div>
-                <span className="hp-cd-sep">:</span>
-                <div className="hp-cd-timer-unit">
-                  <span className="hp-cd-digits">{cd.m}</span>
-                  <span className="hp-cd-unit-label">MIN</span>
-                </div>
-                <span className="hp-cd-sep">:</span>
-                <div className="hp-cd-timer-unit">
-                  <span className="hp-cd-digits">{cd.s}</span>
-                  <span className="hp-cd-unit-label">SEC</span>
-                </div>
-              </div>
-              {/* Toggle to plan */}
-              <button className="hp-cd-plan-toggle" onClick={() => setPlanOpen(true)}>
-                <span>Day 1 Itinerary</span>
-                <span className="hp-cd-toggle-arrow">›</span>
-              </button>
+              )}
             </div>
 
             {/* ── Trip + date picker overlay ── */}
@@ -373,7 +426,7 @@ export function HomeClient() {
                 )}
                 {pickerTripId && (<div style={{ animation: "cd-cal-in 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}>
                   <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 600, letterSpacing: 0.8, margin: "0 0 8px", textTransform: "uppercase" }}>Start date</p>
-                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", padding: "10px 8px 8px", marginBottom: 10 }}>
+                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "none", padding: "10px 8px 8px", marginBottom: 10 }}>
                     {/* Month/year nav */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, padding: "0 2px" }}>
                       <button onClick={prevMonth} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: 8, width: 28, height: 28, color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>‹</button>
@@ -441,25 +494,63 @@ export function HomeClient() {
             </>)}
 
 
-            {/* Today's plan view */}
-            <div className={`hp-cd-plan-view${planOpen ? " hp-cd-plan-open" : ""}`}>
-              <div className="hp-cd-plan-header">
-                <span className="hp-cd-plan-title">Day 1 · Tokyo</span>
-                <button className="hp-cd-plan-close" onClick={() => setPlanOpen(false)}>✕</button>
-              </div>
-              <div className="hp-cd-plan-list">
-                {PLAN.map((item, i) => (
-                  <div key={i} className="hp-cd-plan-row">
-                    <span className="hp-cd-plan-time">{item.time}</span>
-                    <span className="hp-cd-plan-icon">{item.icon}</span>
-                    <div className="hp-cd-plan-info">
-                      <span className="hp-cd-plan-name">{item.title}</span>
-                      <span className="hp-cd-plan-note">{item.note}</span>
-                    </div>
+            {/* Today's plan view — dynamic from saved trip */}
+            {(() => {
+              const linkedTrip = savedTrips.find(t => t.id === cdConfig.tripId);
+              const totalDays  = parseInt(linkedTrip?.duration) || 1;
+              const dayActs    = (linkedTrip?.activities?.[planDay] || []);
+              const CAT_EMOJI  = { attraction:"🏛️", food:"🍜", restaurant:"🍽️", nature:"🌿", shopping:"🛍️", accommodation:"🏨", transport:"🚃", nightlife:"🍸", art:"🎨", default:"📍" };
+              return (
+                <div className={`hp-cd-plan-view${planOpen ? " hp-cd-plan-open" : ""}`}>
+                  <div className="hp-cd-plan-header">
+                    <span className="hp-cd-plan-title">
+                      Day {planDay} · {cdConfig.tripName || "Trip"}
+                    </span>
+                    <button className="hp-cd-plan-close" onClick={() => setPlanOpen(false)}>✕</button>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  {/* Day tabs */}
+                  {totalDays > 1 && (
+                    <div style={{ display: "flex", gap: 6, padding: "0 14px 10px", overflowX: "auto", scrollbarWidth: "none" }}>
+                      {Array.from({ length: totalDays }, (_, i) => i + 1).map(d => (
+                        <button key={d} onClick={() => setPlanDay(d)} style={{
+                          flexShrink: 0,
+                          height: 26, padding: "0 12px", borderRadius: 14, border: "none", cursor: "pointer",
+                          fontSize: 11, fontWeight: 700, letterSpacing: 0.2,
+                          background: planDay === d ? "#ff8c42" : "rgba(255,255,255,0.08)",
+                          color: planDay === d ? "#fff" : "rgba(255,255,255,0.45)",
+                          transition: "background 0.15s, color 0.15s",
+                        }}>
+                          Day {d}
+                          {(linkedTrip?.activities?.[d] || []).length > 0 && (
+                            <span style={{ marginLeft: 4, opacity: 0.7 }}>·{(linkedTrip.activities[d]).length}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="hp-cd-plan-list">
+                    {dayActs.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "14px 0 8px", color: "rgba(255,255,255,0.3)", fontSize: 12 }}>
+                        No places added for Day {planDay} yet
+                      </div>
+                    ) : (
+                      dayActs.map((act, i) => (
+                        <div key={act._id || i} className="hp-cd-plan-row">
+                          <span className="hp-cd-plan-time">{act.time || "—"}</span>
+                          <span className="hp-cd-plan-icon">{CAT_EMOJI[act.category] || CAT_EMOJI.default}</span>
+                          <div className="hp-cd-plan-info">
+                            <span className="hp-cd-plan-name">{act.name}</span>
+                            <span className="hp-cd-plan-note">{act.address?.split(",").slice(0, 2).join(",") || act.category || ""}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -583,8 +674,15 @@ export function HomeClient() {
             if (item.center) {
               return (
                 <div key="center" className="hp-nav-center-wrap">
-                  <Link href="/planner" className="hp-nav-center-btn">
-                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
+                  <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
+                    {pathname === '/planner' ? (
+                      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
+                        <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
+                      </div>
+                    ) : (
+                      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%", background: "linear-gradient(135deg, #F97316 0%, #396cbf 60%, #B497CF 100%)" }} />
+                    )}
+                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
                   </Link>
                 </div>
               );

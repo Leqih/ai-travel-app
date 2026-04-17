@@ -82,7 +82,7 @@ export default function FootprintPage() {
         <Link href="/profile" style={{
           width: 44, height: 44, borderRadius: "50%",
           background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "none",
           display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", flexShrink: 0,
         }}>
           <svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -96,7 +96,7 @@ export default function FootprintPage() {
         <div style={{
           borderRadius: 20, overflow: "hidden", position: "relative",
           background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "none",
           padding: "22px 20px 20px",
         }}>
           {/* Subtle orange glow from avatar */}
@@ -137,7 +137,7 @@ export default function FootprintPage() {
             ].map(s => (
               <div key={s.l} style={{
                 background: "rgba(255,255,255,0.05)", borderRadius: 14,
-                border: "1px solid rgba(255,255,255,0.07)",
+                border: "none",
                 padding: "11px 0", textAlign: "center",
               }}>
                 <div style={{ fontSize: 26, fontWeight: 800, color: "#fff", letterSpacing: -1.5, lineHeight: 1, fontFamily: `-apple-system,"SF Pro Display","Helvetica Neue",sans-serif` }}>{s.v}</div>
@@ -228,7 +228,7 @@ export default function FootprintPage() {
                 {isActive && (
                   <div style={{
                     position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
-                    background: "rgba(20,20,20,0.9)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)",
+                    background: "rgba(20,20,20,0.9)", backdropFilter: "blur(8px)", border: "none",
                     borderRadius: 10, padding: "5px 10px",
                     color: "#fff", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap",
                     boxShadow: "0 6px 20px rgba(0,0,0,0.5)",
@@ -322,7 +322,7 @@ export default function FootprintPage() {
             <Link href="/planner" style={{
               borderRadius: 14, aspectRatio: "2/3", textDecoration: "none",
               background: "rgba(255,255,255,0.025)",
-              border: "1.5px dashed rgba(255,255,255,0.09)",
+              border: "none",
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 9,
             }}>
               <div style={{

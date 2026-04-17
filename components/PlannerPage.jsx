@@ -8,7 +8,8 @@ import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faChevronLeft, faChevronRight, faChevronDown, faCreditCard, faHouse, faCompass, faPlane, faCircleUser, faPlus, faMagnifyingGlass, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 const CircularGallery = dynamic(() => import("./CircularGallery"), { ssr: false });
-const PixelBlast = dynamic(() => import("./PixelBlast"), { ssr: false });
+const Aurora = dynamic(() => import("./Aurora"), { ssr: false });
+const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 
 const TRAVEL_TYPES = ["Vacation", "Adventure", "Relaxation", "Cultural", "Romantic", "Business", "Road Trip", "Backpacking"];
 
@@ -150,15 +151,41 @@ function CitySheet({ open, onClose, value, onSelect }) {
 
   const isSearchMode = focused || query.trim().length > 0;
 
-  const filtered = useMemo(() =>
-    query.trim()
-      ? CITY_OPTIONS.filter(c =>
-          c.label.toLowerCase().includes(query.toLowerCase()) ||
-          c.country.toLowerCase().includes(query.toLowerCase())
-        )
-      : CITY_OPTIONS,
-    [query]
-  );
+  // Returns { sections: [{type,label,cities}] } when searching, null when idle
+  const searchResult = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return null;
+
+    // Which countries partially match the query?
+    const matchedCountries = [
+      ...new Set(
+        CITY_OPTIONS
+          .filter(c => c.country.toLowerCase().includes(q))
+          .map(c => c.country)
+      ),
+    ];
+
+    const sections = [];
+
+    // Country sections — all cities in that country, sorted A→Z
+    matchedCountries.forEach(country => {
+      const cities = CITY_OPTIONS
+        .filter(c => c.country === country)
+        .sort((a, b) => a.label.localeCompare(b.label));
+      sections.push({ type: "country", label: country, cities });
+    });
+
+    // City-name matches not already covered by a country section
+    const coveredCodes = new Set(sections.flatMap(s => s.cities.map(c => c.code)));
+    const cityMatches = CITY_OPTIONS.filter(
+      c => c.label.toLowerCase().includes(q) && !coveredCodes.has(c.code)
+    );
+    if (cityMatches.length > 0) {
+      sections.unshift({ type: "cities", label: "Cities", cities: cityMatches });
+    }
+
+    return { sections, total: sections.reduce((n, s) => n + s.cities.length, 0) };
+  }, [query]);
 
   // Reset on open
   useEffect(() => {
@@ -200,7 +227,11 @@ function CitySheet({ open, onClose, value, onSelect }) {
       {/* Header */}
       <div className="pl-city-header">
         <h2 className="pl-city-title">
-          {isSearchMode ? "Search Destinations" : "Explore Cities"}
+          {isSearchMode
+            ? searchResult
+              ? `${searchResult.total} destination${searchResult.total !== 1 ? "s" : ""}`
+              : "Search Destinations"
+            : "Explore Cities"}
         </h2>
       </div>
 
@@ -224,26 +255,52 @@ function CitySheet({ open, onClose, value, onSelect }) {
         )}
       </div>
 
-      {/* SEARCH MODE — flat list */}
+      {/* SEARCH MODE — sectioned list */}
       {isSearchMode ? (
         <div className="pl-city-list">
-          {filtered.length > 0 ? filtered.map(city => (
-            <button
-              key={city.code}
-              className={`pl-city-list-item${selected === city.label ? " pl-city-list-item--active" : ""}`}
-              onClick={() => pickCity(city)}
-            >
-              <span className="pl-city-list-emoji">{city.emoji}</span>
-              <div className="pl-city-list-info">
-                <span className="pl-city-list-name">{city.label}</span>
-                <span className="pl-city-list-country">{city.country}</span>
-              </div>
-              {selected === city.label && (
-                <FontAwesomeIcon icon={faCheck} className="pl-city-list-check" />
-              )}
-            </button>
-          )) : (
+          {!searchResult || searchResult.total === 0 ? (
             <p className="pl-city-list-empty">No destinations found for "{query}"</p>
+          ) : (
+            searchResult.sections.map((section, si) => (
+              <div key={si}>
+                {/* Section header */}
+                <div className="pl-city-section-hd">
+                  {section.type === "country" ? (
+                    <>
+                      <span className="pl-city-section-flag">
+                        {section.cities[0]?.emoji}
+                      </span>
+                      <span className="pl-city-section-name">{section.label}</span>
+                      <span className="pl-city-section-count">
+                        {section.cities.length} {section.cities.length === 1 ? "city" : "cities"} · A–Z
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="pl-city-section-name">Cities</span>
+                      <span className="pl-city-section-count">{section.cities.length} result{section.cities.length > 1 ? "s" : ""}</span>
+                    </>
+                  )}
+                </div>
+                {/* City rows */}
+                {section.cities.map(city => (
+                  <button
+                    key={city.code}
+                    className={`pl-city-list-item${selected === city.label ? " pl-city-list-item--active" : ""}`}
+                    onClick={() => pickCity(city)}
+                  >
+                    <span className="pl-city-list-emoji">{city.emoji}</span>
+                    <div className="pl-city-list-info">
+                      <span className="pl-city-list-name">{city.label}</span>
+                      <span className="pl-city-list-country">{city.country}</span>
+                    </div>
+                    {selected === city.label && (
+                      <FontAwesomeIcon icon={faCheck} className="pl-city-list-check" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            ))
           )}
         </div>
       ) : (
@@ -984,13 +1041,14 @@ export function PlannerPage() {
   const [activeSheet, setActiveSheet] = useState(null);
   const shellRef = useRef(null);
 
-  // Masonry-style entrance animation
+  // Entrance animation — clearProps:"filter" removes inline filter after animation
+  // so it doesn't create a persistent stacking context that blocks pointer events
   useEffect(() => {
     if (!shellRef.current) return;
     const elements = shellRef.current.querySelectorAll(".pl-header, .pl-heading, .pl-card, .pl-actions");
     gsap.fromTo(elements,
-      { opacity: 0, y: 60, filter: "blur(10px)" },
-      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out", stagger: 0.08 }
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08, clearProps: "transform,filter" }
     );
   }, []);
 
@@ -1004,28 +1062,30 @@ export function PlannerPage() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Navigate after loading animation completes (~3.2s covers all 4 steps)
+  useEffect(() => {
+    if (!generating) return;
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (city) params.set("city", city);
+      if (duration) params.set("duration", duration);
+      if (budget) params.set("budget", budget);
+      if (style) params.set("prefs", style);
+      params.set("ai", "true");
+      router.push(`/planner/manual?${params.toString()}`);
+    }, 3200);
+    return () => clearTimeout(timer);
+  }, [generating]);
+
   return (
     <div className="pl-shell" ref={shellRef}>
-      {/* PixelBlast background */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.5 }}>
-        <PixelBlast
-          variant="square"
-          pixelSize={4}
-          color="#ff6a00"
-          patternScale={2}
-          patternDensity={1.2}
-          pixelSizeJitter={0}
-          enableRipples
-          rippleSpeed={0.4}
-          rippleThickness={0.12}
-          rippleIntensityScale={1.5}
-          liquid={false}
-          liquidStrength={0.12}
-          liquidRadius={1.2}
-          liquidWobbleSpeed={5}
+      {/* Aurora background */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+        <Aurora
+          colorStops={["#F97316", "#97a1cf", "#5227FF"]}
+          blend={0.5}
+          amplitude={1.0}
           speed={0.5}
-          edgeFade={0.1}
-          transparent
         />
       </div>
 
@@ -1063,30 +1123,42 @@ export function PlannerPage() {
 
       {/* Mad-libs card */}
       <div className="pl-card">
-        <p className="pl-prompt">
-          I want to explore{" "}
-          <button className={`pl-pill ${city ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("city")}>
-            <span className="pl-pill-text">{city || "City/Region"}</span>
-          </button>
-          <br/>
-          prefer a{" "}
-          <button className={`pl-pill ${budget ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("budget")}>
-            <span className="pl-pill-text">{budget || "Budget"}</span>
-          </button>
-          {" "}budget,
-          <br/>
-          my travel style is{" "}
-          <button className={`pl-pill ${style ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("style")}>
-            <span className="pl-pill-text">{style || "Type of Group"}</span>
-          </button>
-          <br/>
-          for{" "}
-          <button className={`pl-pill ${duration ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("duration")}>
-            <span className="pl-pill-text">{duration || "Duration"}</span>
-          </button>
-          {" "}....
-        </p>
+        <div className="pl-prompt">
+          <div className="pl-prompt-line">
+            I want to explore{" "}
+            <button className={`pl-pill ${city ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("city")}>
+              <span className="pl-pill-text">{city || "City/Region"}</span>
+            </button>
+          </div>
+          <div className="pl-prompt-line">
+            prefer a{" "}
+            <button className={`pl-pill ${budget ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("budget")}>
+              <span className="pl-pill-text">{budget || "Budget"}</span>
+            </button>
+            {" "}budget,
+          </div>
+          <div className="pl-prompt-line">
+            my travel style is{" "}
+            <button className={`pl-pill ${style ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("style")}>
+              <span className="pl-pill-text">{style || "Type of Group"}</span>
+            </button>
+          </div>
+          <div className="pl-prompt-line" style={{ marginBottom: 0 }}>
+            for{" "}
+            <button className={`pl-pill ${duration ? "pl-pill-selected" : ""}`} onClick={() => setActiveSheet("duration")}>
+              <span className="pl-pill-text">{duration || "Duration"}</span>
+            </button>
+            {" "}....
+          </div>
+        </div>
       </div>
+
+      {/* Validation hint */}
+      {!city && (
+        <div style={{ textAlign: "center", marginTop: 20, marginBottom: 4, color: "#fff", fontSize: 11, fontWeight: 600, letterSpacing: 0.4, animation: "pl-fade-in 0.4s ease" }}>
+          ↑ Choose a destination to get started
+        </div>
+      )}
 
       {/* Action buttons */}
       <div className="pl-actions">
@@ -1094,7 +1166,12 @@ export function PlannerPage() {
           href={`/planner/manual?city=${encodeURIComponent(city || "")}&duration=${encodeURIComponent(duration || "")}${budget ? `&budget=${encodeURIComponent(budget)}` : ""}${style ? `&style=${encodeURIComponent(style)}` : ""}`}
           className="pl-btn-inspire"
         >DIRECTLY CREATE</Link>
-        <button className="pl-btn-generate" onClick={() => setGenerating(true)}>
+        <button
+          className="pl-btn-generate"
+          onClick={() => { if (city) setGenerating(true); }}
+          style={{ opacity: city ? 1 : 0.45, cursor: city ? "pointer" : "not-allowed", transition: "opacity 0.2s" }}
+          title={!city ? "Select a destination first" : undefined}
+        >
           <div className="pl-uiverse-wrapper">
             <span>HELP ME PLAN</span>
             <div className="pl-circle pl-circle-12"></div>
@@ -1116,24 +1193,9 @@ export function PlannerPage() {
       {/* Generating loading overlay */}
       {generating && (
         <div className="pl-gen-overlay">
-          {/* Same pixel background as planner page */}
+          {/* Aurora background for generating overlay */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.5 }}>
-            <PixelBlast
-              variant="square"
-              pixelSize={4}
-              color="#ff6a00"
-              patternScale={2}
-              patternDensity={1.2}
-              pixelSizeJitter={0}
-              enableRipples
-              rippleSpeed={0.4}
-              rippleThickness={0.12}
-              rippleIntensityScale={1.5}
-              liquid={false}
-              speed={0.5}
-              edgeFade={0.1}
-              transparent
-            />
+            <Aurora colorStops={["#F97316", "#97a1cf", "#5227FF"]} blend={0.5} amplitude={1.0} speed={0.5} />
           </div>
           <div className="pl-gen-card">
             <div className="pl-gen-orb" />
@@ -1145,10 +1207,15 @@ export function PlannerPage() {
               </h2>
               <p className="pl-gen-sub">Analysing destinations, weather, and hidden gems</p>
               <div className="pl-gen-steps">
-                {["Researching destination", "Matching your style", "Building itinerary", "Finalising details"].map((s, i) => (
-                  <div key={s} className="pl-gen-step" style={{ animationDelay: `${i * 0.6}s` }}>
-                    <span className="pl-gen-step-dot" />
-                    <span className="pl-gen-step-text">{s}</span>
+                {[
+                  { text: "Researching destination", delay: 0 },
+                  { text: "Matching your style",     delay: 0.7 },
+                  { text: "Building itinerary",       delay: 1.4 },
+                  { text: "Finalising details",        delay: 2.1 },
+                ].map(({ text, delay }) => (
+                  <div key={text} className="pl-gen-step" style={{ animationDelay: `${delay}s` }}>
+                    <span className="pl-gen-step-dot" style={{ animationDelay: `${delay}s` }} />
+                    <span className="pl-gen-step-text">{text}</span>
                   </div>
                 ))}
               </div>
@@ -1176,8 +1243,11 @@ export function PlannerPage() {
             <span className="hp-nav-label">Discover</span>
           </Link>
           <div className="hp-nav-center-wrap">
-            <Link href="/planner" className="hp-nav-center-btn">
-              <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
+            <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
+              <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
+                <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
+              </div>
+              <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
             </Link>
           </div>
           <Link href="/trips" className={`hp-nav-item${pathname === "/trips" ? " hp-nav-active" : ""}`}>

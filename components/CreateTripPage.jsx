@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -105,8 +107,15 @@ export function CreateTripPage() {
           {NAV_ITEMS.map((item, i) =>
             item.center ? (
               <div key="center" className="hp-nav-center-wrap">
-                <Link href="/planner" className="hp-nav-center-btn">
-                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
+                <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
+                  {pathname === '/planner' ? (
+                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
+                      <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
+                    </div>
+                  ) : (
+                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%", background: "linear-gradient(135deg, #F97316 0%, #396cbf 60%, #B497CF 100%)" }} />
+                  )}
+                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
                 </Link>
               </div>
             ) : (

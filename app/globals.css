@@ -954,7 +954,7 @@ h3,
 .page-shell {
   background: var(--panel);
   border-radius: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.06);
+  border: none;
 }
 
 .hero-copy {
@@ -2169,7 +2169,7 @@ h3,
 /* ═══════════════════════════════════════════════════════════
    OPAL DESIGN SYSTEM — Shared Tokens & Components
    ═══════════════════════════════════════════════════════════
-   Glass:       rgba(20,20,20,0.7) + backdrop-filter:blur(8px) + border:1px solid rgba(255,255,255,0.08)
+   Glass:       rgba(20,20,20,0.7) + backdrop-filter:blur(8px) + border: none
    Active:      background:#fff + color:#000
    Inactive:    Glass (above)
    Back Button: 44×44 circle, Glass bg, SVG chevron 10×18 stroke:white strokeWidth:2
@@ -2196,7 +2196,7 @@ h3,
 
   /* Opal Glass tokens */
   --opal-glass: rgba(20, 20, 20, 0.7);
-  --opal-glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --opal-glass-border: none;
   --opal-blur: blur(8px);
   --opal-active-bg: #fff;
   --opal-active-text: #000;
@@ -2221,7 +2221,6 @@ h3,
 .mobile-map-shell,
 .saved-shell {
   background: var(--surface-base);
-  border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.14);
   border-radius: var(--radius-shell);
   padding: var(--space-shell) var(--space-shell) calc(var(--nav-height) + 1.1rem);
@@ -2409,7 +2408,7 @@ button {
   height: var(--nav-height);
   align-items: center;
   background: rgba(18, 18, 30, 0.92);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   width: min(460px, calc(100% - 1rem));
 }
@@ -2713,7 +2712,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   box-shadow: 0 2px 12px rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
@@ -2733,7 +2732,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   color: #fff;
   font-size: 11px;
   font-weight: 600;
@@ -2865,7 +2864,7 @@ button {
   width: 100%;
   box-sizing: border-box;
   background: rgba(255,255,255,0.07) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  border: none !important;
   border-radius: 16px !important;
   padding: 13px 14px 13px 42px !important;
   font-size: 15px;
@@ -2965,7 +2964,7 @@ button {
   background: #0F0F18;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
   border-bottom: none;
   border-radius: 24px 24px 0 0;
   display: flex;
@@ -3017,7 +3016,7 @@ button {
 /* Total (active = white bg, black text) */
 .nd-trip-day-total {
   background: #fff;
-  border: 1px solid #fff;
+  border: none;
 }
 .nd-trip-day-total .nd-trip-day-num {
   font-size: 16px;
@@ -3028,7 +3027,7 @@ button {
 /* Active day (white bg, black text) */
 .nd-trip-day-active {
   background: #fff;
-  border: 1px solid #fff;
+  border: none;
 }
 .nd-trip-day-active .nd-trip-day-num {
   color: #000;
@@ -3039,14 +3038,14 @@ button {
 /* Inactive day (Opal glass) */
 .nd-trip-day-inactive {
   background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.09);
+  border: none;
 }
 .nd-trip-day-inactive .nd-trip-day-num { color: rgba(255,255,255,0.75); }
 .nd-trip-day-inactive .nd-trip-day-label { color: rgba(255,255,255,0.4); }
 /* Future/grayed day */
 .nd-trip-day-future {
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
 }
 .nd-trip-day-future .nd-trip-day-num { color: rgba(255,255,255,0.5); }
 .nd-trip-day-future .nd-trip-day-label { color: rgba(255,255,255,0.5); }
@@ -3074,7 +3073,7 @@ button {
   height: 37px;
   padding: 0 20px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.15px;
@@ -3160,7 +3159,7 @@ button {
   align-items: center;
   justify-content: space-between;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   padding: 0 17px;
   height: 66px;
@@ -3200,7 +3199,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   padding: 17px;
 }
@@ -3284,7 +3283,7 @@ button {
 .nd-trip-weather-inner {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -3361,7 +3360,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   padding: 14px;
   margin-bottom: 0;
@@ -3476,7 +3475,7 @@ button {
   background: rgba(20,20,20,0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-bottom: none;
   border-radius: 20px 22px 0 0;
   display: flex;
@@ -3498,7 +3497,7 @@ button {
   border-radius: 50%;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border: none;
   color: #fff;
   font-size: 20px;
@@ -3545,7 +3544,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
+  border: none;
   border-radius: 20px;
   padding: 14px 16px;
   margin-bottom: 24px;
@@ -3601,7 +3600,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 18px;
   padding: 14px 12px 14px 0;
   overflow: hidden;
@@ -3683,7 +3682,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   height: 66px;
   padding: 0 17px;
@@ -3712,7 +3711,7 @@ button {
 /* Total tab button — inactive */
 .nd-trip-day-text {
   background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.09);
+  border: none;
 }
 .nd-trip-day-text .nd-trip-day-num {
   color: rgba(255,255,255,0.75);
@@ -3723,7 +3722,7 @@ button {
 /* Total tab button — active = white pill */
 .nd-trip-day-text-active {
   background: #fff !important;
-  border: 1px solid #fff !important;
+  border: none !important;
 }
 .nd-trip-day-text-active .nd-trip-day-num {
   color: #000 !important;
@@ -3745,7 +3744,7 @@ button {
   background: rgba(20,20,20,0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-bottom: none;
   border-radius: 20px 22px 0 0;
   display: flex;
@@ -3794,7 +3793,7 @@ button {
   border-radius: 50%;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: #fff;
   font-size: 22px;
   line-height: 1;
@@ -3868,7 +3867,7 @@ button {
 }
 .nd-detail-pill {
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   color: rgba(255,255,255,0.7);
   font-size: 12px;
   font-weight: 500;
@@ -3932,7 +3931,7 @@ button {
 .nd-detail-save-btn {
   flex: 1;
   background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: #fff;
   font-size: 15px;
   font-weight: 600;
@@ -3962,7 +3961,7 @@ button {
   background: rgba(20,20,20,0.7) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  border: none !important;
   color: #fff !important;
   font-size: 13px;
   font-weight: 700;
@@ -3987,7 +3986,7 @@ button {
   height: 10px;
   border-radius: 50%;
   background: rgba(255,255,255,0.5);
-  border: 2px solid rgba(255,255,255,0.8);
+  border: none;
   box-shadow: 0 0 8px rgba(255,255,255,0.3);
 }
 .nd-pin-active .nd-pin-dot {
@@ -4039,7 +4038,7 @@ button {
   height: 36px;
   background: rgba(0,0,0,0.55) !important;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.10) !important;
+  border: none !important;
   border-radius: 50% !important;
   flex-shrink: 0;
   cursor: pointer;
@@ -4072,7 +4071,7 @@ button {
   gap: 5px;
   background: rgba(0,0,0,0.55) !important;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.10) !important;
+  border: none !important;
   border-radius: 20px !important;
   padding: 6px 13px !important;
   cursor: pointer;
@@ -4115,7 +4114,7 @@ button {
   background: rgba(20,20,20,0.7) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  border: none !important;
   border-radius: 20px !important;
   padding: 14px 16px 12px !important;
   display: flex;
@@ -4253,7 +4252,7 @@ button {
   background: rgba(20,20,20,0.7) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  border: none !important;
   border-radius: 20px !important;
   padding: 14px 12px 12px !important;
   display: flex;
@@ -4512,7 +4511,7 @@ button {
   height: 12px;
   border-radius: 50%;
   background: #fff;
-  border: 2px solid rgba(255,255,255,0.4);
+  border: none;
   box-shadow: 0 0 8px rgba(255,255,255,0.5);
   transition: transform 0.2s;
 }
@@ -4585,7 +4584,7 @@ button {
 
 .nearby-mode-pill {
   background: rgba(0,0,0,0.75);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   color: #fff;
   font-size: 12px;
@@ -4627,7 +4626,7 @@ button {
   height: 36px;
   border-radius: 50%;
   background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4681,7 +4680,7 @@ button {
 .nearby-card {
   flex: 1;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.09);
+  border: none;
   border-radius: 20px;
   padding: 10px;
   backdrop-filter: blur(8px);
@@ -4867,7 +4866,7 @@ button {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-  border: 2px solid #fff;
+  border: none;
   transition: transform 0.15s;
 }
 .map-emoji-pin.pin-selected {
@@ -4904,7 +4903,7 @@ button {
   width: 36px; height: 36px;
   border-radius: 50%;
   background: rgba(20,20,32,0.85);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
@@ -4916,7 +4915,7 @@ button {
 .nearby-batch-btn {
   pointer-events: all;
   background: rgba(20,20,32,0.85);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   color: rgba(255,255,255,0.75);
   border-radius: 20px;
   padding: 8px 16px;
@@ -5066,7 +5065,7 @@ button {
   width: 10px; height: 10px;
   background: #e53;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: none;
 }
 
 .bottom-card-content { flex: 1; min-width: 0; }
@@ -5104,7 +5103,7 @@ button {
   flex: 1;
   height: 42px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   background: transparent;
   font-size: 13px;
   color: rgba(255,255,255,0.6);
@@ -5234,7 +5233,7 @@ button {
   -webkit-backdrop-filter: blur(8px);
   padding: 6px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
 }
 
 /* ── Tag filter bar ── */
@@ -5254,7 +5253,7 @@ button {
   flex-shrink: 0;
   padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
   background: rgba(20,20,32,0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -5404,7 +5403,7 @@ button {
   width: 42px; height: 42px;
   border-radius: 50%;
   background: #4a8fe8;
-  border: 3px solid rgba(255,255,255,0.08);
+  border: none;
   box-shadow: 0 4px 18px rgba(74,143,232,0.55);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.15s, box-shadow 0.15s;
@@ -5469,7 +5468,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
 }
 .city-sheet-title {
   margin: 0;
@@ -5506,7 +5505,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
   cursor: pointer;
   text-align: left;
   transition: background 0.15s;
@@ -5557,7 +5556,7 @@ button {
   width: 32px; height: 32px;
   border-radius: 50%;
   background: var(--pin-color, #555);
-  border: 3px solid #fff;
+  border: none;
   box-shadow: 0 3px 10px rgba(0,0,0,0.25);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.2s;
@@ -5598,7 +5597,7 @@ button {
   width: 36px; height: 36px;
   border-radius: 50%;
   background: #4a8fe8;
-  border: 3px solid rgba(255,255,255,0.15);
+  border: none;
   box-shadow: 0 4px 14px rgba(74,143,232,0.5);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -5651,7 +5650,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
 }
 .itin-sheet-back {
   background: none;
@@ -5676,7 +5675,7 @@ button {
   flex-shrink: 0;
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.8);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   border-radius: 16px;
   padding: 6px 14px;
   font-size: 12px;
@@ -5698,7 +5697,7 @@ button {
 .day-tab {
   flex-shrink: 0;
   background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   border-radius: 20px;
   padding: 5px 14px;
   font-size: 12px;
@@ -5808,7 +5807,7 @@ button {
   background: rgba(20,20,32,0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   overflow: hidden;
   scroll-snap-align: center;
@@ -5875,7 +5874,7 @@ button {
   height: 100px;
   object-fit: cover;
   border-radius: 16px;
-  border: 2px solid rgba(255,255,255,0.06);
+  border: none;
   box-shadow: 0 4px 14px rgba(0,0,0,0.4);
 }
 .place-card-gallery-img:nth-child(1) {
@@ -5909,7 +5908,7 @@ button {
 }
 .place-card-save {
   background: none;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: rgba(255,255,255,0.7);
   border-radius: 20px;
   padding: 4px 14px;
@@ -6031,8 +6030,7 @@ button {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #c4c4c4;
-  border: 1.5px solid rgba(80,80,88,0.9);
+  background: #fff;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -6040,11 +6038,11 @@ button {
 /* ── Countdown hero card ── */
 .hp-cd-card {
   margin: 0 16px;
-  height: 192px;
+  height: 210px;
   border-radius: 22px;
   overflow: hidden;
   position: relative;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
 
@@ -6087,7 +6085,7 @@ button {
   background: rgba(20,20,20,0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   color: rgba(255,255,255,0.85);
   font-size: 11px;
   font-weight: 600;
@@ -6120,7 +6118,7 @@ button {
   background: rgba(15,15,20,0.65);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -6241,7 +6239,7 @@ button {
   background: #1c1c1f;
   border-radius: 20px;
   padding: 16px 18px 12px;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
 }
 .hp-plan-header {
   text-align: center;
@@ -6314,7 +6312,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
   text-decoration: none;
   color: #fff;
   min-height: 110px;
@@ -6440,7 +6438,7 @@ button {
   left: 12px;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: #fff;
   font-size: 11px;
   font-weight: 600;
@@ -6692,9 +6690,22 @@ button {
 }
 .hp-nav-active {
   color: #fff;
+  position: relative;
 }
 .hp-nav-active .hp-nav-icon { color: #fff; }
-.hp-nav-active .hp-nav-label { color: #fff; }
+.hp-nav-active .hp-nav-label { color: #ff8c42; font-weight: 700; }
+.hp-nav-active::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ff8c42;
+  box-shadow: 0 0 6px rgba(255,140,66,0.8);
+}
 
 /* center add button */
 .hp-nav-center-wrap {
@@ -6707,13 +6718,14 @@ button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%);
+  background: transparent;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   margin-top: -20px;
-  box-shadow: 0 0 0 4px #1a1a1e, 0 6px 20px rgba(255,95,31,0.55), 0 2px 8px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 4px #1a1a1e, 0 6px 20px rgba(249,115,22,0.55), 0 2px 8px rgba(0,0,0,0.4);
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .hp-nav-center-btn:active {
@@ -6745,7 +6757,7 @@ button {
   text-decoration: none;
   padding: 14px;
   box-sizing: border-box;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   box-shadow: 0 2px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 .hp-bento-bg {
@@ -6775,7 +6787,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   padding: 6px 10px;
 }
@@ -6811,7 +6823,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   padding: 5px 10px;
   font-size: 10px;
@@ -6972,7 +6984,7 @@ button {
   justify-content: flex-end;
   padding-bottom: 10px;
   text-decoration: none;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
 }
 .hp-city-img {
   position: absolute; inset: 0;
@@ -7005,8 +7017,8 @@ button {
 }
 
 /* ── Countdown card: expandable plan ── */
-.hp-cd-card { height: 192px; transition: height 0.38s cubic-bezier(0.4,0,0.2,1); }
-.hp-cd-card:has(.hp-cd-plan-open) { height: 260px; }
+.hp-cd-card { height: 210px; transition: height 0.38s cubic-bezier(0.4,0,0.2,1); }
+.hp-cd-card:has(.hp-cd-plan-open) { height: 300px; }
 .hp-cd-card.hp-cd-picker-open { height: fit-content; }
 
 @keyframes cd-picker-in {
@@ -7032,7 +7044,7 @@ button {
 .hp-cd-plan-toggle {
   position: absolute !important; bottom: 14px; left: 20px;
   display: flex !important; align-items: center !important; gap: 6px !important;
-  background: rgba(20,20,20,0.7) !important; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08) !important;
+  background: rgba(20,20,20,0.7) !important; backdrop-filter: blur(8px); border: none !important;
   border-radius: 16px !important; padding: 6px 14px !important;
   font-size: 13px !important; font-weight: 600 !important;
   color: #fff !important; border: none !important; box-shadow: none !important; cursor: pointer;
@@ -7056,7 +7068,7 @@ button {
   border: none !important; background: none !important; padding: 0 !important;
   box-shadow: none !important; border-radius: 0 !important; cursor: pointer;
 }
-.hp-cd-plan-list { display: flex; flex-direction: column; gap: 0; }
+.hp-cd-plan-list { display: flex; flex-direction: column; gap: 0; overflow-y: auto; max-height: 180px; scrollbar-width: none; }
 .hp-cd-plan-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
 .hp-cd-plan-row:last-child { border-bottom: none; }
 .hp-cd-plan-time { font-size: 11px; color: rgba(255,255,255,0.35); min-width: 36px; font-variant-numeric: tabular-nums; }
@@ -7075,13 +7087,15 @@ button {
 
 /* ── Featured article card ── */
 .hp-featured-card {
-  margin: 0 16px; height: 190px; border-radius: 18px; overflow: hidden;
+  margin: 0 16px; height: 210px; border-radius: 20px; overflow: hidden;
   position: relative; display: flex;
 }
-.hp-featured-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hp-featured-img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
 .hp-featured-overlay {
-  position: absolute; top: 0; left: 0; bottom: 0; right: 130px;
-  background: linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 70%, transparent 100%);
+  position: absolute; inset: 0;
+  background: linear-gradient(113.64deg, rgba(0,0,0,0.88) 7.74%, rgba(0,0,0,0.55) 45.77%, rgba(0,0,0,0.1) 66.91%, rgba(0,0,0,0) 92.27%);
 }
 .hp-featured-content {
   position: absolute; top: 0; left: 0; bottom: 0; right: 130px;
@@ -7089,16 +7103,18 @@ button {
 }
 .hp-featured-tag {
   font-size: 11px; font-weight: 600; color: #fff;
-  background: rgba(20,20,20,0.7); backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(20,20,20,0.65); backdrop-filter: blur(8px);
   border-radius: 16px; padding: 3px 8px; align-self: flex-start;
 }
 .hp-featured-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.35; }
 .hp-featured-thumbs {
-  position: absolute; top: 10px; right: 10px; bottom: 10px; width: 110px;
-  display: flex; flex-direction: column; gap: 5px; z-index: 2;
+  position: absolute; top: 0; right: 0; bottom: 0; width: 120px;
+  display: flex; flex-direction: column; align-items: stretch; justify-content: space-between;
+  padding: 20px 10px; z-index: 2;
 }
-.hp-featured-thumb { flex: 1; width: 100%; object-fit: cover; border-radius: 12px; display: block; }
+.hp-featured-thumb {
+  width: 100%; height: 74px; object-fit: cover; border-radius: 10px; display: block; flex-shrink: 0;
+}
 
 /* ── 精选专题 topic cards ── */
 .hp-topics-scroll { display: flex; gap: 10px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; }
@@ -7106,7 +7122,7 @@ button {
 .hp-topic-card { position: relative; flex-shrink: 0; width: 138px; height: 165px; border-radius: 16px; overflow: hidden; display: block; }
 .hp-topic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hp-topic-grad { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.06) 50%, transparent 100%); }
-.hp-topic-tag { position: absolute; top: 10px; left: 10px; background: rgba(20,20,20,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 16px; z-index: 2; }
+.hp-topic-tag { position: absolute; top: 10px; left: 10px; background: rgba(20,20,20,0.7); backdrop-filter: blur(8px); border: none; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 16px; z-index: 2; }
 .hp-topic-title { position: absolute; bottom: 48px; left: 12px; right: 12px; font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif; font-size: 13px; font-weight: 700; color: #fff; line-height: 1.3; z-index: 2; }
 
 /* ── 我的行程 full-width trip cards ── */
@@ -7114,7 +7130,7 @@ button {
 .hp-mytrip-card {
   display: flex; align-items: center; border-radius: 18px; overflow: hidden;
   padding: 14px 0 14px 0; text-decoration: none; position: relative;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
 }
 .hp-mytrip-accent {
   width: 3px; align-self: stretch; flex-shrink: 0;
@@ -7125,7 +7141,7 @@ button {
 .hp-mytrip-title { font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: -0.2px; color: #fff; margin-bottom: 2px; }
 .hp-mytrip-meta { font-size: 12px; font-weight: 400; line-height: 1.4; color: rgba(255,255,255,0.45); }
 .hp-mytrip-avatars { display: flex; align-items: center; gap: 4px; margin-top: 8px; }
-.hp-mytrip-av { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.2); }
+.hp-mytrip-av { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; }
 .hp-mytrip-av2 { margin-left: -8px; background: rgba(255,255,255,0.22); }
 .hp-mytrip-add { width: 22px; height: 22px; border-radius: 50%; background: transparent; border: 1.5px dashed; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; margin-left: -8px; line-height: 1; }
 .hp-mytrip-img { width: 84px; height: 84px; object-fit: cover; border-radius: 16px; margin: 0 12px 0 12px; flex-shrink: 0; }
@@ -7691,7 +7707,7 @@ button {
   background: rgba(20,20,20,0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7764,7 +7780,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.09);
+  border: none;
   border-radius: 16px;
   padding: 10px 14px;
   margin: 0 20px 24px;
@@ -7825,7 +7841,7 @@ button {
   align-items: flex-start;
   width: 100%;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 20px;
@@ -7996,7 +8012,7 @@ button {
   background: rgba(20,20,20,0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8051,7 +8067,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   padding: 20px;
 }
@@ -8178,7 +8194,7 @@ button {
   background: rgba(20,20,20,0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8196,7 +8212,7 @@ button {
 .pk-nav-add {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 50%;
   width: 44px;
   height: 44px;
@@ -8301,7 +8317,7 @@ button {
 }
 .pk-picker-item {
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   border-radius: 16px;
   padding: 16px 14px;
   display: flex;
@@ -8383,7 +8399,7 @@ button {
 .pk-stat-card {
   flex: 1;
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 18px;
   padding: 14px 16px;
   display: flex;
@@ -8446,7 +8462,7 @@ button {
 /* Card */
 .pk-card {
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 18px;
   overflow: hidden;
 }
@@ -8476,7 +8492,7 @@ button {
   height: 20px;
   min-width: 20px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.2);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8516,7 +8532,7 @@ button {
   min-width: 20px;
   border-radius: 50%;
   background: rgba(255,255,255,0.08);
-  border: 1.5px solid rgba(255,255,255,0.2);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8583,7 +8599,7 @@ button {
   color: #fff;
   font-size: 13px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   box-shadow: 0 2px 12px rgba(0,0,0,0.3);
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
 }
@@ -8595,7 +8611,7 @@ button {
 .nd-map-pin-label {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   color: #fff; font-size: 11px; font-weight: 600;
   padding: 4px 10px; border-radius: 16px;
   white-space: nowrap;
@@ -8647,7 +8663,7 @@ button {
   position: absolute; top: 52px; left: 20px; z-index: 10;
   width: 44px; height: 44px; border-radius: 50%;
   background: rgba(20,20,20,0.9);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
@@ -8659,7 +8675,7 @@ button {
   position: absolute; top: 52px; right: 20px; z-index: 10;
   width: 44px; height: 44px; border-radius: 50%;
   background: rgba(20,20,20,0.9);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
@@ -8711,7 +8727,7 @@ button {
 /* ── Floating glass detail card (exact Figma 958:2508) ── */
 .nd-mapview-card {
   background: rgba(20,20,20,0.7);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 20px;
@@ -8766,7 +8782,7 @@ button {
   margin-top: 4px;
   width: 20px; height: 20px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: none;
   background: rgba(255,255,255,0.08);
   color: rgba(255,255,255,0.55);
   font-size: 14px; line-height: 1;
@@ -8804,7 +8820,7 @@ button {
   flex: 1;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   padding: 11px 0;
   font-size: 14px; font-weight: 600; color: #fff;
@@ -8815,7 +8831,7 @@ button {
 .nd-mapview-btn-solid {
   background: rgba(255,255,255,0.9);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.9);
+  border: none;
   border-radius: 16px;
   padding: 11px 16px;
   font-size: 14px; font-weight: 700; color: #000;
@@ -8845,7 +8861,7 @@ button {
   flex-shrink: 0; box-sizing: border-box; padding: 0;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
@@ -8857,7 +8873,7 @@ button {
   flex-shrink: 0; box-sizing: border-box; padding: 0;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
@@ -8915,7 +8931,7 @@ button {
   flex: 1;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   padding: 16px 12px;
   display: flex; flex-direction: column; align-items: center;
@@ -8939,7 +8955,7 @@ button {
 .nd-act-detail-desc-card {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   padding: 24px;
 }
@@ -8995,7 +9011,7 @@ button {
 .nd-act-detail-spot-tab {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.45);
   white-space: nowrap; cursor: pointer;
@@ -9030,7 +9046,7 @@ button {
 .nd-act-detail-spot-pill {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   padding: 10px 16px;
   font-size: 13px; color: rgba(255,255,255,0.55);
@@ -9045,7 +9061,7 @@ button {
   display: flex; align-items: flex-start; gap: 12px;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   padding: 14px 16px;
 }
@@ -9074,7 +9090,7 @@ button {
   min-width: 130px; flex-shrink: 0;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 16px;
   overflow: hidden;
 }
@@ -9111,7 +9127,7 @@ button {
   border-radius: 16px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 0;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   background: rgba(20,20,20,0.7); color: #fff;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -9264,7 +9280,9 @@ button {
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.picks-shell::-webkit-scrollbar { display: none; }
 
 /* ── Top bar ── */
 .picks-topbar {
@@ -9289,7 +9307,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: #fff;
   display: flex;
   align-items: center;
@@ -9338,7 +9356,7 @@ button {
   font-weight: 600;
   color: rgba(255,255,255,0.55);
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
@@ -9438,7 +9456,7 @@ button {
 .labor-inline-cta,
 .labor-scan-cta,
 .labor-nav-item {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: none;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.6);
   color: #e5edf7;
@@ -9496,7 +9514,7 @@ button {
 .labor-fallback-card,
 .labor-profile-card,
 .labor-scan-stage {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none;
   border-radius: 28px;
   background: rgba(8, 15, 28, 0.62);
   backdrop-filter: blur(18px);
@@ -9534,7 +9552,7 @@ button {
   background: rgba(15, 23, 42, 0.45);
   color: #f8fafc;
   font-size: 0.74rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: none;
 }
 
 .labor-hero-copy p,
@@ -9610,7 +9628,7 @@ button {
   padding: 0.75rem 0.85rem;
   border-radius: 18px;
   background: rgba(8, 15, 28, 0.34);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none;
 }
 
 .labor-process-node span {
@@ -9747,7 +9765,7 @@ button {
   padding: 1rem;
   border-radius: 24px;
   background: rgba(8, 15, 28, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
 }
 
 .labor-person-main {
@@ -9847,7 +9865,7 @@ button {
   width: 240px;
   height: 240px;
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: none;
   background:
     linear-gradient(180deg, rgba(249, 115, 22, 0.15), rgba(59, 130, 246, 0.08)),
     rgba(15, 23, 42, 0.9);
@@ -9883,7 +9901,7 @@ button {
 
 .labor-result-card {
   background: rgba(15, 23, 42, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: none;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
@@ -9916,7 +9934,7 @@ button {
 .labor-fallback-card input {
   width: 100%;
   padding: 0.9rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: none;
   border-radius: 18px;
   background: rgba(15, 23, 42, 0.7);
   color: #f8fafc;
@@ -9954,7 +9972,7 @@ button {
   padding: 0.6rem;
   border-radius: 999px;
   background: rgba(8, 15, 28, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
@@ -10014,7 +10032,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .picks-card:hover {
@@ -10053,7 +10071,7 @@ button {
   padding: 5px 12px;
   border-radius: 999px;
   z-index: 2;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
 }
 
 /* Body content */
@@ -10087,7 +10105,7 @@ button {
   height: 64px;
   border-radius: 16px;
   object-fit: cover;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
 }
 
 /* Actions row */
@@ -10099,7 +10117,7 @@ button {
 .picks-card-like,
 .picks-card-save {
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 12px;
@@ -10204,7 +10222,7 @@ button {
 .labor-v2-tab,
 .labor-v2-primary-btn,
 .labor-v2-nav-item {
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   background: rgba(15, 23, 42, 0.7);
   color: #e2e8f0;
   box-shadow: none;
@@ -10273,7 +10291,7 @@ button {
 .labor-v2-history-row,
 .labor-v2-step-row,
 .labor-v2-result-hero {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 24px;
   background: rgba(9, 16, 30, 0.78);
   backdrop-filter: blur(18px);
@@ -10406,7 +10424,7 @@ button {
   padding: 0.95rem 1rem;
   text-align: left;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   background: rgba(15, 23, 42, 0.72);
 }
 
@@ -10443,7 +10461,7 @@ button {
   display: grid;
   justify-items: start;
   gap: 0.75rem;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   background: rgba(15, 23, 42, 0.72);
   color: #e2e8f0;
 }
@@ -10631,7 +10649,7 @@ button {
   width: 240px;
   height: 240px;
   border-radius: 28px;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
   background:
     linear-gradient(180deg, rgba(249, 115, 22, 0.12), rgba(56, 189, 248, 0.08)),
     rgba(15, 23, 42, 0.9);
@@ -10671,7 +10689,7 @@ button {
 .labor-v2-manual-grid input {
   padding: 0.85rem 0.95rem;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   background: rgba(15, 23, 42, 0.72);
 }
 
@@ -10797,7 +10815,7 @@ button {
   padding: 0.55rem;
   border-radius: 28px;
   background: rgba(8, 15, 28, 0.92);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   box-shadow: 0 16px 40px rgba(0,0,0,0.4);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -10884,7 +10902,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10914,7 +10932,7 @@ button {
   -webkit-backdrop-filter: blur(8px);
   padding: 3px 8px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
@@ -10942,7 +10960,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10964,7 +10982,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: #fff;
   font-family: -apple-system, "SF Pro Display", sans-serif;
   font-size: 15px;
@@ -11004,7 +11022,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: rgba(255,255,255,0.7);
   font-family: -apple-system, "SF Pro Display", sans-serif;
   font-size: 12px;
@@ -11037,7 +11055,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: #fff;
   font-family: -apple-system, "SF Pro Display", sans-serif;
   font-size: 13px;
@@ -11066,7 +11084,7 @@ button {
   -webkit-backdrop-filter: blur(8px);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-bottom: none;
   padding: 8px 20px 32px;
 }
@@ -11095,7 +11113,7 @@ button {
   width: 100%;
   padding: 14px 12px;
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.2s;
@@ -11162,7 +11180,7 @@ button {
   background: rgba(20,20,20,0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   overflow: hidden;
   transition: border-color 0.2s;
@@ -11226,7 +11244,7 @@ button {
   gap: 10px;
   padding: 6px 12px;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
+  border: none;
   border-radius: 14px;
   margin-bottom: 8px;
 }
@@ -11253,7 +11271,7 @@ button {
 }
 .pa-carousel-card-btn-save {
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 12px;
@@ -11331,7 +11349,7 @@ button {
   padding: 10px 20px;
   border-radius: 16px;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   color: #fff;
   cursor: pointer;
 }
@@ -11381,7 +11399,7 @@ button {
   border-radius: 50%;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11391,7 +11409,7 @@ button {
 .ct-badge {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 999px;
   padding: 6px 18px;
   font-size: 11px;
@@ -11434,7 +11452,7 @@ button {
   padding: 20px;
   background: rgba(20,20,20,0.5);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   border-radius: 20px;
   cursor: pointer;
   text-decoration: none;
@@ -11463,7 +11481,7 @@ button {
 }
 .ct-card-icon-manual {
   background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
 }
 .ct-card-icon-import {
   background: linear-gradient(135deg, rgba(255,90,95,0.2) 0%, rgba(255,90,95,0.08) 100%);
@@ -11547,7 +11565,6 @@ button {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-bottom: 100px;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -11592,7 +11609,7 @@ button {
   border-radius: 50%;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11602,7 +11619,6 @@ button {
 .pl-badge {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 999px;
   padding: 6px 18px;
   font-size: 11px;
@@ -11616,7 +11632,7 @@ button {
 /* Heading */
 .pl-heading {
   position: relative;
-  z-index: 50;
+  z-index: 2;
   padding: 24px 24px 0;
 }
 .pl-title {
@@ -11631,7 +11647,7 @@ button {
 .pl-vacation-wrap {
   position: relative;
   margin: 4px 0 0;
-  z-index: 50;
+  z-index: 5;
 }
 .pl-vacation-btn {
   display: flex;
@@ -11672,7 +11688,7 @@ button {
   background: rgba(20,20,20,0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 20px;
   padding: 8px;
   z-index: 50;
@@ -11710,7 +11726,7 @@ button {
   background: linear-gradient(180deg, rgba(20,20,20,0.3) 0%, rgba(20,20,20,0.85) 40%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   border-radius: 24px;
   padding: 40px 28px 52px;
   flex-shrink: 0;
@@ -11719,10 +11735,14 @@ button {
 .pl-prompt {
   font-size: 18px;
   font-weight: 500;
-  line-height: 2.6;
-  color: rgba(255,255,255,0.75);
+  line-height: 1.4;
+  color: #fff;
   text-align: center;
   margin: 0;
+}
+.pl-prompt-line {
+  display: block;
+  margin-bottom: 20px;
 }
 
 /* ── Pills (inline in card) ── */
@@ -11731,7 +11751,7 @@ button {
   align-items: center;
   gap: 6px;
   padding: 6px 16px;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: none;
   border-radius: 999px;
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.5);
@@ -11745,12 +11765,10 @@ button {
   white-space: nowrap;
 }
 .pl-pill:hover {
-  border-color: rgba(255,255,255,0.35);
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.8);
 }
 .pl-pill-selected {
-  border-color: rgba(255,255,255,0.3);
   color: #fff;
   font-style: normal;
   background: rgba(255,255,255,0.1);
@@ -11768,7 +11786,8 @@ button {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: plOverlayIn 0.25s ease;
+  animation: plOverlayIn 0.3s ease both;
+  animation-delay: 0.05s;
 }
 @keyframes plOverlayIn {
   from { opacity: 0; }
@@ -11789,7 +11808,8 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: plSheetUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: plSheetUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.15s;
   max-height: 85vh;
   overflow-y: auto;
   scrollbar-width: none;
@@ -11797,8 +11817,8 @@ button {
 }
 .pl-sheet::-webkit-scrollbar { display: none; }
 @keyframes plSheetUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 
 .pl-sheet-handle {
@@ -11808,6 +11828,13 @@ button {
   background: rgba(255,255,255,0.12);
   margin: 12px auto 0;
   flex-shrink: 0;
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.3s;
+}
+
+@keyframes plSheetFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── City sheet header ── */
@@ -11819,6 +11846,8 @@ button {
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.35s;
 }
 .pl-city-title {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
@@ -11940,7 +11969,7 @@ button {
   background: rgba(255,255,255,0.12);
   border-radius: 99px;
   padding: 2px 9px;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
 }
 .pl-detail-hint {
   font-size: 10px;
@@ -11956,6 +11985,8 @@ button {
   width: 100%;
   box-sizing: border-box;
   padding: 0 24px;
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.42s;
 }
 .pl-city-search {
   width: 100%;
@@ -11963,7 +11994,7 @@ button {
   background: rgba(255,255,255,0.1) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.18) !important;
+  border: none !important;
   border-radius: 999px !important;
   padding: 13px 14px !important;
   font-size: 15px;
@@ -12066,6 +12097,10 @@ button {
 }
 .pl-sheet-cta:hover { background: rgba(255,255,255,0.9); }
 .pl-sheet-cta:active { transform: scale(0.97); }
+.pl-sheet-overlay .pl-sheet-cta {
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.5s;
+}
 .pl-sheet-cta--disabled { opacity: 0.35; cursor: not-allowed; }
 .pl-sheet-cta--disabled:hover { background: #fff; transform: none; }
 
@@ -12154,6 +12189,34 @@ button {
   font-size: 14px;
   padding: 40px 0;
   margin: 0;
+}
+
+/* Country / section headers in search results */
+.pl-city-section-hd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 6px;
+  margin-top: 4px;
+}
+.pl-city-section-hd:first-child { margin-top: 0; }
+.pl-city-section-flag {
+  font-size: 16px;
+  line-height: 1;
+}
+.pl-city-section-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex: 1;
+}
+.pl-city-section-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,140,66,0.8);
+  letter-spacing: 0.3px;
 }
 
 .pl-sheet-hint {
@@ -12352,7 +12415,7 @@ button {
 }
 .pl-orbit-ring {
   position: absolute;
-  border: 1px dashed rgba(255,255,255,0.06);
+  border: none;
   border-radius: 50%;
 }
 .pl-orbit-ring-inner {
@@ -12370,7 +12433,7 @@ button {
   height: 52px;
   border-radius: 50%;
   background: #1c1c1e;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12420,7 +12483,7 @@ button {
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -12474,7 +12537,7 @@ button {
   height: 36px;
   border-radius: 12px;
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12490,7 +12553,7 @@ button {
 .pl-budget-toggle {
   display: flex;
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.05);
+  border: none;
   border-radius: 12px;
   padding: 4px;
 }
@@ -12507,7 +12570,7 @@ button {
 }
 .pl-budget-toggle-active {
   background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   color: #fff;
 }
 
@@ -12522,7 +12585,7 @@ button {
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: none;
   background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
   display: flex;
   align-items: center;
@@ -12710,7 +12773,7 @@ button {
   border-radius: 10px;
   white-space: nowrap;
   pointer-events: none;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   z-index: 5;
   transition: left 0.15s cubic-bezier(0.4,0,0.2,1);
@@ -12809,7 +12872,7 @@ button {
   height: 150px;
   border-radius: 50%;
   background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -12894,7 +12957,7 @@ button {
 .pl-budget-seg {
   padding: 8px 16px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   background: rgba(255,255,255,0.04);
   color: rgba(255,255,255,0.5);
   font-size: 12px;
@@ -12930,7 +12993,7 @@ button {
   padding: 20px 12px;
   border-radius: 20px;
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   color: rgba(255,255,255,0.6);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -12972,7 +13035,7 @@ button {
   padding: 20px 12px;
   border-radius: 20px;
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: none;
   color: rgba(255,255,255,0.6);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -13095,7 +13158,7 @@ button {
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13210,8 +13273,8 @@ button {
   align-items: stretch;
   justify-content: center;
   gap: 0;
-  margin-top: 16px;
-  padding: 0 24px 100px;
+  margin-top: 20px;
+  padding: 0 24px;
   flex-shrink: 0;
 }
 .pl-btn-inspire {
@@ -13220,7 +13283,7 @@ button {
   border-radius: 999px 0 0 999px;
   background: rgba(10,10,15,0.95);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-right: none;
   color: #fff;
   font-size: 11px;
@@ -13378,7 +13441,7 @@ button {
   width: calc(100% - 48px);
   max-width: 360px;
   background: rgba(20,20,26,0.9);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   border-radius: 28px;
   padding: 36px 28px 32px;
   overflow: hidden;
@@ -13451,21 +13514,38 @@ button {
   to   { opacity: 1; transform: translateX(0); }
 }
 .pl-gen-step-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,123,75,0.5);
+  background: rgba(255,123,75,0.12);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: plGenDotPulse 1.4s ease-in-out infinite;
+}
+.pl-gen-step-dot::after {
+  content: '';
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #ff7b4b;
-  flex-shrink: 0;
-  animation: plGenDotPulse 1.2s ease-in-out infinite;
 }
 @keyframes plGenDotPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.7); }
+  0%, 100% { border-color: rgba(255,123,75,0.5); box-shadow: 0 0 0 0 rgba(255,123,75,0); }
+  50%       { border-color: rgba(255,123,75,0.9); box-shadow: 0 0 0 4px rgba(255,123,75,0.15); }
 }
 .pl-gen-step-text {
   font-size: 13px;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.75);
   font-weight: 500;
+  letter-spacing: 0.1px;
+}
+
+@keyframes pl-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .pl-gen-cancel {
   position: relative;
@@ -13508,7 +13588,7 @@ button {
   height: 44px;
   border-radius: 50%;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13558,7 +13638,7 @@ button {
 /* ── Day group card ── */
 .mp-plan-shell .nd-trip-day-group {
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: none;
   border-radius: 20px;
   padding: 18px 16px 14px;
   margin-bottom: 12px;
@@ -13581,7 +13661,7 @@ button {
   height: 36px;
   padding: 0 14px;
   border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.65);
   font-size: 13px;
@@ -13636,7 +13716,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.025);
-  border: 1px dashed rgba(255,255,255,0.13);
+  border: none;
   border-radius: 16px;
   width: 100%;
   height: 66px;
@@ -13656,7 +13736,7 @@ button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.025);
-  border: 1px dashed rgba(255,255,255,0.13);
+  border: none;
   border-radius: 16px;
   padding: 14px;
   cursor: pointer;
@@ -13684,7 +13764,7 @@ button {
   min-height: 36px;
   border-radius: 50%;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   color: rgba(255,255,255,0.5);
   padding: 0 !important;
   font-size: 16px;
@@ -13753,7 +13833,7 @@ button {
   background: rgba(20,20,20,0.92);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-bottom: none;
   border-radius: 24px 24px 0 0;
   display: flex;
@@ -13822,7 +13902,7 @@ button {
   background: rgba(30,30,30,0.97);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
   border-radius: 14px;
   overflow: hidden;
   z-index: 10;
@@ -13853,7 +13933,7 @@ button {
 .mp-sheet-close {
   width: 44px; height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   background: rgba(255,255,255,0.08);
   color: rgba(255,255,255,0.55);
   font-size: 13px;
@@ -13867,7 +13947,7 @@ button {
 /* ── Budget / Spending Tracker ── */
 .mp-budget-section {
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 18px;
   padding: 16px;
   margin-bottom: 16px;
@@ -14005,7 +14085,7 @@ button {
 .mp-exp-page-back {
   width: 44px; height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   background: rgba(255,255,255,0.08);
   color: #fff;
   display: flex; align-items: center; justify-content: center;
@@ -14075,7 +14155,7 @@ button {
   gap: 6px;
   height: 76px;
   border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   background: rgba(255,255,255,0.05);
   cursor: pointer;
   transition: all 0.15s;
@@ -14097,7 +14177,7 @@ button {
 .mp-exp-note-wrap {
   margin: 0 20px;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   border-radius: 14px;
   padding: 0 16px;
 }
@@ -14114,7 +14194,7 @@ button {
   font-size: 11px; font-weight: 500;
   color: rgba(255,255,255,0.3);
   margin-left: 6px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: none;
   border-radius: 8px;
   padding: 2px 7px;
 }
@@ -14140,7 +14220,7 @@ button {
   gap: 3px;
   padding: 16px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   background: rgba(255,255,255,0.05);
   cursor: pointer;
   transition: all 0.15s;
@@ -14197,7 +14277,7 @@ button {
 .mp-setbudget-custom-input {
   display: flex; align-items: center; gap: 8px;
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   border-radius: 14px; padding: 12px 16px;
   transition: border-color 0.15s;
 }
@@ -14215,7 +14295,7 @@ button {
 .mp-add-exp-btn {
   width: 100%; padding: 10px;
   background: rgba(255,255,255,0.06);
-  border: 1px dashed rgba(255,255,255,0.15);
+  border: none;
   border-radius: 12px;
   color: rgba(255,255,255,0.45);
   font-size: 13px; font-weight: 600;
@@ -14225,7 +14305,7 @@ button {
 
 .mp-add-exp-form {
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   border-radius: 14px;
   padding: 12px;
   display: flex; flex-direction: column; gap: 10px;
@@ -14233,7 +14313,7 @@ button {
 .mp-add-exp-cats { display: flex; gap: 8px; }
 .mp-add-exp-cat {
   width: 36px; height: 36px; border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   background: rgba(255,255,255,0.06);
   font-size: 18px; cursor: pointer; transition: all 0.15s;
 }
@@ -14254,7 +14334,7 @@ button {
 .mp-add-exp-note::placeholder { color: rgba(255,255,255,0.25); }
 .mp-add-exp-actions { display: flex; gap: 8px; justify-content: flex-end; }
 .mp-add-exp-cancel {
-  padding: 7px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+  padding: 7px 14px; border-radius: 10px; border: none;
   background: transparent; color: rgba(255,255,255,0.5);
   font-size: 13px; font-weight: 600; cursor: pointer;
 }
@@ -14316,7 +14396,7 @@ button {
   padding: 0 9px;
   border-radius: 11px;
   background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
   color: rgba(255,255,255,0.9);
   font-size: 11px;
   font-weight: 600;
@@ -14331,7 +14411,6 @@ button {
 .mp-trip-badge--pref {
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.75);
-  border-color: rgba(255,255,255,0.15);
 }
 
 /* Category cards — horizontal scroll */
@@ -14349,7 +14428,7 @@ button {
   width: 72px;
   height: 72px;
   border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   background: rgba(255,255,255,0.07);
   display: flex;
   flex-direction: column;
@@ -14444,7 +14523,7 @@ button {
   width: 42px; height: 42px;
   border-radius: 12px;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex; align-items: center; justify-content: center;
   font-size: 18px;
   flex-shrink: 0;
@@ -14476,7 +14555,7 @@ button {
   min-width: 36px; min-height: 36px;
   padding: 0 !important;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   background: rgba(255,255,255,0.08);
   flex-shrink: 0;
   aspect-ratio: 1 / 1;
@@ -14522,7 +14601,7 @@ button {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px dashed rgba(255,255,255,0.35);
+  border: none;
   background: rgba(30,30,48,0.85);
   color: rgba(255,255,255,0.75);
   font-size: 18px;
@@ -14547,7 +14626,7 @@ button {
   padding: 16px;
   border-radius: 20px;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -14574,7 +14653,7 @@ button {
   margin: 0 20px 24px;
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
 }
 .mp-invite-member-row {
   display: flex;
@@ -14608,7 +14687,7 @@ button {
   padding: 3px 10px;
   border-radius: 999px;
   background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.12);
+  border: none;
   font-size: 11px;
   font-weight: 700;
   color: rgba(255,255,255,0.5);
@@ -14623,7 +14702,7 @@ button {
   padding: 14px 16px;
   border-radius: 16px;
   background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: none;
 }
 .mp-invite-link-text {
   flex: 1;
@@ -14641,7 +14720,7 @@ button {
   padding: 0 14px;
   border-radius: 999px;
   background: rgba(255,255,255,0.14);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: none;
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -14660,7 +14739,7 @@ button {
   height: 50px;
   border-radius: 16px;
   background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
+  border: none;
   color: #fff;
   font-size: 15px;
   font-weight: 700;
