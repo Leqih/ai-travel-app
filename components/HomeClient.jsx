@@ -91,7 +91,7 @@ const NAV_ITEMS = [
   { icon: faCircleUser,  label: "Profile",   href: "/profile" },
 ];
 
-const DEST_IMG  = "https://picsum.photos/seed/japan-fuji-hero/700/400";
+const DEST_IMG  = "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=700&h=400&fit=crop";
 const TODAY_FEATURED_IMG = "https://images.unsplash.com/photo-1543832923-44667a44c804?w=800&h=450&fit=crop";
 const TODAY_THUMBS = [
   "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=240&h=200&fit=crop",
@@ -251,43 +251,40 @@ export function HomeClient() {
 
             {/* Countdown view */}
             <div className={`hp-cd-count-view${planOpen || pickerOpen ? " hp-cd-hidden" : ""}`}>
-              <div className="hp-cd-top">
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span className="hp-cd-trip">
-                    {cdConfig.tripName
-                      ? `${CITY_FLAGS[cdConfig.tripName] || "✈️"} ${cdConfig.tripName.toUpperCase()}`
-                      : "✈️ MY TRIP"}
-                  </span>
-                  {(() => {
-                    const trip = savedTrips.find(t => t.id === cdConfig.tripId);
-                    if (!trip) return null;
-                    const stops = Object.values(trip.activities || {}).flat().length;
-                    return (
-                      <span style={{
-                        fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 600,
-                        letterSpacing: 0.2, whiteSpace: "nowrap",
-                      }}>
-                        {trip.duration}{stops > 0 ? ` · ${stops} stops` : ""}
-                      </span>
-                    );
-                  })()}
-                </div>
-                <button
-                  onClick={() => setPickerOpen(true)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    borderRadius: 16, padding: "4px 11px", cursor: "pointer",
-                    color: cdConfig.startDate ? "rgba(255,255,255,0.85)" : "#ff9a52",
-                    fontSize: 11, fontWeight: 600, letterSpacing: 0.2,
-                  }}>
-                  {cdConfig.startDate
-                    ? <>{new Date(cdConfig.startDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })} <span style={{ opacity: 0.6, fontSize: 10 }}>✎</span></>
-                    : "Set dates ›"}
-                </button>
-              </div>
               {cdConfig.startDate ? (
                 <>
+                  {/* Active countdown — show trip name + date + timer */}
+                  <div className="hp-cd-top">
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span className="hp-cd-trip">
+                        {CITY_FLAGS[cdConfig.tripName] || "✈️"} {cdConfig.tripName.toUpperCase()}
+                      </span>
+                      {(() => {
+                        const trip = savedTrips.find(t => t.id === cdConfig.tripId);
+                        if (!trip) return null;
+                        const stops = Object.values(trip.activities || {}).flat().length;
+                        return (
+                          <span style={{
+                            fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 600,
+                            letterSpacing: 0.2, whiteSpace: "nowrap",
+                          }}>
+                            {trip.duration}{stops > 0 ? ` · ${stops} stops` : ""}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                    <button
+                      onClick={() => setPickerOpen(true)}
+                      style={{
+                        background: "none", border: "none",
+                        borderRadius: 16, padding: "4px 11px", cursor: "pointer",
+                        color: "rgba(255,255,255,0.85)",
+                        fontSize: 11, fontWeight: 600, letterSpacing: 0.2,
+                      }}>
+                      {new Date(cdConfig.startDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      {" "}<span style={{ opacity: 0.6, fontSize: 10 }}>✎</span>
+                    </button>
+                  </div>
                   <div className="hp-cd-main">{`In ${cd.days} days`}</div>
                   <div className="hp-cd-timer">
                     <div className="hp-cd-timer-unit">
@@ -311,24 +308,47 @@ export function HomeClient() {
                   </button>
                 </>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, padding: "4px 0 8px" }}>
-                  <div style={{ color: "#fff", fontSize: 22, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.4 }}>
-                    {savedTrips.length > 0 ? "Where to next?" : "Plan your first trip"}
-                  </div>
-                  <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, lineHeight: 1.5 }}>
-                    {savedTrips.length > 0 ? "Set a date to start your countdown" : "Create an itinerary and start counting down"}
-                  </div>
-                  <button
-                    onClick={() => savedTrips.length > 0 ? setPickerOpen(true) : null}
-                    style={{
-                      marginTop: 4,
-                      background: "#ff8c42", border: "none",
-                      color: "#000", fontSize: 12, fontWeight: 800,
-                      padding: "9px 20px", borderRadius: 20, cursor: "pointer",
-                      letterSpacing: 0.3, display: "flex", alignItems: "center", gap: 6,
+                /* Empty state — no redundant top row, single clean CTA */
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "flex-end", height: "100%", padding: "16px 16px 18px" }}>
+                  <div style={{ marginBottom: 6 }}>
+                    <span style={{
+                      display: "inline-block",
+                      background: "rgba(255,140,66,0.15)", border: "1px solid rgba(255,140,66,0.3)",
+                      borderRadius: 20, padding: "3px 10px",
+                      color: "#ff9a52", fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
                     }}>
-                    {savedTrips.length > 0 ? "Set date ›" : <Link href="/planner" style={{ color: "#000", textDecoration: "none" }}>Start planning ›</Link>}
-                  </button>
+                      {savedTrips.length > 0 ? `${savedTrips.length} trip${savedTrips.length > 1 ? "s" : ""} planned` : "Get started"}
+                    </span>
+                  </div>
+                  <div style={{ color: "#fff", fontSize: 24, fontWeight: 900, lineHeight: 1.15, letterSpacing: -0.5, marginBottom: 6 }}>
+                    {savedTrips.length > 0 ? "Where to\nnext?" : "Plan your\nfirst trip"}
+                  </div>
+                  <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, lineHeight: 1.5, marginBottom: 14 }}>
+                    {savedTrips.length > 0
+                      ? "Pick a trip and set a date to start your countdown"
+                      : "Create an itinerary and start counting down"}
+                  </div>
+                  {savedTrips.length > 0 ? (
+                    <button
+                      onClick={() => setPickerOpen(true)}
+                      style={{
+                        background: "#ff8c42", border: "none",
+                        color: "#000", fontSize: 13, fontWeight: 800,
+                        padding: "10px 22px", borderRadius: 22, cursor: "pointer",
+                        letterSpacing: 0.2,
+                      }}>
+                      Set countdown ›
+                    </button>
+                  ) : (
+                    <Link href="/planner" style={{
+                      background: "#ff8c42", textDecoration: "none",
+                      color: "#000", fontSize: 13, fontWeight: 800,
+                      padding: "10px 22px", borderRadius: 22,
+                      letterSpacing: 0.2,
+                    }}>
+                      Start planning ›
+                    </Link>
+                  )}
                 </div>
               )}
             </div>

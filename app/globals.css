@@ -6038,7 +6038,7 @@ button {
 /* ── Countdown hero card ── */
 .hp-cd-card {
   margin: 0 16px;
-  height: 192px;
+  height: 210px;
   border-radius: 22px;
   overflow: hidden;
   position: relative;
@@ -7016,7 +7016,7 @@ button {
 }
 
 /* ── Countdown card: expandable plan ── */
-.hp-cd-card { height: 192px; transition: height 0.38s cubic-bezier(0.4,0,0.2,1); }
+.hp-cd-card { height: 210px; transition: height 0.38s cubic-bezier(0.4,0,0.2,1); }
 .hp-cd-card:has(.hp-cd-plan-open) { height: 260px; }
 .hp-cd-card.hp-cd-picker-open { height: fit-content; }
 
