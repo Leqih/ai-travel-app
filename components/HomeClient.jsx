@@ -92,10 +92,10 @@ const NAV_ITEMS = [
 ];
 
 const DEST_IMG  = "https://picsum.photos/seed/japan-fuji-hero/700/400";
-const TODAY_FEATURED_IMG = "https://picsum.photos/seed/iran-isfahan/700/400";
+const TODAY_FEATURED_IMG = "https://images.unsplash.com/photo-1543832923-44667a44c804?w=800&h=450&fit=crop";
 const TODAY_THUMBS = [
-  "https://picsum.photos/seed/iran-bazaar/120/100",
-  "https://picsum.photos/seed/iran-mosque/120/100",
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=240&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=240&h=200&fit=crop",
 ];
 
 function pad(n) { return String(n).padStart(2, "0"); }
@@ -241,7 +241,7 @@ export function HomeClient() {
               </div>
               <div className="hp-greeting">Good <strong>{greeting}</strong></div>
             </div>
-            <div className="hp-avatar" />
+            <div className="hp-avatar"><img src="/memojis/10.png" alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
           </div>
 
           {/* ── Countdown hero card (expandable) ── */}
@@ -286,30 +286,51 @@ export function HomeClient() {
                     : "Set dates ›"}
                 </button>
               </div>
-              <div className="hp-cd-main">
-                {cdConfig.startDate ? `In ${cd.days} days` : "No date set"}
-              </div>
-              <div className="hp-cd-timer">
-                <div className="hp-cd-timer-unit">
-                  <span className="hp-cd-digits">{cd.h}</span>
-                  <span className="hp-cd-unit-label">HRS</span>
+              {cdConfig.startDate ? (
+                <>
+                  <div className="hp-cd-main">{`In ${cd.days} days`}</div>
+                  <div className="hp-cd-timer">
+                    <div className="hp-cd-timer-unit">
+                      <span className="hp-cd-digits">{cd.h}</span>
+                      <span className="hp-cd-unit-label">HRS</span>
+                    </div>
+                    <span className="hp-cd-sep">:</span>
+                    <div className="hp-cd-timer-unit">
+                      <span className="hp-cd-digits">{cd.m}</span>
+                      <span className="hp-cd-unit-label">MIN</span>
+                    </div>
+                    <span className="hp-cd-sep">:</span>
+                    <div className="hp-cd-timer-unit">
+                      <span className="hp-cd-digits">{cd.s}</span>
+                      <span className="hp-cd-unit-label">SEC</span>
+                    </div>
+                  </div>
+                  <button className="hp-cd-plan-toggle" onClick={() => setPlanOpen(true)}>
+                    <span>Day 1 Itinerary</span>
+                    <span className="hp-cd-toggle-arrow">›</span>
+                  </button>
+                </>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, padding: "4px 0 8px" }}>
+                  <div style={{ color: "#fff", fontSize: 22, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.4 }}>
+                    {savedTrips.length > 0 ? "Where to next?" : "Plan your first trip"}
+                  </div>
+                  <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, lineHeight: 1.5 }}>
+                    {savedTrips.length > 0 ? "Set a date to start your countdown" : "Create an itinerary and start counting down"}
+                  </div>
+                  <button
+                    onClick={() => savedTrips.length > 0 ? setPickerOpen(true) : null}
+                    style={{
+                      marginTop: 4,
+                      background: "#ff8c42", border: "none",
+                      color: "#000", fontSize: 12, fontWeight: 800,
+                      padding: "9px 20px", borderRadius: 20, cursor: "pointer",
+                      letterSpacing: 0.3, display: "flex", alignItems: "center", gap: 6,
+                    }}>
+                    {savedTrips.length > 0 ? "Set date ›" : <Link href="/planner" style={{ color: "#000", textDecoration: "none" }}>Start planning ›</Link>}
+                  </button>
                 </div>
-                <span className="hp-cd-sep">:</span>
-                <div className="hp-cd-timer-unit">
-                  <span className="hp-cd-digits">{cd.m}</span>
-                  <span className="hp-cd-unit-label">MIN</span>
-                </div>
-                <span className="hp-cd-sep">:</span>
-                <div className="hp-cd-timer-unit">
-                  <span className="hp-cd-digits">{cd.s}</span>
-                  <span className="hp-cd-unit-label">SEC</span>
-                </div>
-              </div>
-              {/* Toggle to plan */}
-              <button className="hp-cd-plan-toggle" onClick={() => setPlanOpen(true)}>
-                <span>Day 1 Itinerary</span>
-                <span className="hp-cd-toggle-arrow">›</span>
-              </button>
+              )}
             </div>
 
             {/* ── Trip + date picker overlay ── */}
@@ -373,7 +394,7 @@ export function HomeClient() {
                 )}
                 {pickerTripId && (<div style={{ animation: "cd-cal-in 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}>
                   <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 600, letterSpacing: 0.8, margin: "0 0 8px", textTransform: "uppercase" }}>Start date</p>
-                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", padding: "10px 8px 8px", marginBottom: 10 }}>
+                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "none", padding: "10px 8px 8px", marginBottom: 10 }}>
                     {/* Month/year nav */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, padding: "0 2px" }}>
                       <button onClick={prevMonth} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: 8, width: 28, height: 28, color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>‹</button>

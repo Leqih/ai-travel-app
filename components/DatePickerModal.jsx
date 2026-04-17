@@ -75,7 +75,7 @@ export default function DatePickerModal({ trip, initialDate = "", onSave, onClos
           <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 12px" }}>Start Date</p>
 
           {/* Calendar card — mirrors homepage calendar exactly */}
-          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", padding: "10px 8px 8px", marginBottom: 12, maxWidth: 320, margin: "0 auto 12px" }}>
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "none", padding: "10px 8px 8px", marginBottom: 12, maxWidth: 320, margin: "0 auto 12px" }}>
             {/* Month/year nav */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, padding: "0 2px" }}>
               <button onClick={prevMonth} style={{ background: "rgba(255,255,255,0.07)", border: "none", borderRadius: 8, width: 28, height: 28, minWidth: 28, padding: 0, color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "none" }}>‹</button>

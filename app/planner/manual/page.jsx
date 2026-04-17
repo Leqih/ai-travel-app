@@ -380,6 +380,7 @@ function ManualPlanInner() {
   const paramPrefs    = searchParams.get("prefs")    || "";
   const paramBudget   = searchParams.get("budget")   || ""; // e.g. "Mid-Range · $500/day"
   const paramId       = searchParams.get("id")       || "";
+  const paramAI       = searchParams.get("ai")       === "true";
 
   // Derive clean destination label (strip country, e.g. "Tokyo, Japan" → "Tokyo")
   const initDest  = paramCity ? paramCity.split(",")[0].trim() : "";
@@ -1139,7 +1140,14 @@ function ManualPlanInner() {
             <div className="mp-trip-header-left">
               <span className="mp-trip-flag">{CITY_FLAGS[destination] || "✈️"}</span>
               <div className="mp-trip-header-text">
-                <h2 className="mp-trip-title">{makeTripTitle(destination, prefs)}</h2>
+                <h2 className="mp-trip-title">
+                  {makeTripTitle(destination, prefs)}
+                  {paramAI && (
+                    <span style={{ marginLeft: 8, display: "inline-flex", alignItems: "center", gap: 3, background: "linear-gradient(90deg,rgba(255,140,66,0.15),rgba(255,80,180,0.15))", border: "1px solid rgba(255,140,66,0.25)", borderRadius: 8, padding: "2px 7px", fontSize: 10, fontWeight: 700, color: "#ff9a52", letterSpacing: 0.5, verticalAlign: "middle" }}>
+                      ✦ AI
+                    </span>
+                  )}
+                </h2>
                 <div className="mp-trip-meta">
                   {duration && (
                     <div style={{ position: "relative" }} onClick={e => e.stopPropagation()}>

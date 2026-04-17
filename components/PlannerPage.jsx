@@ -1004,6 +1004,21 @@ export function PlannerPage() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Navigate after loading animation completes (~3.2s covers all 4 steps)
+  useEffect(() => {
+    if (!generating) return;
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (city) params.set("city", city);
+      if (duration) params.set("duration", duration);
+      if (budget) params.set("budget", budget);
+      if (style) params.set("prefs", style);
+      params.set("ai", "true");
+      router.push(`/planner/manual?${params.toString()}`);
+    }, 3200);
+    return () => clearTimeout(timer);
+  }, [generating]);
+
   return (
     <div className="pl-shell" ref={shellRef}>
       {/* PixelBlast background */}
@@ -1088,13 +1103,25 @@ export function PlannerPage() {
         </p>
       </div>
 
+      {/* Validation hint */}
+      {!city && (
+        <div style={{ textAlign: "center", marginBottom: 4, color: "rgba(255,140,66,0.65)", fontSize: 11, fontWeight: 600, letterSpacing: 0.4, animation: "pl-fade-in 0.4s ease" }}>
+          ↑ Choose a destination to get started
+        </div>
+      )}
+
       {/* Action buttons */}
       <div className="pl-actions">
         <Link
           href={`/planner/manual?city=${encodeURIComponent(city || "")}&duration=${encodeURIComponent(duration || "")}${budget ? `&budget=${encodeURIComponent(budget)}` : ""}${style ? `&style=${encodeURIComponent(style)}` : ""}`}
           className="pl-btn-inspire"
         >DIRECTLY CREATE</Link>
-        <button className="pl-btn-generate" onClick={() => setGenerating(true)}>
+        <button
+          className="pl-btn-generate"
+          onClick={() => { if (city) setGenerating(true); }}
+          style={{ opacity: city ? 1 : 0.45, cursor: city ? "pointer" : "not-allowed", transition: "opacity 0.2s" }}
+          title={!city ? "Select a destination first" : undefined}
+        >
           <div className="pl-uiverse-wrapper">
             <span>HELP ME PLAN</span>
             <div className="pl-circle pl-circle-12"></div>
@@ -1145,10 +1172,15 @@ export function PlannerPage() {
               </h2>
               <p className="pl-gen-sub">Analysing destinations, weather, and hidden gems</p>
               <div className="pl-gen-steps">
-                {["Researching destination", "Matching your style", "Building itinerary", "Finalising details"].map((s, i) => (
-                  <div key={s} className="pl-gen-step" style={{ animationDelay: `${i * 0.6}s` }}>
-                    <span className="pl-gen-step-dot" />
-                    <span className="pl-gen-step-text">{s}</span>
+                {[
+                  { text: "Researching destination", delay: 0 },
+                  { text: "Matching your style",     delay: 0.7 },
+                  { text: "Building itinerary",       delay: 1.4 },
+                  { text: "Finalising details",        delay: 2.1 },
+                ].map(({ text, delay }) => (
+                  <div key={text} className="pl-gen-step" style={{ animationDelay: `${delay}s` }}>
+                    <span className="pl-gen-step-dot" style={{ animationDelay: `${delay}s` }} />
+                    <span className="pl-gen-step-text">{text}</span>
                   </div>
                 ))}
               </div>

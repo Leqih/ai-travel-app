@@ -1246,7 +1246,7 @@ h1 {
   height: 12px;
   border-radius: 50%;
   background: #fff;
-  border: 2px solid rgba(255,255,255,0.4);
+  border: none;
   box-shadow: 0 0 8px rgba(255,255,255,0.5);
   transition: transform 0.2s;
 }
@@ -1319,7 +1319,7 @@ h1 {
 
 .nearby-mode-pill {
   background: rgba(0,0,0,0.75);
-  border: 1px solid rgba(255,255,255,0.15);
+  border: none;
   border-radius: 20px;
   color: #fff;
   font-size: 12px;
@@ -1361,7 +1361,7 @@ h1 {
   height: 36px;
   border-radius: 50%;
   background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1428,7 +1428,7 @@ h1 {
 .nearby-card {
   flex: 1;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.09);
+  border: none;
   border-radius: 24px;
   padding: 10px;
   backdrop-filter: blur(10px);

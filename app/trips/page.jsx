@@ -104,7 +104,7 @@ export default function TripsPage() {
             onClick={() => setEditMode(e => !e)}
             style={{
               height: 34, padding: "0 18px", borderRadius: 20, cursor: "pointer",
-              border: editMode ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.1)",
+              border: "none",
               background: editMode ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
               color: editMode ? "#fff" : "rgba(255,255,255,0.55)",
               fontSize: 13, fontWeight: 600, letterSpacing: 0.1,
@@ -118,86 +118,91 @@ export default function TripsPage() {
       {/* Trips list */}
       <div className="ct-trip-list" style={{ padding: "12px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
         {trips.length === 0 && (
-          <div style={{ textAlign: "center", paddingTop: 80 }}>
+          <div style={{ textAlign: "center", paddingTop: 60, paddingBottom: 40 }}>
             <div style={{
-              width: 72, height: 72, borderRadius: "50%",
-              background: "rgba(255,140,66,0.1)",
-              border: "1px solid rgba(255,140,66,0.2)",
+              width: 88, height: 88, borderRadius: 28,
+              background: "linear-gradient(135deg, rgba(255,140,66,0.12), rgba(255,80,120,0.08))",
+              border: "1px solid rgba(255,140,66,0.18)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 32, margin: "0 auto 20px",
+              fontSize: 38, margin: "0 auto 24px",
             }}>✈️</div>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 17, fontWeight: 600, margin: "0 0 6px" }}>No trips yet</p>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 14, margin: 0 }}>Tap + to plan your first adventure</p>
+            <p style={{ color: "#fff", fontSize: 20, fontWeight: 800, margin: "0 0 8px", letterSpacing: -0.3 }}>No trips yet</p>
+            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, margin: "0 0 32px", lineHeight: 1.5 }}>Start by planning your first adventure</p>
+            <Link href="/planner" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, background: "#ff8c42", color: "#000", fontSize: 14, fontWeight: 700, padding: "13px 28px", borderRadius: 22, letterSpacing: 0.2 }}>
+              Plan a trip ›
+            </Link>
           </div>
         )}
 
-        {trips.map(trip => {
+        {trips.map((trip, idx) => {
           const img = CITY_IMAGES[trip.destination];
           const flag = CITY_FLAGS[trip.destination] || "✈️";
           const title = makeTripTitle(trip.destination, trip.prefs);
           const count = activityCount(trip.activities);
           const href = `/planner/manual?city=${encodeURIComponent(trip.destination || "")}&duration=${encodeURIComponent(trip.duration || "")}&prefs=${encodeURIComponent((trip.prefs || []).join(","))}&id=${trip.id}`;
 
+          // Status badge
+          const getStatus = () => {
+            if (!trip.startDate) return null;
+            const start = new Date(trip.startDate + "T00:00:00");
+            const days = parseInt(trip.duration) || 0;
+            const end = new Date(start); end.setDate(end.getDate() + days - 1);
+            const now = new Date();
+            if (now < start) return { label: "Upcoming", color: "#ff8c42" };
+            if (now <= end) return { label: "Ongoing", color: "#4ade80" };
+            return { label: "Past", color: "rgba(255,255,255,0.35)" };
+          };
+          const status = getStatus();
+
+          // Tag label — prefs or fallback
+          const tagLabel = trip.prefs?.length > 0 ? (Array.isArray(trip.prefs) ? trip.prefs[0] : trip.prefs) : (trip.destination || "Trip");
 
           const card = (
-            <div style={{
-              borderRadius: 18, overflow: "hidden", position: "relative",
-              height: 240, background: "#111",
-            }}>
-              {/* Full-bleed image — same as hp-trip-img */}
+            <div className="hp-trip-card" style={{ width: "100%", height: 220, borderRadius: 20, flexShrink: "unset" }}>
               {img
-                ? <img src={img} alt={trip.destination} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-                : <div style={{ position: "absolute", inset: 0, background: "#111" }} />
+                ? <img className="hp-trip-img" src={img} alt={trip.destination} />
+                : <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#1a1a2e,#0d0d1a)" }} />
               }
-              {/* Gradient — exact match hp-trip-grad */}
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)" }} />
+              <div className="hp-trip-grad" />
 
-              {/* Top-left: trip name chip */}
-              <div style={{
-                position: "absolute", top: 12, left: 12, zIndex: 2,
-                background: "rgba(20,20,20,0.7)",
-                backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "#fff", fontSize: 11, fontWeight: 600,
-                padding: "3px 9px", borderRadius: 16,
-                maxWidth: "60%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-              }}>{title}</div>
+              {/* Top-left tag */}
+              <span className="hp-trip-tag">{tagLabel}</span>
 
-              {/* Top-right: delete (edit mode only) */}
-              {editMode && (
-                <button
-                  onClick={e => { e.preventDefault(); e.stopPropagation(); deleteTrip(trip.id); }}
-                  style={{
-                    position: "absolute", top: 10, right: 10, zIndex: 2,
-                    width: 32, height: 32, borderRadius: "50%",
-                    background: "rgba(220,38,38,0.85)", backdropFilter: "blur(8px)",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                    padding: 0, boxShadow: "none",
-                  }}>
-                  <FontAwesomeIcon icon={faTrash} style={{ width: 12, height: 12, color: "#fff" }} />
-                </button>
-              )}
+              {/* Top-right: status pill or delete */}
+              <div style={{ position: "absolute", top: 12, right: 12, zIndex: 2, display: "flex", gap: 6, alignItems: "center" }}>
+                {status && (
+                  <span style={{
+                    background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)",
+                    color: status.color, fontSize: 10, fontWeight: 700,
+                    padding: "3px 9px", borderRadius: 16, letterSpacing: 0.3,
+                  }}>{status.label}</span>
+                )}
+                {editMode && (
+                  <button
+                    onClick={e => { e.preventDefault(); e.stopPropagation(); deleteTrip(trip.id); }}
+                    style={{
+                      width: 28, height: 28, borderRadius: "50%",
+                      background: "rgba(220,38,38,0.85)", border: "none", cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
+                    }}>
+                    <FontAwesomeIcon icon={faTrash} style={{ width: 11, height: 11, color: "#fff" }} />
+                  </button>
+                )}
+              </div>
 
-              {/* Info — exact match hp-trip-info position */}
-              <div style={{ position: "absolute", bottom: 48, left: 14, right: 14, zIndex: 2 }}>
-                <p style={{ margin: 0, fontFamily: `-apple-system,"SF Pro Display","Helvetica Neue",sans-serif`, fontSize: 17, fontWeight: 700, color: "#fff", lineHeight: 1.2 }}>
+              {/* Info */}
+              <div className="hp-trip-info" style={{ bottom: 50 }}>
+                <p className="hp-trip-title" style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.3 }}>
                   {flag} {trip.destination}
                 </p>
-                <p style={{ margin: "3px 0 0", fontSize: 10, color: "rgba(255,255,255,0.55)" }}>
+                <p className="hp-trip-meta" style={{ fontSize: 11, marginTop: 3 }}>
                   {[trip.duration, count > 0 && `${count} places`].filter(Boolean).join(" · ")}
                 </p>
               </div>
 
-              {/* Button — exact match hp-trip-action-btn */}
+              {/* Action button — exact Home style */}
               {!editMode && (
-                <div style={{
-                  position: "absolute", bottom: 10, left: 10, right: 10, zIndex: 3,
-                  background: "#fff", color: "#000",
-                  fontSize: 12, fontWeight: 700,
-                  padding: "8px 0", borderRadius: 16,
-                  textAlign: "center", letterSpacing: 0.1,
-                }}>→ Open</div>
+                <div className="hp-trip-action-btn">→ Open</div>
               )}
             </div>
           );
