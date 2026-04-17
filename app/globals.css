@@ -6718,13 +6718,14 @@ button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%);
+  background: transparent;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   margin-top: -20px;
-  box-shadow: 0 0 0 4px #1a1a1e, 0 6px 20px rgba(255,95,31,0.55), 0 2px 8px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 4px #1a1a1e, 0 6px 20px rgba(249,115,22,0.55), 0 2px 8px rgba(0,0,0,0.4);
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .hp-nav-center-btn:active {

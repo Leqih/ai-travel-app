@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
+import dynamic from "next/dynamic";
+const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 
 const CITY_FLAGS = { Tokyo:"🇯🇵", Seoul:"🇰🇷", Bangkok:"🇹🇭", Bali:"🇮🇩", Paris:"🇫🇷", "New York":"🇺🇸", London:"🇬🇧", Rome:"🇮🇹", Istanbul:"🇹🇷", Dubai:"🇦🇪", Sydney:"🇦🇺", Barcelona:"🇪🇸", Kyoto:"🇯🇵", Singapore:"🇸🇬", Lisbon:"🇵🇹", Osaka:"🇯🇵" };
 const CITY_IMAGES = { Tokyo:"https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=400&fit=crop", Seoul:"https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=600&h=400&fit=crop", Paris:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop", Bali:"https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop", Bangkok:"https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&h=400&fit=crop", Osaka:"https://images.unsplash.com/photo-1565559204102-f59129a70ae2?w=600&h=400&fit=crop" };
@@ -672,8 +674,11 @@ export function HomeClient() {
             if (item.center) {
               return (
                 <div key="center" className="hp-nav-center-wrap">
-                  <Link href="/planner" className="hp-nav-center-btn">
-                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white" }} />
+                  <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
+                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
+                      <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
+                    </div>
+                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
                   </Link>
                 </div>
               );
