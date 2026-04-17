@@ -1167,7 +1167,7 @@ export function PlannerPage() {
 
       {/* Validation hint */}
       {!city && (
-        <div style={{ textAlign: "center", marginBottom: 4, color: "rgba(255,140,66,0.65)", fontSize: 11, fontWeight: 600, letterSpacing: 0.4, animation: "pl-fade-in 0.4s ease" }}>
+        <div style={{ textAlign: "center", marginTop: 20, marginBottom: 4, color: "#fff", fontSize: 11, fontWeight: 600, letterSpacing: 0.4, animation: "pl-fade-in 0.4s ease" }}>
           ↑ Choose a destination to get started
         </div>
       )}
