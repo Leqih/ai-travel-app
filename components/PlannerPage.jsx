@@ -8,6 +8,7 @@ import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faChevronLeft, faChevronRight, faChevronDown, faCreditCard, faHouse, faCompass, faPlane, faCircleUser, faPlus, faMagnifyingGlass, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 const CircularGallery = dynamic(() => import("./CircularGallery"), { ssr: false });
+const Aurora = dynamic(() => import("./Aurora"), { ssr: false });
 const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 
 const TRAVEL_TYPES = ["Vacation", "Adventure", "Relaxation", "Cultural", "Romantic", "Business", "Road Trip", "Backpacking"];
@@ -1078,31 +1079,13 @@ export function PlannerPage() {
 
   return (
     <div className="pl-shell" ref={shellRef}>
-      {/* Grainient background */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.55 }}>
-        <Grainient
-          color1="#F97316"
-          color2="#396cbf"
-          color3="#B497CF"
-          timeSpeed={0.25}
-          colorBalance={0}
-          warpStrength={1}
-          warpFrequency={5}
-          warpSpeed={2}
-          warpAmplitude={50}
-          blendAngle={0}
-          blendSoftness={0.05}
-          rotationAmount={500}
-          noiseScale={2}
-          grainAmount={0.1}
-          grainScale={2}
-          grainAnimated={false}
-          contrast={1.5}
-          gamma={1}
-          saturation={1}
-          centerX={0}
-          centerY={0}
-          zoom={0.9}
+      {/* Aurora background */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+        <Aurora
+          colorStops={["#F97316", "#97a1cf", "#5227FF"]}
+          blend={0.5}
+          amplitude={1.0}
+          speed={0.5}
         />
       </div>
 
@@ -1210,9 +1193,9 @@ export function PlannerPage() {
       {/* Generating loading overlay */}
       {generating && (
         <div className="pl-gen-overlay">
-          {/* Grainient background for generating overlay */}
+          {/* Aurora background for generating overlay */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.5 }}>
-            <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
+            <Aurora colorStops={["#F97316", "#97a1cf", "#5227FF"]} blend={0.5} amplitude={1.0} speed={0.5} />
           </div>
           <div className="pl-gen-card">
             <div className="pl-gen-orb" />
