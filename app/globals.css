@@ -11786,7 +11786,8 @@ button {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: plOverlayIn 0.25s ease;
+  animation: plOverlayIn 0.3s ease both;
+  animation-delay: 0.05s;
 }
 @keyframes plOverlayIn {
   from { opacity: 0; }
@@ -11807,7 +11808,8 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: plSheetUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: plSheetUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.15s;
   max-height: 85vh;
   overflow-y: auto;
   scrollbar-width: none;
@@ -11815,8 +11817,8 @@ button {
 }
 .pl-sheet::-webkit-scrollbar { display: none; }
 @keyframes plSheetUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 
 .pl-sheet-handle {
@@ -11826,6 +11828,13 @@ button {
   background: rgba(255,255,255,0.12);
   margin: 12px auto 0;
   flex-shrink: 0;
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.3s;
+}
+
+@keyframes plSheetFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── City sheet header ── */
@@ -11837,6 +11846,8 @@ button {
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.35s;
 }
 .pl-city-title {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
@@ -11974,6 +11985,8 @@ button {
   width: 100%;
   box-sizing: border-box;
   padding: 0 24px;
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.42s;
 }
 .pl-city-search {
   width: 100%;
@@ -12084,6 +12097,10 @@ button {
 }
 .pl-sheet-cta:hover { background: rgba(255,255,255,0.9); }
 .pl-sheet-cta:active { transform: scale(0.97); }
+.pl-sheet-overlay .pl-sheet-cta {
+  animation: plSheetFadeUp 0.4s ease both;
+  animation-delay: 0.5s;
+}
 .pl-sheet-cta--disabled { opacity: 0.35; cursor: not-allowed; }
 .pl-sheet-cta--disabled:hover { background: #fff; transform: none; }
 
