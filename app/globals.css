@@ -11632,7 +11632,7 @@ button {
 /* Heading */
 .pl-heading {
   position: relative;
-  z-index: 50;
+  z-index: 2;
   padding: 24px 24px 0;
 }
 .pl-title {
@@ -11647,7 +11647,7 @@ button {
 .pl-vacation-wrap {
   position: relative;
   margin: 4px 0 0;
-  z-index: 50;
+  z-index: 5;
 }
 .pl-vacation-btn {
   display: flex;

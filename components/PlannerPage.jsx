@@ -984,13 +984,14 @@ export function PlannerPage() {
   const [activeSheet, setActiveSheet] = useState(null);
   const shellRef = useRef(null);
 
-  // Masonry-style entrance animation
+  // Entrance animation — clearProps:"filter" removes inline filter after animation
+  // so it doesn't create a persistent stacking context that blocks pointer events
   useEffect(() => {
     if (!shellRef.current) return;
     const elements = shellRef.current.querySelectorAll(".pl-header, .pl-heading, .pl-card, .pl-actions");
     gsap.fromTo(elements,
-      { opacity: 0, y: 60, filter: "blur(10px)" },
-      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power3.out", stagger: 0.08 }
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08, clearProps: "transform,filter" }
     );
   }, []);
 
