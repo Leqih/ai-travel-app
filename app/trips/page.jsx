@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 const Grainient = dynamic(() => import("@/components/Grainient"), { ssr: false });
@@ -76,12 +76,15 @@ export default function TripsPage() {
     } catch (_) {}
   }, []);
 
+  useLayoutEffect(() => {
+    if (!shellRef.current) return;
+    gsap.set(shellRef.current.querySelectorAll(".ct-header, .ct-trip-list"), { opacity: 0, y: 24 });
+  }, []);
+
   useEffect(() => {
     if (!shellRef.current) return;
-    const sections = shellRef.current.querySelectorAll(".ct-header, .ct-trip-list");
-    gsap.fromTo(sections,
-      { opacity: 0, y: 50, filter: "blur(8px)" },
-      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power3.out", stagger: 0.06 }
+    gsap.to(shellRef.current.querySelectorAll(".ct-header, .ct-trip-list"),
+      { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", stagger: 0.05 }
     );
   }, []);
 
@@ -93,21 +96,27 @@ export default function TripsPage() {
 
   return (
     <div className="ct-shell" ref={shellRef} style={{ background: "#09090f", minHeight: "100vh", paddingBottom: 100 }}>
-      {/* Header */}
-      <div className="ct-header" style={{ padding: "60px 20px 12px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+      {/* Header — Opal dotted bg panel */}
+      <div className="ct-header" style={{
+        backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)",
+        backgroundSize: "8px 8px",
+        borderRadius: "0 0 20px 20px",
+        padding: "60px 20px 20px",
+        display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+      }}>
         <div>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 4px" }}>
-            {trips.length > 0 ? `${trips.length} ${trips.length === 1 ? "trip" : "trips"}` : "Travel"}
+          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 6px" }}>
+            {trips.length > 0 ? `${trips.length} ${trips.length === 1 ? "trip" : "trips"}` : "My Journeys"}
           </p>
-          <h1 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: 0, letterSpacing: -0.3 }}>My Trips</h1>
+          <h1 style={{ color: "#fff", fontSize: 24, fontWeight: 700, margin: 0, letterSpacing: -0.3 }}>My Trips</h1>
         </div>
         {trips.length > 0 && (
           <button
             onClick={() => setEditMode(e => !e)}
             style={{
-              height: 34, padding: "0 18px", borderRadius: 20, cursor: "pointer",
-              border: "none",
-              background: editMode ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+              height: 34, padding: "0 16px", borderRadius: 14, cursor: "pointer",
+              background: editMode ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.08)",
               color: editMode ? "#fff" : "rgba(255,255,255,0.55)",
               fontSize: 13, fontWeight: 600, letterSpacing: 0.1,
               backdropFilter: "blur(8px)",
@@ -118,19 +127,27 @@ export default function TripsPage() {
       </div>
 
       {/* Trips list */}
-      <div className="ct-trip-list" style={{ padding: "12px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div className="ct-trip-list" style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
         {trips.length === 0 && (
-          <div style={{ textAlign: "center", paddingTop: 60, paddingBottom: 40 }}>
+          <div style={{ textAlign: "center", paddingTop: 64, paddingBottom: 40 }}>
+            {/* Icon — Opal surface card */}
             <div style={{
-              width: 88, height: 88, borderRadius: 28,
-              background: "linear-gradient(135deg, rgba(255,140,66,0.12), rgba(255,80,120,0.08))",
-              border: "1px solid rgba(255,140,66,0.18)",
+              width: 80, height: 80, borderRadius: 24,
+              background: "#1A1A1E",
+              border: "1px solid rgba(255,255,255,0.06)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 38, margin: "0 auto 24px",
+              fontSize: 34, margin: "0 auto 24px",
             }}>✈️</div>
-            <p style={{ color: "#fff", fontSize: 20, fontWeight: 800, margin: "0 0 8px", letterSpacing: -0.3 }}>No trips yet</p>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, margin: "0 0 32px", lineHeight: 1.5 }}>Start by planning your first adventure</p>
-            <Link href="/planner" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, background: "#ff8c42", color: "#000", fontSize: 14, fontWeight: 700, padding: "13px 28px", borderRadius: 22, letterSpacing: 0.2 }}>
+            <p style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 8px", letterSpacing: -0.3 }}>No trips yet</p>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, margin: "0 0 32px", lineHeight: 1.5 }}>Start by planning your first adventure</p>
+            {/* Opal white primary CTA */}
+            <Link href="/planner" style={{
+              textDecoration: "none", display: "inline-block",
+              background: "#fff", color: "#09090F",
+              fontSize: 14, fontWeight: 700,
+              padding: "13px 32px", borderRadius: 14, letterSpacing: 0.1,
+            }}>
               Plan a trip ›
             </Link>
           </div>
@@ -217,32 +234,6 @@ export default function TripsPage() {
         })}
       </div>
 
-      {/* Bottom nav */}
-      <nav className="hp-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0 }}>
-        <div className="hp-nav-pill">
-          {NAV_ITEMS.map((item, i) =>
-            item.center ? (
-              <div key="center" className="hp-nav-center-wrap">
-                <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
-                  {pathname === '/planner' ? (
-                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
-                      <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
-                    </div>
-                  ) : (
-                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%", background: "linear-gradient(135deg, #F97316 0%, #396cbf 60%, #B497CF 100%)" }} />
-                  )}
-                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
-                </Link>
-              </div>
-            ) : (
-              <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
-                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-                <span className="hp-nav-label">{item.label}</span>
-              </Link>
-            )
-          )}
-        </div>
-      </nav>
     </div>
   );
 }

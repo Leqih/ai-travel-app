@@ -101,32 +101,6 @@ export function CreateTripPage() {
         </Link>
       </div>
 
-      {/* Nav */}
-      <nav className="hp-nav">
-        <div className="hp-nav-pill">
-          {NAV_ITEMS.map((item, i) =>
-            item.center ? (
-              <div key="center" className="hp-nav-center-wrap">
-                <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
-                  {pathname === '/planner' ? (
-                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
-                      <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
-                    </div>
-                  ) : (
-                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%", background: "linear-gradient(135deg, #F97316 0%, #396cbf 60%, #B497CF 100%)" }} />
-                  )}
-                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
-                </Link>
-              </div>
-            ) : (
-              <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
-                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-                <span className="hp-nav-label">{item.label}</span>
-              </Link>
-            )
-          )}
-        </div>
-      </nav>
     </div>
   );
 }

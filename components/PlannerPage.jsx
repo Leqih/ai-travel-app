@@ -11,7 +11,14 @@ const CircularGallery = dynamic(() => import("./CircularGallery"), { ssr: false 
 const Aurora = dynamic(() => import("./Aurora"), { ssr: false });
 const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 
-const TRAVEL_TYPES = ["Vacation", "Adventure", "Relaxation", "Cultural", "Romantic", "Business", "Road Trip", "Backpacking"];
+const TRAVEL_TYPES = [
+  "Vacation", "Adventure", "Relaxation", "Cultural", "Romantic",
+  "Business", "Road Trip", "Backpacking", "Honeymoon", "Solo Travel",
+  "Family Trip", "Group Tour", "Wellness & Spa", "Food & Culinary",
+  "Photography", "Festival & Events", "Luxury", "Budget Travel",
+  "Nature & Wildlife", "City Break", "Cruise", "Ski & Snow",
+  "Beach & Islands", "Pilgrimage", "Sports & Active",
+];
 
 const CITY_OPTIONS = [
   { label: "Tokyo", emoji: "🗼", country: "Japan", code: "TYO", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=300&h=300&fit=crop", desc: "A neon-lit metropolis where ancient temples sit beside futuristic skyscrapers.", bestTime: "Mar – May, Oct – Nov", vibes: ["Foodie", "Tech", "Culture"] },
@@ -488,6 +495,79 @@ function RangeSlider({ min, max, rangeMin, rangeMax, step, onChangeMin, onChange
   );
 }
 
+const B_TICK_SPACING = 28;
+const B_PAD = 10;
+
+function HorizontalBudgetRuler({ value, onChange, constraintMin = 0, constraintMax = MAX_BUDGET }) {
+  const dragStartX = useRef(null);
+  const dragStartVal = useRef(null);
+  const stepIndex = value / TICK_VALUE;
+  const rulerOffset = (B_PAD + stepIndex) * B_TICK_SPACING;
+
+  const doChange = (clientX) => {
+    if (dragStartX.current === null) return;
+    const delta = Math.round((clientX - dragStartX.current) / B_TICK_SPACING);
+    const newVal = Math.max(constraintMin, Math.min(constraintMax, dragStartVal.current + delta * TICK_VALUE));
+    onChange(newVal);
+  };
+
+  return (
+    <div style={{ position: "relative", margin: "0 -28px", overflow: "hidden" }}>
+      <div
+        onMouseDown={e => { dragStartX.current = e.clientX; dragStartVal.current = value; }}
+        onMouseMove={e => e.buttons === 1 && doChange(e.clientX)}
+        onMouseUp={() => { dragStartX.current = null; }}
+        onTouchStart={e => { dragStartX.current = e.touches[0].clientX; dragStartVal.current = value; }}
+        onTouchMove={e => { e.preventDefault(); doChange(e.touches[0].clientX); }}
+        onTouchEnd={() => { dragStartX.current = null; }}
+        style={{
+          touchAction: "none", userSelect: "none", cursor: "ew-resize",
+          height: 80, position: "relative", overflow: "hidden",
+          background: "rgba(255,255,255,0.02)",
+          borderTop: "1px solid rgba(255,255,255,0.07)",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+        }}
+      >
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 60, background: "linear-gradient(90deg,rgba(14,14,18,1),rgba(14,14,18,0))", zIndex: 2, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 60, background: "linear-gradient(270deg,rgba(14,14,18,1),rgba(14,14,18,0))", zIndex: 2, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 3, pointerEvents: "none" }}>
+          <div style={{ width: 0, height: 0, borderLeft: "7px solid transparent", borderRight: "7px solid transparent", borderTop: "10px solid #ff8c42" }} />
+        </div>
+        <div style={{ position: "absolute", top: 10, bottom: 12, left: "50%", transform: "translateX(-50%)", width: 2, borderRadius: 1, background: "linear-gradient(180deg,rgba(255,140,66,0.5),rgba(255,140,66,0))", zIndex: 1, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: 0, bottom: 0, left: `calc(50% - ${rulerOffset}px)`, display: "flex" }}>
+          {Array.from({ length: B_PAD }).map((_, i) => <div key={`l${i}`} style={{ width: B_TICK_SPACING, flexShrink: 0 }} />)}
+          {Array.from({ length: TICK_COUNT }).map((_, i) => {
+            const tickVal = i * TICK_VALUE;
+            const isMajor = i % 5 === 0;
+            const isSel = tickVal === value;
+            return (
+              <div key={i}
+                onClick={() => onChange(Math.max(constraintMin, Math.min(constraintMax, tickVal)))}
+                style={{ width: B_TICK_SPACING, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 12, cursor: "pointer", height: "100%" }}
+              >
+                <div style={{
+                  width: isSel ? 3 : isMajor ? 2 : 1.5,
+                  height: isSel ? 46 : isMajor ? 28 : 14,
+                  borderRadius: 2,
+                  background: isSel ? "linear-gradient(180deg,#ff8c42,#ff5f1f)" : isMajor ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.12)",
+                  boxShadow: isSel ? "0 2px 10px rgba(255,140,66,0.5)" : "none",
+                  transition: "height 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s",
+                }} />
+                {isMajor && (
+                  <span style={{ fontSize: 9, fontWeight: 700, lineHeight: 1, marginTop: 4, color: isSel ? "#ff9a52" : "rgba(255,255,255,0.2)", letterSpacing: 0.2 }}>
+                    {tickVal === 0 ? "$0" : tickVal >= 1000 ? `$${tickVal / 1000}k` : `$${tickVal}`}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+          {Array.from({ length: B_PAD }).map((_, i) => <div key={`r${i}`} style={{ width: B_TICK_SPACING, flexShrink: 0 }} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BudgetSheet({ open, onClose, value, onSelect }) {
   const [mode, setMode] = useState("single"); // "single" | "range"
   const [amount, setAmount] = useState(MIN_BUDGET);
@@ -557,6 +637,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
     activePointer.current = null;
   };
 
+
   useEffect(() => {
     if (!open || mode !== "single") return;
     const onMove = (e) => handleMove(e);
@@ -573,6 +654,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
     };
   }, [open, mode]);
 
+
   const label = mode === "single" ? getBudgetLabel(amount) : `${getBudgetLabel(rangeMin)} – ${getBudgetLabel(rangeMax)}`;
 
   return (
@@ -588,6 +670,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
         </div>
       </div>
 
+      <div className="pl-budget-content">
       {mode === "single" ? (
         /* ── Single: Rotary Dial ── */
         <div className="pl-dial-wrap">
@@ -598,19 +681,45 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
             onTouchStart={handleStart}
             style={{ cursor: "grab", userSelect: "none", touchAction: "none" }}
           >
+            {/* Arc progress SVG */}
+            {(() => {
+              const R = 108, CX = 120, CY = 120;
+              const totalLen = (270 / 360) * 2 * Math.PI * R; // 270° arc
+              const progress = (rotation + 135) / 270;
+              const dashOffset = totalLen * (1 - Math.max(0, Math.min(1, progress)));
+              return (
+                <svg className="pl-dial-arc-svg" width="240" height="240" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
+                  {/* Track */}
+                  <path d="M 43.6 196.4 A 108 108 0 1 1 196.4 196.4"
+                    fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="3" strokeLinecap="round" />
+                  {/* Progress */}
+                  <path d="M 43.6 196.4 A 108 108 0 1 1 196.4 196.4"
+                    fill="none" stroke="#ff8c42" strokeWidth="3" strokeLinecap="round"
+                    strokeDasharray={totalLen} strokeDashoffset={dashOffset}
+                    style={{ filter: "drop-shadow(0 0 5px rgba(255,140,66,0.7))", transition: "stroke-dashoffset 0.25s cubic-bezier(0.34,1.56,0.64,1)" }} />
+                </svg>
+              );
+            })()}
             {Array.from({ length: 36 }).map((_, i) => {
-              const a = (i / 36) * 360;
-              const isMajor = i % 5 === 0;
+              // 36 ticks = $0…$3500 in $100 steps, constrained to the 270° active range
+              const a = -135 + (i / 35) * 270;
+              const isMajor = i % 5 === 0; // every $500
+              const isActive = a <= rotation;
               return (
                 <div
                   key={i}
                   className={`pl-dial-tick ${isMajor ? "pl-dial-tick-major" : ""}`}
-                  style={{ transform: `rotate(${a}deg)` }}
+                  style={{
+                    transform: `rotate(${a}deg)`,
+                    background: isActive
+                      ? (isMajor ? "rgba(255,140,66,0.9)" : "rgba(255,140,66,0.45)")
+                      : undefined,
+                  }}
                 />
               );
             })}
             <div className="pl-dial-pointer" style={{ transform: `rotate(${rotation}deg)` }}>
-              <div className="pl-dial-pointer-tri" />
+              <div className="pl-dial-pointer-dot" />
             </div>
             <div
               className="pl-dial-inner"
@@ -622,7 +731,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
               }}
               style={{ cursor: "pointer" }}
             >
-              <span className="pl-dial-unit">USD / DAY</span>
+              <span className="pl-dial-unit">USD</span>
               {editing ? (
                 <span className="pl-dial-amount">
                   <span className="pl-dial-dollar">$</span>
@@ -665,27 +774,32 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
           </div>
         </div>
       ) : (
-        /* ── Range: Horizontal Slider ── */
-        <div className="pl-range-section">
-          <div className="pl-range-display">
-            <span className="pl-range-display-label">USD / DAY</span>
-            <span className="pl-range-display-value">
-              <span className="pl-dial-dollar">$</span>{rangeMin.toLocaleString()}
-              <span className="pl-range-display-sep"> – </span>
-              <span className="pl-dial-dollar">$</span>{rangeMax.toLocaleString()}
-            </span>
+        /* ── Range: Dual Horizontal Rulers ── */
+        <div style={{ width: "100%", paddingTop: 4 }}>
+          {/* MIN ruler */}
+          <div style={{ marginBottom: 4 }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "0 0 6px" }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 1.5, textTransform: "uppercase" }}>Min</span>
+              <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -1.5, color: "#fff", lineHeight: 1 }}>
+                <span style={{ fontSize: 14, fontWeight: 300, color: "rgba(255,255,255,0.3)" }}>$</span>{rangeMin.toLocaleString()}
+              </span>
+            </div>
+            <HorizontalBudgetRuler value={rangeMin} onChange={setRangeMin} constraintMin={0} constraintMax={rangeMax - TICK_VALUE} />
           </div>
-          <RangeSlider
-            min={MIN_BUDGET}
-            max={MAX_BUDGET}
-            step={TICK_VALUE}
-            rangeMin={rangeMin}
-            rangeMax={rangeMax}
-            onChangeMin={setRangeMin}
-            onChangeMax={setRangeMax}
-          />
+          {/* MAX ruler */}
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "12px 0 6px" }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 1.5, textTransform: "uppercase" }}>Max</span>
+              <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -1.5, color: "#fff", lineHeight: 1 }}>
+                <span style={{ fontSize: 14, fontWeight: 300, color: "rgba(255,255,255,0.3)" }}>$</span>{rangeMax.toLocaleString()}
+              </span>
+            </div>
+            <HorizontalBudgetRuler value={rangeMax} onChange={setRangeMax} constraintMin={rangeMin + TICK_VALUE} constraintMax={MAX_BUDGET} />
+          </div>
+          <div style={{ textAlign: "center", marginTop: 8, fontSize: 10, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>← swipe to adjust →</div>
         </div>
       )}
+      </div>
 
       {mode === "single" ? (
         <div className="pl-budget-segments">
@@ -703,14 +817,13 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
           ))}
         </div>
       ) : (
-        <div className="pl-budget-range-presets">
+        <div className="pl-budget-segments">
           {[
             { label: "Budget", min: 0, max: 500 },
             { label: "Mid-Range", min: 500, max: 1500 },
             { label: "Luxury", min: 1500, max: 3000 },
             { label: "Flexible", min: 0, max: 3500 },
           ].map((p) => {
-            // Highlight when range matches this preset (within $50 tolerance)
             const isActive = Math.abs(rangeMin - p.min) <= 50 && Math.abs(rangeMax - p.max) <= 50;
             return (
               <button
@@ -1028,6 +1141,9 @@ function DurationSheet({ open, onClose, value, onSelect }) {
 export function PlannerPage() {
   const router = useRouter();
   const pathname = usePathname();
+  useEffect(() => {
+    ["/", "/nearby", "/trips", "/profile"].forEach(r => router.prefetch(r));
+  }, [router]);
   const [travelType, setTravelType] = useState(0);
   const [travelOpen, setTravelOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -1040,6 +1156,10 @@ export function PlannerPage() {
 
   const [activeSheet, setActiveSheet] = useState(null);
   const shellRef = useRef(null);
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("nav-visibility-change", { detail: { hidden: !!activeSheet } }));
+  }, [activeSheet]);
 
   // Entrance animation — clearProps:"filter" removes inline filter after animation
   // so it doesn't create a persistent stacking context that blocks pointer events
@@ -1231,35 +1351,6 @@ export function PlannerPage() {
       <StyleSheet open={activeSheet === "style"} onClose={() => setActiveSheet(null)} value={style} onSelect={setStyle} />
       <DurationSheet open={activeSheet === "duration"} onClose={() => setActiveSheet(null)} value={duration} onSelect={setDuration} />
 
-      {/* Bottom nav */}
-      <nav className="hp-nav">
-        <div className="hp-nav-pill">
-          <Link href="/" className={`hp-nav-item${pathname === "/" ? " hp-nav-active" : ""}`}>
-            <FontAwesomeIcon icon={faHouse} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-            <span className="hp-nav-label">Home</span>
-          </Link>
-          <Link href="/nearby" className={`hp-nav-item${pathname === "/nearby" ? " hp-nav-active" : ""}`}>
-            <FontAwesomeIcon icon={faCompass} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-            <span className="hp-nav-label">Discover</span>
-          </Link>
-          <div className="hp-nav-center-wrap">
-            <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
-              <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
-                <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
-              </div>
-              <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
-            </Link>
-          </div>
-          <Link href="/trips" className={`hp-nav-item${pathname === "/trips" ? " hp-nav-active" : ""}`}>
-            <FontAwesomeIcon icon={faPlane} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-            <span className="hp-nav-label">My Trips</span>
-          </Link>
-          <Link href="/profile" className={`hp-nav-item${pathname === "/profile" ? " hp-nav-active" : ""}`}>
-            <FontAwesomeIcon icon={faCircleUser} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-            <span className="hp-nav-label">Profile</span>
-          </Link>
-        </div>
-      </nav>
     </div>
   );
 }

@@ -6039,7 +6039,7 @@ button {
 .hp-cd-card {
   margin: 0 16px;
   height: 210px;
-  border-radius: 22px;
+  border-radius: 20px;
   overflow: hidden;
   position: relative;
   border: none;
@@ -6055,13 +6055,12 @@ button {
   display: block;
 }
 
-/* Gradient overlay */
+/* Gradient overlay — Opal standard dark scrim */
 .hp-cd-overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, rgba(160,50,0,0.65) 0%, rgba(80,15,0,0.4) 40%, transparent 70%),
-    linear-gradient(0deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.1) 100%);
+    linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.72) 100%);
 }
 
 .hp-cd-top {
@@ -6108,17 +6107,17 @@ button {
   z-index: 2;
 }
 
-/* Timer — three labeled units */
+/* Timer — three labeled units — Opal glass style */
 .hp-cd-timer {
   position: absolute;
   bottom: 48px;
   left: 16px;
   right: 16px;
   height: 48px;
-  background: rgba(15,15,20,0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: none;
+  background: rgba(20,20,20,0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -6438,12 +6437,12 @@ button {
   left: 12px;
   background: rgba(20,20,20,0.7);
   backdrop-filter: blur(8px);
-  border: none;
+  border: 1px solid rgba(255,255,255,0.08);
   color: #fff;
   font-size: 11px;
   font-weight: 600;
   padding: 3px 9px;
-  border-radius: 16px;
+  border-radius: 14px;
   z-index: 2;
 }
 .hp-trip-info {
@@ -6483,7 +6482,7 @@ button {
   font-size: 12px;
   font-weight: 700;
   padding: 8px 0;
-  border-radius: 16px;
+  border-radius: 14px;
   z-index: 3;
   text-align: center;
   letter-spacing: 0.1px;
@@ -6498,7 +6497,7 @@ button {
   font-size: 12px;
   font-weight: 700;
   padding: 8px 0;
-  border-radius: 16px;
+  border-radius: 14px;
   z-index: 3;
   text-align: center;
   white-space: nowrap;
@@ -6693,19 +6692,7 @@ button {
   position: relative;
 }
 .hp-nav-active .hp-nav-icon { color: #fff; }
-.hp-nav-active .hp-nav-label { color: #ff8c42; font-weight: 700; }
-.hp-nav-active::before {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #ff8c42;
-  box-shadow: 0 0 6px rgba(255,140,66,0.8);
-}
+.hp-nav-active .hp-nav-label { color: #fff; font-weight: 700; }
 
 /* center add button */
 .hp-nav-center-wrap {
@@ -6731,6 +6718,10 @@ button {
 .hp-nav-center-btn:active {
   transform: scale(0.93);
   box-shadow: 0 0 0 4px #1a1a1e, 0 4px 12px rgba(255,95,31,0.45);
+}
+
+.hp-nav-center-btn--active {
+  box-shadow: 0 0 0 4px #1a1a1e, 0 6px 24px rgba(249,115,22,0.7), 0 2px 8px rgba(0,0,0,0.4);
 }
 .hp-nav-center-icon {
   font-size: 26px;
@@ -7044,10 +7035,10 @@ button {
 .hp-cd-plan-toggle {
   position: absolute !important; bottom: 14px; left: 20px;
   display: flex !important; align-items: center !important; gap: 6px !important;
-  background: rgba(20,20,20,0.7) !important; backdrop-filter: blur(8px); border: none !important;
-  border-radius: 16px !important; padding: 6px 14px !important;
+  background: rgba(20,20,20,0.7) !important; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 14px !important; padding: 6px 14px !important;
   font-size: 13px !important; font-weight: 600 !important;
-  color: #fff !important; border: none !important; box-shadow: none !important; cursor: pointer;
+  color: #fff !important; box-shadow: none !important; cursor: pointer;
 }
 .hp-cd-toggle-arrow { font-size: 16px; line-height: 1; }
 
@@ -7087,7 +7078,7 @@ button {
 
 /* ── Featured article card ── */
 .hp-featured-card {
-  margin: 0 16px; height: 210px; border-radius: 20px; overflow: hidden;
+  margin: 0 16px; height: 192px; border-radius: 20px; overflow: hidden;
   position: relative; display: flex;
 }
 .hp-featured-img {
@@ -7103,8 +7094,9 @@ button {
 }
 .hp-featured-tag {
   font-size: 11px; font-weight: 600; color: #fff;
-  background: rgba(20,20,20,0.65); backdrop-filter: blur(8px);
-  border-radius: 16px; padding: 3px 8px; align-self: flex-start;
+  background: rgba(20,20,20,0.7); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 3px 9px; align-self: flex-start;
 }
 .hp-featured-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.35; }
 .hp-featured-thumbs {
@@ -7122,7 +7114,7 @@ button {
 .hp-topic-card { position: relative; flex-shrink: 0; width: 138px; height: 165px; border-radius: 16px; overflow: hidden; display: block; }
 .hp-topic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hp-topic-grad { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.06) 50%, transparent 100%); }
-.hp-topic-tag { position: absolute; top: 10px; left: 10px; background: rgba(20,20,20,0.7); backdrop-filter: blur(8px); border: none; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 16px; z-index: 2; }
+.hp-topic-tag { position: absolute; top: 10px; left: 10px; background: rgba(20,20,20,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 14px; z-index: 2; }
 .hp-topic-title { position: absolute; bottom: 48px; left: 12px; right: 12px; font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif; font-size: 13px; font-weight: 700; color: #fff; line-height: 1.3; z-index: 2; }
 
 /* ── 我的行程 full-width trip cards ── */
@@ -11632,7 +11624,7 @@ button {
 /* Heading */
 .pl-heading {
   position: relative;
-  z-index: 2;
+  z-index: 50;
   padding: 24px 24px 0;
 }
 .pl-title {
@@ -11647,7 +11639,7 @@ button {
 .pl-vacation-wrap {
   position: relative;
   margin: 4px 0 0;
-  z-index: 5;
+  z-index: 50;
 }
 .pl-vacation-btn {
   display: flex;
@@ -11691,8 +11683,7 @@ button {
   border: none;
   border-radius: 20px;
   padding: 8px;
-  z-index: 50;
-  z-index: 20;
+  z-index: 51;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -11779,7 +11770,7 @@ button {
 .pl-sheet-overlay {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 200;
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -12574,11 +12565,19 @@ button {
   color: #fff;
 }
 
+.pl-budget-content {
+  min-height: 284px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .pl-dial-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 24px;
 }
 .pl-dial-outer {
   position: relative;
@@ -12612,31 +12611,31 @@ button {
 
 .pl-dial-pointer {
   position: absolute;
-  top: -12px;
+  top: -8px;
   left: 50%;
   margin-left: -8px;
-  transform-origin: 8px 132px;
+  transform-origin: 8px 128px;
   z-index: 3;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.pl-dial-pointer-tri {
+.pl-dial-pointer-dot {
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 12px solid #c1c42b;
-  filter: drop-shadow(0 0 6px rgba(193,196,43,0.6));
+  border-top: 14px solid #ff8c42;
+  filter: drop-shadow(0 0 6px rgba(255,140,66,0.9));
 }
 
-/* Range mode: min pointer (blue tint) */
-.pl-dial-pointer-min .pl-dial-pointer-tri {
+/* Range mode: min pointer (blue) */
+.pl-dial-pointer-min .pl-dial-pointer-dot {
   border-top-color: #4a9eff;
-  filter: drop-shadow(0 0 6px rgba(74,158,255,0.6));
+  filter: drop-shadow(0 0 6px rgba(74,158,255,0.9));
 }
-/* Range mode: max pointer (yellow, same as single) */
-.pl-dial-pointer-max .pl-dial-pointer-tri {
-  border-top-color: #c1c42b;
-  filter: drop-shadow(0 0 6px rgba(193,196,43,0.6));
+/* Range mode: max pointer (orange) */
+.pl-dial-pointer-max .pl-dial-pointer-dot {
+  border-top-color: #ff8c42;
+  filter: drop-shadow(0 0 6px rgba(255,140,66,0.9));
 }
 
 /* Value bubble on range pointers */
@@ -12676,11 +12675,11 @@ button {
   border-top-color: #1a3a5c;
 }
 .pl-dial-pointer-max .pl-dial-pointer-bubble {
-  background: #3a3b1a;
-  border: 1px solid rgba(193,196,43,0.4);
+  background: #3a1e0f;
+  border: 1px solid rgba(255,140,66,0.4);
 }
 .pl-dial-pointer-max .pl-dial-pointer-bubble::after {
-  border-top-color: #3a3b1a;
+  border-top-color: #3a1e0f;
 }
 
 .pl-dial-arc-svg {
@@ -12723,11 +12722,12 @@ button {
 
 /* ── Range Slider (horizontal dual-thumb) ── */
 .pl-range-section {
-  padding: 0 28px 8px;
+  width: 100%;
+  padding: 20px 8px 0;
 }
 .pl-range-display {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
 }
 .pl-range-display-label {
   display: block;
@@ -12735,20 +12735,22 @@ button {
   letter-spacing: 3px;
   color: rgba(255,255,255,0.35);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-family: 'SF Pro Display', -apple-system, sans-serif;
 }
 .pl-range-display-value {
   font-family: 'SF Pro Display', -apple-system, sans-serif;
   font-weight: 800;
-  font-size: 36px;
+  font-size: 44px;
   color: #fff;
-  letter-spacing: -1px;
+  letter-spacing: -2px;
 }
 .pl-range-display-sep {
-  color: rgba(255,255,255,0.3);
-  margin: 0 4px;
-  font-weight: 400;
+  color: rgba(255,255,255,0.25);
+  margin: 0 6px;
+  font-weight: 300;
+  font-size: 32px;
+  letter-spacing: 0;
 }
 
 /* Slider container */
@@ -12932,7 +12934,7 @@ button {
   background: rgba(255,255,255,0.1);
 }
 .pl-dial-dot-active {
-  background: #c1c42b;
+  background: #ff8c42;
 }
 
 .pl-dial-range {
