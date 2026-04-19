@@ -120,18 +120,54 @@ export default function TripsPage() {
       {/* Trips list */}
       <div className="ct-trip-list" style={{ padding: "12px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
         {trips.length === 0 && (
-          <div style={{ textAlign: "center", paddingTop: 60, paddingBottom: 40 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 48, paddingBottom: 48, gap: 0 }}>
+            {/* Glow orb */}
             <div style={{
-              width: 88, height: 88, borderRadius: 28,
-              background: "linear-gradient(135deg, rgba(255,140,66,0.12), rgba(255,80,120,0.08))",
-              border: "1px solid rgba(255,140,66,0.18)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 38, margin: "0 auto 24px",
-            }}>✈️</div>
-            <p style={{ color: "#fff", fontSize: 20, fontWeight: 800, margin: "0 0 8px", letterSpacing: -0.3 }}>No trips yet</p>
-            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, margin: "0 0 32px", lineHeight: 1.5 }}>Start by planning your first adventure</p>
-            <Link href="/planner" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, background: "#ff8c42", color: "#000", fontSize: 14, fontWeight: 700, padding: "13px 28px", borderRadius: 22, letterSpacing: 0.2 }}>
-              Plan a trip ›
+              position: "relative", width: 120, height: 120, marginBottom: 32,
+            }}>
+              <div style={{
+                position: "absolute", inset: -20,
+                background: "radial-gradient(circle, rgba(255,140,66,0.18) 0%, transparent 70%)",
+                borderRadius: "50%",
+              }} />
+              <div style={{
+                width: 120, height: 120, borderRadius: 36,
+                background: "rgba(255,255,255,0.04)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                position: "relative",
+              }}>
+                {/* Plane SVG */}
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+                    fill="rgba(255,140,66,0.9)" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Text */}
+            <p style={{ color: "#fff", fontSize: 22, fontWeight: 800, margin: "0 0 8px", letterSpacing: -0.5, lineHeight: 1.2 }}>No trips yet</p>
+            <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 13, margin: "0 0 36px", lineHeight: 1.6, textAlign: "center", maxWidth: 220 }}>
+              Plan your first adventure and it'll show up here
+            </p>
+
+            {/* CTA */}
+            <Link href="/planner" style={{
+              textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 8,
+              background: "linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%)",
+              color: "#fff", fontSize: 13, fontWeight: 700,
+              padding: "14px 32px", borderRadius: 99,
+              letterSpacing: 0.8, textTransform: "uppercase",
+              boxShadow: "0 4px 20px rgba(255,95,31,0.35), 0 1px 0 rgba(255,255,255,0.12) inset",
+            }}>
+              Start planning
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </Link>
           </div>
         )}
