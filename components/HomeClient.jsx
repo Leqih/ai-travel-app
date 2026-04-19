@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -20,24 +20,33 @@ const PLAN = [
   { time: "21:00", icon: "🏨", title: "Check-in Hotel",    note: "Shinjuku" },
 ];
 
-const TRIPS = [
-  { id: 1, title: "Japan Classic",   dates: "Mar 20–25", places: 12, img: "https://picsum.photos/seed/japan-torii/300/380",    tag: "Culture", color: "#6c6cff" },
-  { id: 2, title: "Seoul Adventure", dates: "Apr 10–13", places: 8,  img: "https://picsum.photos/seed/seoul-night/300/380",    tag: "Food",    color: "#fff" },
-  { id: 3, title: "Bangkok Hop",     dates: "May 1–7",   places: 15, img: "https://picsum.photos/seed/bangkok-temple/300/380", tag: "Nature",  color: "#e0a020" },
-];
+function activityCount(activities) {
+  if (!activities) return 0;
+  return Object.values(activities).reduce((s, a) => s + (a?.length || 0), 0);
+}
+
+function formatTripDates(startDate, duration) {
+  if (!startDate) return duration || null;
+  const start = new Date(startDate + "T00:00:00");
+  const days = parseInt(duration) || 1;
+  const end = new Date(start);
+  end.setDate(end.getDate() + days - 1);
+  const fmt = d => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return `${fmt(start)} – ${fmt(end)}`;
+}
 
 const DISCOVER = [
-  { id: 1, title: "Immersive Art",    sub: "Exhibitions & installations", img: "https://picsum.photos/seed/art-exhibit/400/600"  },
-  { id: 2, title: "Theme Parks",      sub: "Thrills & memories",          img: "https://picsum.photos/seed/theme-park/400/300"   },
-  { id: 3, title: "Craft & Make",     sub: "DIY workshops nearby",        img: "https://picsum.photos/seed/pottery-craft/400/300" },
-  { id: 4, title: "Live Music",       sub: "Concerts & festivals",        img: "https://picsum.photos/seed/concert-crowd/400/300" },
+  { id: 1, title: "Immersive Art",    sub: "Exhibitions & installations", img: "https://picsum.photos/seed/art-exhibit/400/600",   city: "Tokyo",  category: "art"       },
+  { id: 2, title: "Theme Parks",      sub: "Thrills & memories",          img: "https://picsum.photos/seed/theme-park/400/300",    city: "Osaka",  category: "adventure" },
+  { id: 3, title: "Craft & Make",     sub: "DIY workshops nearby",        img: "https://picsum.photos/seed/pottery-craft/400/300", city: "Kyoto",  category: "culture"   },
+  { id: 4, title: "Live Music",       sub: "Concerts & festivals",        img: "https://picsum.photos/seed/concert-crowd/400/300", city: "Seoul",  category: "adventure" },
 ];
 
 const TOPICS = [
-  { id: 1, tag: "Outdoor",   title: "Japan's Best Hiking Trails", img: "https://picsum.photos/seed/japan-hike/220/160" },
-  { id: 2, tag: "Deep Dive", title: "Hidden Alleys of Kyoto",     img: "https://picsum.photos/seed/kyoto-alley/220/160" },
-  { id: 3, tag: "Food",      title: "Osaka Street Food Map",      img: "https://picsum.photos/seed/osaka-food/220/160" },
-  { id: 4, tag: "Culture",   title: "Festivals & Crafts",         img: "https://picsum.photos/seed/japan-craft/220/160" },
+  { id: 1, tag: "Outdoor",   title: "Japan's Best Hiking Trails", img: "https://picsum.photos/seed/japan-hike/220/160",   city: "Tokyo", category: "nature"  },
+  { id: 2, tag: "Deep Dive", title: "Hidden Alleys of Kyoto",     img: "https://picsum.photos/seed/kyoto-alley/220/160",  city: "Kyoto", category: "culture" },
+  { id: 3, tag: "Food",      title: "Osaka Street Food Map",      img: "https://picsum.photos/seed/osaka-food/220/160",   city: "Osaka", category: "food"    },
+  { id: 4, tag: "Culture",   title: "Festivals & Crafts",         img: "https://picsum.photos/seed/japan-craft/220/160",  city: "Tokyo", category: "culture" },
 ];
 
 const MY_TRIPS = [
@@ -105,7 +114,13 @@ function pad(n) { return String(n).padStart(2, "0"); }
 /* ─── HomeClient ─────────────────────────────────────────────────── */
 export function HomeClient() {
   const pathname = usePathname();
+  const router = useRouter();
   const hour = new Date().getHours();
+
+  // Prefetch all nav routes on mount so taps are instant
+  useEffect(() => {
+    ["/nearby", "/trips", "/profile", "/planner"].forEach(r => router.prefetch(r));
+  }, [router]);
   const greeting = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
   const today = new Date();
   const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
@@ -204,15 +219,17 @@ export function HomeClient() {
   }, [cdConfig.startDate]);
 
   const shellRef = useRef(null);
+  useLayoutEffect(() => {
+    if (!shellRef.current) return;
+    gsap.set(shellRef.current.querySelectorAll(
+      ".hp-section-hd, .hp-featured-card, .hp-trips-scroll, .hp-topics-scroll, .hp-disc-grid"
+    ), { opacity: 0, y: 24 });
+  }, []);
   useEffect(() => {
     if (!shellRef.current) return;
-    const sections = shellRef.current.querySelectorAll(
+    gsap.to(shellRef.current.querySelectorAll(
       ".hp-section-hd, .hp-featured-card, .hp-trips-scroll, .hp-topics-scroll, .hp-disc-grid"
-    );
-    gsap.fromTo(sections,
-      { opacity: 0, y: 50, filter: "blur(8px)" },
-      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power3.out", stagger: 0.06 }
-    );
+    ), { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", stagger: 0.05 });
   }, []);
 
   return (
@@ -320,47 +337,49 @@ export function HomeClient() {
                   </button>
                 </>
               ) : (
-                /* Empty state — no redundant top row, single clean CTA */
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "flex-end", height: "100%", padding: "16px 16px 18px" }}>
-                  <div style={{ marginBottom: 6 }}>
+                /* Empty state — Opal cd-card layout: top label · mid heading · bottom CTA */
+                <div style={{ position: "relative", height: "100%", padding: "16px 20px" }}>
+                  {/* Top row — badge */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <span style={{
-                      display: "inline-block",
-                      background: "rgba(255,140,66,0.15)", border: "1px solid rgba(255,140,66,0.3)",
-                      borderRadius: 20, padding: "3px 10px",
-                      color: "#ff9a52", fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
+                      background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+                      border: "1px solid rgba(255,95,31,0.55)",
+                      borderRadius: 12, padding: "4px 12px",
+                      color: "#ff8c42", fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase",
                     }}>
                       {savedTrips.length > 0 ? `${savedTrips.length} trip${savedTrips.length > 1 ? "s" : ""} planned` : "Get started"}
                     </span>
                   </div>
-                  <div style={{ color: "#fff", fontSize: 24, fontWeight: 900, lineHeight: 1.15, letterSpacing: -0.5, marginBottom: 6 }}>
-                    {savedTrips.length > 0 ? "Where to\nnext?" : "Plan your\nfirst trip"}
+                  {/* Main heading — Opal cd-main spec: 28px/700/−0.5px */}
+                  <div style={{ color: "#fff", fontSize: 28, fontWeight: 700, lineHeight: 1.15, letterSpacing: -0.5, marginTop: 10 }}>
+                    {savedTrips.length > 0 ? "Where to next?" : "Plan your first trip"}
                   </div>
-                  <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, lineHeight: 1.5, marginBottom: 14 }}>
+                  <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, lineHeight: 1.5, marginTop: 5 }}>
                     {savedTrips.length > 0
                       ? "Pick a trip and set a date to start your countdown"
                       : "Create an itinerary and start counting down"}
                   </div>
-                  {savedTrips.length > 0 ? (
-                    <button
-                      onClick={() => setPickerOpen(true)}
-                      style={{
-                        background: "#ff8c42", border: "none",
-                        color: "#000", fontSize: 13, fontWeight: 800,
-                        padding: "10px 22px", borderRadius: 22, cursor: "pointer",
-                        letterSpacing: 0.2,
+                  {/* Bottom CTA — Opal white primary button, absolutely pinned */}
+                  <div style={{ position: "absolute", bottom: 14, left: 20, right: 20 }}>
+                    {savedTrips.length > 0 ? (
+                      <button onClick={() => setPickerOpen(true)} style={{
+                        display: "block", width: "100%", padding: "11px 0",
+                        background: "#fff", border: "none", borderRadius: 14, cursor: "pointer",
+                        color: "#09090F", fontSize: 14, fontWeight: 700, letterSpacing: 0.1, textAlign: "center",
                       }}>
-                      Set countdown ›
-                    </button>
-                  ) : (
-                    <Link href="/planner" style={{
-                      background: "#ff8c42", textDecoration: "none",
-                      color: "#000", fontSize: 13, fontWeight: 800,
-                      padding: "10px 22px", borderRadius: 22,
-                      letterSpacing: 0.2,
-                    }}>
-                      Start planning ›
-                    </Link>
-                  )}
+                        Set countdown ›
+                      </button>
+                    ) : (
+                      <Link href="/planner" style={{
+                        display: "block", textAlign: "center",
+                        padding: "11px 0", background: "#fff", textDecoration: "none",
+                        borderRadius: 14,
+                        color: "#09090F", fontSize: 14, fontWeight: 700, letterSpacing: 0.1,
+                      }}>
+                        Start planning ›
+                      </Link>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -574,11 +593,7 @@ export function HomeClient() {
             <p className="hp-featured-tag">🌍 Cultural Exploration</p>
             <p className="hp-featured-title">Iran: Ancient Cities at the<br />Crossroads of Civilization</p>
           </div>
-          <div className="hp-featured-thumbs">
-            {TODAY_THUMBS.map((src, i) => (
-              <img key={i} className="hp-featured-thumb" src={src} alt="" />
-            ))}
-          </div>
+
         </div>
 
 
@@ -587,24 +602,66 @@ export function HomeClient() {
           <div>
             <p className="hp-section-cat">Your Journeys</p>
             <span className="hp-section-title">Your Trips</span>
-            <p className="hp-section-sub">3 upcoming · Plan your next</p>
+            <p className="hp-section-sub">
+              {savedTrips.length > 0 ? `${savedTrips.length} ${savedTrips.length === 1 ? "trip" : "trips"} · Plan your next` : "No trips yet"}
+            </p>
           </div>
-          <button className="hp-section-link">+ New</button>
+          <Link href="/planner" className="hp-section-link" style={{ textDecoration: "none" }}>+ New</Link>
         </div>
 
         <div className="hp-trips-scroll">
-          {TRIPS.map((trip) => (
-            <Link key={trip.id} href="/nearby" className="hp-trip-card">
-              <img className="hp-trip-img" src={trip.img} alt={trip.title} />
-              <div className="hp-trip-grad" />
-              <span className="hp-trip-tag">{trip.tag}</span>
-              <div className="hp-trip-info">
-                <p className="hp-trip-title">{trip.title}</p>
-                <p className="hp-trip-meta">{trip.dates} · {trip.places} places</p>
+          {savedTrips.length === 0 ? (
+            <Link href="/planner" style={{ textDecoration: "none" }}>
+              <div className="hp-trip-card" style={{
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                background: "#1A1A1E",
+                border: "1px solid rgba(255,255,255,0.06)",
+                boxShadow: "0 2px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+                backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)",
+                backgroundSize: "10px 10px",
+              }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 18,
+                  background: "#242428",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 26, marginBottom: 16,
+                }}>✈️</div>
+                <p style={{ color: "#fff", fontSize: 15, fontWeight: 700, margin: "0 0 5px", letterSpacing: -0.3 }}>No trips yet</p>
+                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 20px", lineHeight: 1.4, textAlign: "center" }}>Start planning your adventure</p>
+                <div style={{
+                  background: "#fff", color: "#09090F",
+                  fontSize: 12, fontWeight: 700, letterSpacing: 0.1,
+                  padding: "8px 20px", borderRadius: 12,
+                }}>Plan a trip ›</div>
               </div>
-              <div className="hp-trip-action-btn">→ Open</div>
             </Link>
-          ))}
+          ) : (
+            savedTrips.map((trip) => {
+              const img = CITY_IMAGES[trip.destination];
+              const flag = CITY_FLAGS[trip.destination] || "✈️";
+              const tag = trip.prefs?.[0] || trip.destination || "Trip";
+              const dates = formatTripDates(trip.startDate, trip.duration);
+              const count = activityCount(trip.activities);
+              const href = `/planner/manual?city=${encodeURIComponent(trip.destination || "")}&duration=${encodeURIComponent(trip.duration || "")}&prefs=${encodeURIComponent((trip.prefs || []).join(","))}&id=${trip.id}`;
+              return (
+                <Link key={trip.id} href={href} className="hp-trip-card" style={{ textDecoration: "none" }}>
+                  {img
+                    ? <img className="hp-trip-img" src={img} alt={trip.destination} />
+                    : <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#1a1a2e,#0d0d1a)" }} />
+                  }
+                  <div className="hp-trip-grad" />
+                  <span className="hp-trip-tag">{tag}</span>
+                  <div className="hp-trip-info">
+                    <p className="hp-trip-title">{flag} {trip.destination}</p>
+                    <p className="hp-trip-meta">{[dates, count > 0 && `${count} places`].filter(Boolean).join(" · ")}</p>
+                  </div>
+                  <div className="hp-trip-action-btn">→ Open</div>
+                </Link>
+              );
+            })
+          )}
         </div>
 
         {/* My Itineraries lives in the Trips tab — see nav */}
@@ -621,7 +678,7 @@ export function HomeClient() {
 
         <div className="hp-topics-scroll">
           {TOPICS.map((t) => (
-            <Link key={t.id} href="/nearby" className="hp-topic-card">
+            <Link key={t.id} href={`/nearby?city=${t.city}&category=${t.category}`} className="hp-topic-card">
               <img className="hp-topic-img" src={t.img} alt={t.title} />
               <div className="hp-topic-grad" />
               <span className="hp-topic-tag">{t.tag}</span>
@@ -643,7 +700,7 @@ export function HomeClient() {
 
         <div className="hp-disc-grid">
           {/* Left — tall card spanning both rows */}
-          <Link href="/nearby" className="hp-disc-cell hp-disc-tall">
+          <Link href={`/nearby?city=${DISCOVER[0].city}&category=${DISCOVER[0].category}`} className="hp-disc-cell hp-disc-tall">
             <img className="hp-disc-img" src={DISCOVER[0].img} alt={DISCOVER[0].title} />
             <div className="hp-disc-grad" />
             <div className="hp-disc-label">
@@ -653,7 +710,7 @@ export function HomeClient() {
           </Link>
           {/* Right column — two stacked */}
           {DISCOVER.slice(1, 3).map((item) => (
-            <Link key={item.id} href="/nearby" className="hp-disc-cell hp-disc-short">
+            <Link key={item.id} href={`/nearby?city=${item.city}&category=${item.category}`} className="hp-disc-cell hp-disc-short">
               <img className="hp-disc-img" src={item.img} alt={item.title} />
               <div className="hp-disc-grad" />
               <div className="hp-disc-label">
@@ -667,36 +724,6 @@ export function HomeClient() {
         <div style={{ height: 112 }} />
       </div>
 
-      {/* ── Bottom nav ── */}
-      <nav className="hp-nav">
-        <div className="hp-nav-pill">
-          {NAV_ITEMS.map((item, i) => {
-            if (item.center) {
-              return (
-                <div key="center" className="hp-nav-center-wrap">
-                  <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
-                    {pathname === '/planner' ? (
-                      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
-                        <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
-                      </div>
-                    ) : (
-                      <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%", background: "linear-gradient(135deg, #F97316 0%, #396cbf 60%, #B497CF 100%)" }} />
-                    )}
-                    <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
-                  </Link>
-                </div>
-              );
-            }
-            return (
-              <Link key={i} href={item.href}
-                className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
-                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-                <span className="hp-nav-label">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
     </div>
     </>
   );

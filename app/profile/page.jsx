@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 const Grainient = dynamic(() => import("@/components/Grainient"), { ssr: false });
@@ -224,10 +224,10 @@ function ProfileBudgetSheet({ open, onClose, onSelect }) {
               <div key={i} className={`pl-dial-tick ${i % 5 === 0 ? "pl-dial-tick-major" : ""}`} style={{ transform: `rotate(${(i / 36) * 360}deg)` }} />
             ))}
             <div className="pl-dial-pointer" style={{ transform: `rotate(${rotation}deg)` }}>
-              <div className="pl-dial-pointer-tri" />
+              <div className="pl-dial-pointer-dot" />
             </div>
             <div className="pl-dial-inner" onClick={e => { e.stopPropagation(); setEditing(true); setInputVal(String(amount)); setTimeout(() => inputRef.current?.focus(), 50); }} style={{ cursor: "pointer" }}>
-              <span className="pl-dial-unit">USD / DAY</span>
+              <span className="pl-dial-unit">USD</span>
               <span className="pl-dial-amount">
                 <span className="pl-dial-dollar">$</span>
                 {editing
@@ -695,45 +695,53 @@ function TagLibrarySheet({ open, onClose, stats, displayTagId, onSelectTag }) {
 export default function ProfilePage() {
   const pathname = usePathname();
   const shellRef = useRef(null);
-  const [trips, setTrips] = useState([]);
+  const [trips, setTrips] = useState(() => {
+    if (typeof window === "undefined") return [];
+    try { return JSON.parse(localStorage.getItem("opal_trips") || "[]"); } catch (_) { return []; }
+  });
+
+  useEffect(() => {
+    const sync = () => {
+      try { setTrips(JSON.parse(localStorage.getItem("opal_trips") || "[]")); } catch (_) {}
+    };
+    window.addEventListener("storage", sync);
+    window.addEventListener("focus", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("focus", sync);
+    };
+  }, []);
+
+  const [selectedMemoji, setSelectedMemoji] = useState("10");
+  const [memojiPickerOpen, setMemojiPickerOpen] = useState(false);
   const [activeCity, setActiveCity] = useState(null);
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [collectionMode, setCollectionMode] = useState("photos");
   const [budgetSheetOpen, setBudgetSheetOpen] = useState(false);
-  const [profileBudget, setProfileBudget] = useState(null);
+  const [profileBudget, setProfileBudget] = useState(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("opal_daily_budget") || null;
+  });
   const [displayTagId, setDisplayTagId] = useState(null);
   const [tagDetail, setTagDetail] = useState(null);
-  const [avatarUrl, setAvatarUrl] = useState(null);
   const [userPhotos, setUserPhotos] = useState([]);
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   const [pendingPhotoData, setPendingPhotoData] = useState(null);
   const [focusPhotoId, setFocusPhotoId] = useState(null);
-  const avatarInputRef = useRef(null);
   const addPhotoInputRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!shellRef.current) return;
+    gsap.set(shellRef.current.querySelectorAll(".fp-a"), { opacity: 0, y: 24, filter: "blur(5px)" });
+  }, []);
 
   useEffect(() => {
     try { setTrips(JSON.parse(localStorage.getItem("opal_trips") || "[]")); } catch (_) {}
-    try {
-      const saved = localStorage.getItem("opal_avatar");
-      if (saved) setAvatarUrl(saved);
-    } catch (_) {}
     try {
       const saved = localStorage.getItem("opal_photos");
       if (saved) setUserPhotos(JSON.parse(saved));
     } catch (_) {}
   }, []);
-
-  function handleAvatarChange(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target.result;
-      setAvatarUrl(dataUrl);
-      try { localStorage.setItem("opal_avatar", dataUrl); } catch (_) {}
-    };
-    reader.readAsDataURL(file);
-  }
 
   async function handleAddPhotoChange(e) {
     const file = e.target.files?.[0];
@@ -779,11 +787,10 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!shellRef.current) return;
-    gsap.fromTo(shellRef.current.querySelectorAll(".fp-a"),
-      { opacity: 0, y: 24, filter: "blur(5px)" },
+    gsap.to(shellRef.current.querySelectorAll(".fp-a"),
       { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.55, ease: "power3.out", stagger: 0.07 }
     );
-  }, [trips]);
+  }, []);
 
   const visitedCities = [...new Set(trips.map(t => t.destination).filter(Boolean))];
   const visitedCountries = [...new Set(visitedCities.map(c => COUNTRY_MAP[c]).filter(Boolean))];
@@ -791,7 +798,7 @@ export default function ProfilePage() {
 
   return (
     <div className="hp-shell" style={{ fontFamily: `-apple-system,"SF Pro Display","Helvetica Neue",sans-serif` }}>
-      <div ref={shellRef} className="hp-scroll" style={{ paddingBottom: 24 }}>
+      <div ref={shellRef} className="hp-scroll" style={{ paddingBottom: 110 }}>
 
       {/* ══ Header — dot-grid bg matches homepage ══ */}
       <div className="fp-a hp-header" style={{ paddingBottom: 24 }}>
@@ -817,20 +824,13 @@ export default function ProfilePage() {
             })()}
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-            <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fff", flexShrink: 0, overflow: "hidden" }}>
-              <img src={avatarUrl || "/memojis/10.png"} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-            <input
-              ref={avatarInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleAvatarChange}
-            />
-            <button
-              onClick={() => avatarInputRef.current?.click()}
-              style={{ ...glass, width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}
-            >
+            <button onClick={() => setMemojiPickerOpen(true)} style={{ width: 64, height: 64, borderRadius: "50%", background: selectedMemoji.startsWith("e:") ? "#FFD93D" : "#fff", flexShrink: 0, overflow: "hidden", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34 }}>
+              {selectedMemoji.startsWith("e:")
+                ? selectedMemoji.slice(2)
+                : <img src={`/memojis/${selectedMemoji}.png`} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              }
+            </button>
+            <button onClick={() => setMemojiPickerOpen(true)} style={{ ...glass, width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
               <FontAwesomeIcon icon={faPen} style={{ width: 11, height: 11, color: "rgba(255,255,255,0.4)" }} />
             </button>
           </div>
@@ -1046,24 +1046,37 @@ export default function ProfilePage() {
         <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 600, letterSpacing: "0.5px", textTransform: "uppercase", margin: "0 0 10px" }}>Account</p>
         <div style={{ ...glass, borderRadius: 20, overflow: "hidden" }}>
           {[
-            { icon: faCreditCard, label: "Daily Budget",    sub: profileBudget || "Set your travel budget", action: () => setBudgetSheetOpen(true) },
-            { icon: faBell,       label: "Trip Reminders",  sub: "Get notified before your trips" },
-            { icon: faGear,       label: "Settings",        sub: "Preferences & privacy", last: true },
+            { icon: faPlane,  label: "Saved Trips",    sub: trips.length > 0 ? `${trips.length} ${trips.length === 1 ? "trip" : "trips"} saved` : "No trips saved yet", href: "/trips" },
+            { icon: faBell,   label: "Trip Reminders", sub: "Get notified before your trips" },
+            { icon: faGear,   label: "Settings",       sub: "Preferences & privacy", last: true },
           ].map((item) => (
-            <div key={item.label} onClick={item.action} style={{
-              display: "flex", alignItems: "center", gap: 12, padding: "14px 16px",
-              borderBottom: item.last ? "none" : "1px solid rgba(255,255,255,0.06)",
-              cursor: "pointer",
-            }}>
-              <div style={{ width: 40, height: 40, borderRadius: 16, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <FontAwesomeIcon icon={item.icon} style={{ width: 14, height: 14, color: "rgba(255,255,255,0.5)" }} />
+            item.href ? (
+              <Link key={item.label} href={item.href} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <div style={{ width: 40, height: 40, borderRadius: 16, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <FontAwesomeIcon icon={item.icon} style={{ width: 14, height: 14, color: "rgba(255,255,255,0.5)" }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "#fff", fontSize: 15, fontWeight: 600, letterSpacing: -0.2 }}>{item.label}</div>
+                  <div style={{ color: trips.length > 0 ? "rgba(255,140,66,0.8)" : "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>{item.sub}</div>
+                </div>
+                <FontAwesomeIcon icon={faChevronRight} style={{ width: 9, height: 9, color: "rgba(255,255,255,0.28)", flexShrink: 0 }} />
+              </Link>
+            ) : (
+              <div key={item.label} style={{
+                display: "flex", alignItems: "center", gap: 12, padding: "14px 16px",
+                borderBottom: item.last ? "none" : "1px solid rgba(255,255,255,0.06)",
+                cursor: "pointer",
+              }}>
+                <div style={{ width: 40, height: 40, borderRadius: 16, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <FontAwesomeIcon icon={item.icon} style={{ width: 14, height: 14, color: "rgba(255,255,255,0.5)" }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "#fff", fontSize: 15, fontWeight: 600, letterSpacing: -0.2 }}>{item.label}</div>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>{item.sub}</div>
+                </div>
+                <FontAwesomeIcon icon={faChevronRight} style={{ width: 9, height: 9, color: "rgba(255,255,255,0.28)", flexShrink: 0 }} />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: "#fff", fontSize: 15, fontWeight: 600, letterSpacing: -0.2 }}>{item.label}</div>
-                <div style={{ color: item.action && profileBudget ? "rgba(255,140,66,0.8)" : "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>{item.sub}</div>
-              </div>
-              <FontAwesomeIcon icon={faChevronRight} style={{ width: 9, height: 9, color: "rgba(255,255,255,0.28)", flexShrink: 0 }} />
-            </div>
+            )
           ))}
         </div>
       </div>
@@ -1137,8 +1150,67 @@ export default function ProfilePage() {
       <ProfileBudgetSheet
         open={budgetSheetOpen}
         onClose={() => setBudgetSheetOpen(false)}
-        onSelect={v => setProfileBudget(v)}
+        onSelect={v => { setProfileBudget(v); localStorage.setItem("opal_daily_budget", v); }}
       />
+
+      {memojiPickerOpen && (() => {
+        const EMOJIS = ["😀","😂","🥹","😍","🤩","😎","🥸","🤓","😏","😌","🥳","🤗","😇","🫡","🤔","😴","🥰","😋","🤪","😜","🫠","🤭","😤","🫨","🤯","🥺","😭","😱","🤠","👻","💀","🤖","👾","🐶","🐱","🐼","🐨","🦊","🐯","🦁","🐸","🦋","🐙","🦄","🐲","🌈","🌸","⭐","🔥","💎","🎸","🎮","🚀","🍕","🍣","🧋"];
+        const EMOJI_BG = ["#FFD93D","#FF6B6B","#4ECDC4","#A8E6CF","#FFB347","#C3B1E1","#87CEEB","#F0E68C","#98FB98","#DDA0DD","#F08080","#B0E0E6","#FFDAB9","#E0BBE4","#957DAD","#D4A5A5","#9EC1A3","#CFE2F3","#F9C784","#FC8EAC","#A8DADC","#F7B2BD","#B5EAD7","#C7CEEA","#E2F0CB","#FFDFD3","#D4E6F1","#F9EBEA","#E8F8F5","#FEF9E7","#F4ECF7","#EBF5FB","#E9F7EF","#FDFEFE","#F8F9FA","#EEF2FF","#FFF0F3","#F0FDF4","#FFFBEB","#FFF7ED","#FDF4FF","#ECFDF5","#EFF6FF","#FEF2F2","#F0F9FF","#FAFAF9","#F9F9F9","#FDFDEA","#F0FFF4","#FFFDE7","#FFF8F1","#FBF5F5","#F5F0FF","#EDFCF2","#F6FFF8"];
+        const selectAvatar = id => { setSelectedMemoji(id); localStorage.setItem("opal_memoji", id); setMemojiPickerOpen(false); };
+        const MemojiBtn = ({ id }) => (
+          <button onClick={() => selectAvatar(id)} style={{
+            padding: 0, border: "none", cursor: "pointer", borderRadius: "50%",
+            background: id === selectedMemoji ? "rgba(255,255,255,0.15)" : "transparent",
+            outline: id === selectedMemoji ? "2px solid rgba(255,255,255,0.7)" : "none",
+            outlineOffset: 2, width: "100%", aspectRatio: "1/1", overflow: "hidden",
+          }}>
+            <img src={`/memojis/${id}.png`} alt="memoji" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          </button>
+        );
+        const EmojiBtn = ({ emoji, idx }) => {
+          const id = `e:${emoji}`;
+          return (
+            <button onClick={() => selectAvatar(id)} style={{
+              padding: 0, border: "none", cursor: "pointer", borderRadius: "50%",
+              outline: id === selectedMemoji ? "2px solid rgba(255,255,255,0.7)" : "none",
+              outlineOffset: 2, width: "100%", aspectRatio: "1/1", overflow: "hidden",
+              background: EMOJI_BG[idx % EMOJI_BG.length],
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "min(7vw, 32px)",
+            }}>
+              {emoji}
+            </button>
+          );
+        };
+        const previewSrc = selectedMemoji.startsWith("e:") ? null : `/memojis/${selectedMemoji}.png`;
+        const previewEmoji = selectedMemoji.startsWith("e:") ? selectedMemoji.slice(2) : null;
+        return (
+          <div className="pl-sheet-overlay" onClick={() => setMemojiPickerOpen(false)}>
+            <div className="pl-sheet" onClick={e => e.stopPropagation()} style={{ maxHeight: "80vh" }}>
+              <div className="pl-sheet-handle" />
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 0 16px" }}>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: previewEmoji ? "#FFD93D" : "#fff", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
+                  {previewEmoji ? previewEmoji : <img src={previewSrc} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+                </div>
+                <div>
+                  <p style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0, letterSpacing: -0.3 }}>Choose Avatar</p>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "2px 0 0" }}>Tap to select</p>
+                </div>
+              </div>
+              <div style={{ overflowY: "auto", maxHeight: "calc(80vh - 110px)", paddingBottom: 8 }}>
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 10px" }}>Memoji</p>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 24 }}>
+                  {Array.from({ length: 58 }, (_, i) => String(i + 1)).map(id => <MemojiBtn key={id} id={id} />)}
+                </div>
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", margin: "0 0 10px" }}>Emoji</p>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+                  {EMOJIS.map((em, i) => <EmojiBtn key={em} emoji={em} idx={i} />)}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {tagDetail && (
         <TagDetailPanel
@@ -1295,31 +1367,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <nav className="hp-nav">
-        <div className="hp-nav-pill">
-          {NAV_ITEMS.map((item, i) =>
-            item.center ? (
-              <div key="center" className="hp-nav-center-wrap">
-                <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
-                  {pathname === '/planner' ? (
-                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%" }}>
-                      <Grainient color1="#F97316" color2="#396cbf" color3="#B497CF" timeSpeed={0.25} warpStrength={1} warpFrequency={5} warpSpeed={2} warpAmplitude={50} rotationAmount={500} grainAmount={0.1} contrast={1.5} zoom={0.9} />
-                    </div>
-                  ) : (
-                    <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%", background: "linear-gradient(135deg, #F97316 0%, #396cbf 60%, #B497CF 100%)" }} />
-                  )}
-                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
-                </Link>
-              </div>
-            ) : (
-              <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
-                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
-                <span className="hp-nav-label">{item.label}</span>
-              </Link>
-            )
-          )}
-        </div>
-      </nav>
     </div>
   );
 }
