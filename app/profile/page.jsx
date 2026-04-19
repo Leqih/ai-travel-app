@@ -585,10 +585,28 @@ export default function ProfilePage() {
   const [profileBudget, setProfileBudget] = useState(null);
   const [displayTagId, setDisplayTagId] = useState(null);
   const [tagDetail, setTagDetail] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const avatarInputRef = useRef(null);
 
   useEffect(() => {
     try { setTrips(JSON.parse(localStorage.getItem("opal_trips") || "[]")); } catch (_) {}
+    try {
+      const saved = localStorage.getItem("opal_avatar");
+      if (saved) setAvatarUrl(saved);
+    } catch (_) {}
   }, []);
+
+  function handleAvatarChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target.result;
+      setAvatarUrl(dataUrl);
+      try { localStorage.setItem("opal_avatar", dataUrl); } catch (_) {}
+    };
+    reader.readAsDataURL(file);
+  }
 
   useEffect(() => {
     if (!shellRef.current) return;
@@ -631,9 +649,19 @@ export default function ProfilePage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
             <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#fff", flexShrink: 0, overflow: "hidden" }}>
-              <img src="/memojis/10.png" alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src={avatarUrl || "/memojis/10.png"} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
-            <button style={{ ...glass, width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleAvatarChange}
+            />
+            <button
+              onClick={() => avatarInputRef.current?.click()}
+              style={{ ...glass, width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}
+            >
               <FontAwesomeIcon icon={faPen} style={{ width: 11, height: 11, color: "rgba(255,255,255,0.4)" }} />
             </button>
           </div>

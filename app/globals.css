@@ -6693,7 +6693,7 @@ button {
   position: relative;
 }
 .hp-nav-active .hp-nav-icon { color: #fff; }
-.hp-nav-active .hp-nav-label { color: #ff8c42; font-weight: 700; }
+.hp-nav-active .hp-nav-label { color: #fff; font-weight: 700; }
 .hp-nav-active::before {
   content: '';
   position: absolute;
@@ -6703,8 +6703,8 @@ button {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #ff8c42;
-  box-shadow: 0 0 6px rgba(255,140,66,0.8);
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,0.5);
 }
 
 /* center add button */
