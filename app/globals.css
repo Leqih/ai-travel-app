@@ -6693,6 +6693,18 @@ button {
 }
 .hp-nav-active .hp-nav-icon { color: #fff; }
 .hp-nav-active .hp-nav-label { color: #fff; font-weight: 700; }
+.hp-nav-active::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
 
 /* center add button */
 .hp-nav-center-wrap {

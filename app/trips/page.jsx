@@ -129,27 +129,58 @@ export default function TripsPage() {
       {/* Trips list */}
       <div className="ct-trip-list" style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
         {trips.length === 0 && (
-          <div style={{ textAlign: "center", paddingTop: 64, paddingBottom: 40 }}>
-            {/* Icon — Opal surface card */}
-            <div style={{
-              width: 80, height: 80, borderRadius: 24,
-              background: "#1A1A1E",
-              border: "1px solid rgba(255,255,255,0.06)",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 34, margin: "0 auto 24px",
-            }}>✈️</div>
-            <p style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 8px", letterSpacing: -0.3 }}>No trips yet</p>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, margin: "0 0 32px", lineHeight: 1.5 }}>Start by planning your first adventure</p>
-            {/* Opal white primary CTA */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Ghost hero card */}
             <Link href="/planner" style={{
-              textDecoration: "none", display: "inline-block",
-              background: "#fff", color: "#09090F",
-              fontSize: 14, fontWeight: 700,
-              padding: "13px 32px", borderRadius: 14, letterSpacing: 0.1,
+              textDecoration: "none", position: "relative",
+              display: "flex", flexDirection: "column", justifyContent: "flex-end",
+              height: 240, borderRadius: 20, overflow: "hidden",
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
             }}>
-              Plan a trip ›
+              {/* City silhouette */}
+              <svg viewBox="0 0 375 120" preserveAspectRatio="xMidYMax meet"
+                style={{ position: "absolute", bottom: 60, left: 0, right: 0, width: "100%", opacity: 0.07 }}>
+                <path d="M0,120 L0,80 L20,80 L20,60 L30,60 L30,40 L40,40 L40,60 L55,60 L55,70 L65,70 L65,50 L75,50 L75,30 L85,30 L85,50 L95,50 L95,70 L105,70 L105,55 L115,55 L115,35 L125,35 L125,55 L135,55 L135,70 L145,70 L145,45 L155,45 L155,25 L165,25 L165,45 L175,45 L175,65 L190,65 L190,40 L200,40 L200,20 L210,20 L210,40 L220,40 L220,60 L230,60 L230,45 L240,45 L240,65 L255,65 L255,50 L265,50 L265,35 L275,35 L275,50 L285,50 L285,70 L295,70 L295,55 L310,55 L310,75 L325,75 L325,60 L340,60 L340,80 L355,80 L355,90 L375,90 L375,120 Z"
+                  fill="rgba(255,255,255,1)" />
+              </svg>
+              {/* Bottom fade */}
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%)" }} />
+              {/* Top tag */}
+              <div style={{
+                position: "absolute", top: 14, left: 14,
+                background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(8px)", color: "rgba(255,255,255,0.6)",
+                fontSize: 10, fontWeight: 700, padding: "4px 10px", borderRadius: 20,
+                letterSpacing: 0.8, textTransform: "uppercase",
+              }}>No trips yet</div>
+              {/* Card body */}
+              <div style={{ position: "relative", padding: "0 16px 18px", zIndex: 2 }}>
+                <p style={{ color: "#fff", fontSize: 22, fontWeight: 800, margin: "0 0 14px", letterSpacing: -0.5, lineHeight: 1.2 }}>Where to next?</p>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  background: "#fff", color: "#000",
+                  fontSize: 12, fontWeight: 700, padding: "9px 20px", borderRadius: 99,
+                  letterSpacing: 0.5, textTransform: "uppercase",
+                }}>
+                  Start planning
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+              </div>
             </Link>
+
+            {/* Two ghost placeholder cards */}
+            <div style={{ display: "flex", gap: 12 }}>
+              {[0, 1].map(i => (
+                <div key={i} style={{
+                  flex: 1, height: 140, borderRadius: 18,
+                  background: "rgba(255,255,255,0.02)",
+                  border: "1px dashed rgba(255,255,255,0.07)",
+                }} />
+              ))}
+            </div>
           </div>
         )}
 
