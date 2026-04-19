@@ -120,55 +120,78 @@ export default function TripsPage() {
       {/* Trips list */}
       <div className="ct-trip-list" style={{ padding: "12px 20px", display: "flex", flexDirection: "column", gap: 16 }}>
         {trips.length === 0 && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 48, paddingBottom: 48, gap: 0 }}>
-            {/* Glow orb */}
-            <div style={{
-              position: "relative", width: 120, height: 120, marginBottom: 32,
-            }}>
-              <div style={{
-                position: "absolute", inset: -20,
-                background: "radial-gradient(circle, rgba(255,140,66,0.18) 0%, transparent 70%)",
-                borderRadius: "50%",
-              }} />
-              <div style={{
-                width: 120, height: 120, borderRadius: 36,
-                background: "rgba(255,255,255,0.04)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.09)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                position: "relative",
-              }}>
-                {/* Plane SVG */}
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                  <path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2h0A1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
-                    fill="rgba(255,140,66,0.9)" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Text */}
-            <p style={{ color: "#fff", fontSize: 22, fontWeight: 800, margin: "0 0 8px", letterSpacing: -0.5, lineHeight: 1.2 }}>No trips yet</p>
-            <p style={{ color: "rgba(255,255,255,0.38)", fontSize: 13, margin: "0 0 36px", lineHeight: 1.6, textAlign: "center", maxWidth: 220 }}>
-              Plan your first adventure and it'll show up here
-            </p>
-
-            {/* CTA */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Ghost hero card — matches hp-trip-card anatomy */}
             <Link href="/planner" style={{
               textDecoration: "none",
-              display: "inline-flex", alignItems: "center", gap: 8,
-              background: "linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%)",
-              color: "#fff", fontSize: 13, fontWeight: 700,
-              padding: "14px 32px", borderRadius: 99,
-              letterSpacing: 0.8, textTransform: "uppercase",
-              boxShadow: "0 4px 20px rgba(255,95,31,0.35), 0 1px 0 rgba(255,255,255,0.12) inset",
+              position: "relative",
+              display: "flex", flexDirection: "column", justifyContent: "flex-end",
+              height: 240, borderRadius: 20, overflow: "hidden",
+              background: "linear-gradient(145deg, rgba(255,140,66,0.07) 0%, rgba(255,255,255,0.03) 60%, rgba(80,100,200,0.06) 100%)",
+              border: "1px solid rgba(255,255,255,0.07)",
             }}>
-              Start planning
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Horizon glow */}
+              <div style={{
+                position: "absolute", bottom: 0, left: 0, right: 0, height: "60%",
+                background: "linear-gradient(0deg, rgba(255,95,31,0.18) 0%, transparent 100%)",
+              }} />
+              {/* City silhouette SVG */}
+              <svg viewBox="0 0 375 120" preserveAspectRatio="xMidYMax meet"
+                style={{ position: "absolute", bottom: 60, left: 0, right: 0, width: "100%", opacity: 0.12 }}>
+                <path d="M0,120 L0,80 L20,80 L20,60 L30,60 L30,40 L40,40 L40,60 L55,60 L55,70 L65,70 L65,50 L75,50 L75,30 L85,30 L85,50 L95,50 L95,70 L105,70 L105,55 L115,55 L115,35 L125,35 L125,55 L135,55 L135,70 L145,70 L145,45 L155,45 L155,25 L165,25 L165,45 L175,45 L175,65 L190,65 L190,40 L200,40 L200,20 L210,20 L210,40 L220,40 L220,60 L230,60 L230,45 L240,45 L240,65 L255,65 L255,50 L265,50 L265,35 L275,35 L275,50 L285,50 L285,70 L295,70 L295,55 L310,55 L310,75 L325,75 L325,60 L340,60 L340,80 L355,80 L355,90 L375,90 L375,120 Z"
+                  fill="rgba(255,255,255,1)" />
               </svg>
+              {/* Bottom gradient */}
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(0deg, rgba(0,0,0,0.75) 0%, transparent 60%)",
+              }} />
+              {/* Top tag — matches hp-trip-tag */}
+              <div style={{
+                position: "absolute", top: 14, left: 14,
+                background: "rgba(255,140,66,0.15)",
+                border: "1px solid rgba(255,140,66,0.25)",
+                backdropFilter: "blur(8px)",
+                color: "#ff8c42", fontSize: 11, fontWeight: 700,
+                padding: "4px 10px", borderRadius: 20,
+                letterSpacing: 0.6, textTransform: "uppercase",
+              }}>First trip</div>
+              {/* Card body — matches hp-trip-info */}
+              <div style={{ position: "relative", padding: "0 16px 18px", zIndex: 2 }}>
+                <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase", margin: "0 0 5px" }}>No trips yet</p>
+                <p style={{ color: "#fff", fontSize: 19, fontWeight: 800, margin: "0 0 14px", letterSpacing: -0.4, lineHeight: 1.2 }}>Where to next?</p>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  background: "linear-gradient(135deg, #ff8c42 0%, #ff5f1f 100%)",
+                  color: "#fff", fontSize: 12, fontWeight: 700,
+                  padding: "9px 20px", borderRadius: 99,
+                  letterSpacing: 0.5, textTransform: "uppercase",
+                  boxShadow: "0 4px 16px rgba(255,95,31,0.4)",
+                }}>
+                  Start planning
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+              </div>
             </Link>
+
+            {/* Two ghost placeholder cards — matches hp-trip-card size */}
+            <div style={{ display: "flex", gap: 12 }}>
+              {[0, 1].map(i => (
+                <div key={i} style={{
+                  flex: 1, height: 140, borderRadius: 18,
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px dashed rgba(255,255,255,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5"/>
+                    <path d="M12 8v4m0 4h.01" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
