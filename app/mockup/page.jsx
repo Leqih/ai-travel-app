@@ -380,18 +380,13 @@ export default function MockupPage() {
         ))}
       </div>
 
-      {/* Phones */}
-      <div style={{ display:"flex", gap:64, alignItems:"flex-start", flexWrap:"wrap", justifyContent:"center" }}>
-        {/* iPhone 16 Pro — Figma Black Titanium */}
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:22 }}>
-          <IPhone16Pro route={route} />
-          <div style={{ textAlign:"center" }}>
-            <div style={{ color:"#fff", fontSize:15, fontWeight:700, letterSpacing:-0.3 }}>iPhone 16 Pro</div>
-            <div style={{ color:"rgba(255,255,255,0.32)", fontSize:11, marginTop:3, letterSpacing:0.2 }}>Black Titanium · USB-C · Camera Control</div>
-          </div>
+      {/* Phone */}
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:22 }}>
+        <IPhone16Pro route={route} />
+        <div style={{ textAlign:"center" }}>
+          <div style={{ color:"#fff", fontSize:15, fontWeight:700, letterSpacing:-0.3 }}>iPhone 16 Pro</div>
+          <div style={{ color:"rgba(255,255,255,0.32)", fontSize:11, marginTop:3, letterSpacing:0.2 }}>Black Titanium · USB-C · Camera Control</div>
         </div>
-        {/* iPhone 17 — CSS Desert Titanium */}
-        <IPhone17 route={route} />
       </div>
 
       {/* Footer */}
