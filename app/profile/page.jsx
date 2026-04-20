@@ -380,11 +380,11 @@ function CollectionMapView({ visitedCities, userPhotos = [], focusPhotoId = null
           const div = document.createElement("div");
           div.style.cssText = "position:absolute;cursor:pointer;transform:translate(-50%,-50%);z-index:10;";
           div.innerHTML = `
-            <div style="position:relative">
-              <div style="width:52px;height:52px;border-radius:12px;overflow:hidden;border:2.5px solid #ff8c42;box-shadow:0 4px 18px rgba(255,140,66,0.45),0 2px 8px rgba(0,0,0,0.6);position:relative;z-index:1;transition:transform 0.15s">
+            <div style="position:relative;filter:drop-shadow(0 6px 20px rgba(255,140,66,0.5))">
+              <div style="width:56px;height:56px;border-radius:14px;overflow:hidden;border:2.5px solid #ff8c42;box-shadow:0 0 0 3px rgba(255,140,66,0.2);position:relative;z-index:1;transition:transform 0.15s;background:#0a0a12">
                 <img src="${photo.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block">
               </div>
-              <div style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #ff8c42;"></div>
+              <div style="position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #ff8c42;filter:drop-shadow(0 2px 4px rgba(255,140,66,0.4))"></div>
             </div>
           `;
           div.addEventListener("click", () => { setSelectedPhoto(prev => prev?.id === photo.id ? null : photo); setSelectedCity(null); });
@@ -429,17 +429,23 @@ function CollectionMapView({ visitedCities, userPhotos = [], focusPhotoId = null
 
       {/* Selected user photo card */}
       {selectedPhoto && (
-        <div style={{ position: "absolute", bottom: 16, left: 16, right: 16, background: "rgba(10,10,18,0.96)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: 20, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.7)" }}>
-          <div style={{ width: 54, height: 54, borderRadius: 14, overflow: "hidden", flexShrink: 0, border: "1.5px solid rgba(255,140,66,0.5)" }}>
+        <div style={{ position: "absolute", bottom: 16, left: 16, right: 16, background: "rgba(8,8,16,0.97)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: 22, padding: "12px 14px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 8px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,140,66,0.2)", border: "1px solid rgba(255,140,66,0.18)" }}>
+          <div style={{ width: 56, height: 56, borderRadius: 14, overflow: "hidden", flexShrink: 0, border: "2px solid rgba(255,140,66,0.55)", boxShadow: "0 0 0 3px rgba(255,140,66,0.12)" }}>
             <img src={selectedPhoto.dataUrl} alt="photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: "#fff", fontSize: 15, fontWeight: 700, letterSpacing: -0.3 }}>📍 {selectedPhoto.label}</div>
-            <div style={{ color: "rgba(255,140,66,0.7)", fontSize: 11, marginTop: 3, fontWeight: 500 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 3 }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#ff8c42", boxShadow: "0 0 5px rgba(255,140,66,0.8)", flexShrink: 0 }} />
+              <span style={{ color: "rgba(255,140,66,0.8)", fontSize: 9, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>Your photo</span>
+            </div>
+            <div style={{ color: "#fff", fontSize: 14, fontWeight: 700, letterSpacing: -0.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{selectedPhoto.label}</div>
+            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, marginTop: 2, fontWeight: 500 }}>
               {new Date(selectedPhoto.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </div>
           </div>
-          <button onClick={() => { setSelectedPhoto(null); onFocusClear?.(); }} style={{ all: "unset", width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 14, color: "rgba(255,255,255,0.5)", flexShrink: 0 }}>✕</button>
+          <button onClick={() => { setSelectedPhoto(null); onFocusClear?.(); }} style={{ all: "unset", width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+            <FontAwesomeIcon icon={faXmark} style={{ width: 12, height: 12, color: "rgba(255,255,255,0.5)" }} />
+          </button>
         </div>
       )}
 
@@ -528,9 +534,7 @@ function TagDetailPanel({ tag, stats, isActive, onSetActive, onClose }) {
         )}
         <span style={{
           fontSize: 160, lineHeight: 1, display: "block", position: "relative",
-          filter: isUnlocked
-            ? `drop-shadow(0 0 40px rgba(${g},0.9)) drop-shadow(0 12px 48px rgba(${g},0.55))`
-            : "grayscale(1) brightness(0.28)",
+          filter: isUnlocked ? "none" : "grayscale(1) brightness(0.28)",
           transform: isUnlocked ? "translateY(-12px)" : "none",
         }}>{tag.emoji}</span>
       </div>
@@ -644,13 +648,11 @@ function TagLibrarySheet({ open, onClose, stats, displayTagId, onSelectTag }) {
                     {/* Gem with glow halo */}
                     <div style={{ position: "relative", width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
                       {isUnlocked && (
-                        <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: `radial-gradient(circle, rgba(${g},0.28) 0%, transparent 70%)`, filter: "blur(6px)", pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", inset: 4, borderRadius: "50%", background: `radial-gradient(circle, rgba(${g},0.35) 0%, transparent 75%)`, pointerEvents: "none" }} />
                       )}
                       <span style={{
                         fontSize: 44, lineHeight: 1, display: "block", position: "relative",
-                        filter: isUnlocked
-                          ? `drop-shadow(0 2px 10px rgba(${g},0.9))`
-                          : "grayscale(1) brightness(0.25)",
+                        filter: isUnlocked ? "none" : "grayscale(1) brightness(0.25)",
                         transform: isUnlocked ? "translateY(-2px)" : "none",
                         transition: "filter 0.2s",
                       }}>{tag.emoji}</span>
@@ -801,7 +803,7 @@ export default function ProfilePage() {
       <div ref={shellRef} className="hp-scroll" style={{ paddingBottom: 110 }}>
 
       {/* ══ Header — dot-grid bg matches homepage ══ */}
-      <div className="fp-a hp-header" style={{ paddingBottom: 24 }}>
+      <div className="fp-a hp-header" style={{ paddingBottom: 16 }}>
         {/* Topbar: avatar left, edit right */}
         <div className="hp-topbar">
           <div className="hp-topbar-left">
@@ -913,12 +915,16 @@ export default function ProfilePage() {
                       <button key={tag.id} onClick={() => setTagDetail(tag)}
                         style={{ all: "unset", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 5, width: 56, cursor: "pointer" }}>
                         <div style={{ position: "relative", width: 52, height: 52 }}>
+                          {/* Glow halo behind emoji — doesn't affect emoji rendering */}
+                          {isUnlocked && (
+                            <div style={{ position: "absolute", inset: 0, borderRadius: 16, background: `rgba(${g},0.18)`, boxShadow: `0 0 12px rgba(${g},0.45)`, pointerEvents: "none" }} />
+                          )}
                           <div style={{
                             width: 52, height: 52, borderRadius: 16,
-                            background: isUnlocked ? `rgba(${g},0.13)` : "rgba(255,255,255,0.04)",
+                            background: isUnlocked ? "transparent" : "rgba(255,255,255,0.04)",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: 26,
-                            filter: isUnlocked ? `drop-shadow(0 2px 8px rgba(${g},0.7))` : "grayscale(1) brightness(0.2)",
+                            fontSize: 26, position: "relative",
+                            filter: isUnlocked ? "none" : "grayscale(1) brightness(0.2)",
                             transition: "all 0.2s",
                           }}>{tag.emoji}</div>
                           {isActive && (
@@ -989,60 +995,82 @@ export default function ProfilePage() {
       </div>
 
 
-      {/* ══ Collection section ══ */}
+      {/* ══ Collection section ══ — always visible */}
       <input ref={addPhotoInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleAddPhotoChange} />
-      {(visitedCities.length > 0 || userPhotos.length > 0) && (
-        <>
-          <div className="fp-a hp-section-hd">
-            <div>
-              <p className="hp-section-cat">Photos</p>
-              <p className="hp-section-title">Collection</p>
-              <p className="hp-section-sub">Memories from your trips</p>
-            </div>
+      <>
+        <div className="fp-a hp-section-hd">
+          <div>
+            <p className="hp-section-cat">Photos</p>
+            <p className="hp-section-title">Collection</p>
+            <p className="hp-section-sub">Memories from your trips</p>
+          </div>
+          {(visitedCities.filter(c => CITY_IMAGES[c]).length + userPhotos.length) > 0 && (
             <button onClick={() => { setCollectionOpen(true); setCollectionMode("photos"); }} style={{ all: "unset", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}>
               {visitedCities.filter(c => CITY_IMAGES[c]).length + userPhotos.length} photos
             </button>
+          )}
+        </div>
+
+        {/* Empty state — no photos yet */}
+        {userPhotos.length === 0 && visitedCities.filter(c => CITY_IMAGES[c]).length === 0 ? (
+          <div className="fp-a" style={{ padding: "0 16px 8px" }}>
+            <button onClick={() => addPhotoInputRef.current?.click()} style={{ all: "unset", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, width: "100%", padding: "32px 0", background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.1)", borderRadius: 20, cursor: "pointer", boxSizing: "border-box" }}>
+              <div style={{ width: 52, height: 52, borderRadius: 16, background: "rgba(255,140,66,0.08)", border: "1px solid rgba(255,140,66,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <FontAwesomeIcon icon={faImages} style={{ width: 20, height: 20, color: "#ff8c42" }} />
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <p style={{ color: "#fff", fontSize: 15, fontWeight: 700, margin: "0 0 4px", letterSpacing: -0.2 }}>Upload your first photo</p>
+                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>GPS is read automatically · tap any photo to see it on the map</p>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,140,66,0.12)", border: "1px solid rgba(255,140,66,0.25)", borderRadius: 99, padding: "7px 18px" }}>
+                <FontAwesomeIcon icon={faUpload} style={{ width: 11, height: 11, color: "#ff8c42" }} />
+                <span style={{ color: "#ff8c42", fontSize: 12, fontWeight: 700 }}>Choose photo</span>
+              </div>
+            </button>
           </div>
+        ) : (
           <div className="fp-a" style={{ padding: "0 16px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-              {/* User-uploaded photos first */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8 }}>
+              {/* User-uploaded photos first — max 3 */}
               {userPhotos.slice(0, 3).map(photo => (
-                <button key={photo.id} className="fp-col-card" onClick={() => openPhotoOnMap(photo)} style={{ position: "relative", aspectRatio: "2/3", display: "block", cursor: "pointer", width: "100%", border: "none", padding: 0, background: "none" }}>
+                <button key={photo.id} className="fp-col-card" onClick={() => openPhotoOnMap(photo)} style={{ position: "relative", aspectRatio: "1/1", display: "block", cursor: "pointer", width: "100%", border: "none", padding: 0, background: "none" }}>
                   <img src={photo.dataUrl} alt="photo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%)" }} />
-                  <div style={{ position: "absolute", top: 6, right: 6, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)", borderRadius: "50%", width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: 9 }}>📍</span>
-                  </div>
-                  <div style={{ position: "absolute", bottom: 8, left: 8, right: 8 }}>
-                    <div style={{ color: "#fff", fontSize: 10, fontWeight: 600 }}>{photo.label}</div>
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.82) 100%)" }} />
+                  <div style={{ position: "absolute", top: 8, right: 8, width: 7, height: 7, borderRadius: "50%", background: "rgba(255,140,66,0.75)" }} />
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 10px 10px" }}>
+                    <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 9, fontWeight: 600, letterSpacing: 0.5, marginBottom: 2, textTransform: "uppercase" }}>Your photo</div>
+                    <div style={{ color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: -0.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{photo.label}</div>
                   </div>
                 </button>
               ))}
-              {/* Trip city photos */}
-              {visitedCities.filter(c => CITY_IMAGES[c]).slice(0, Math.max(0, 2 - userPhotos.length)).map(city => (
-                <button key={city} className="fp-col-card" onClick={() => { setCollectionOpen(true); setCollectionMode("photos"); }} style={{ position: "relative", aspectRatio: "2/3", display: "block", cursor: "pointer", width: "100%", border: "none", padding: 0, background: "none" }}>
+              {/* Trip city photos — fill remaining slots up to 3 total */}
+              {visitedCities.filter(c => CITY_IMAGES[c]).slice(0, Math.max(0, 3 - userPhotos.length)).map(city => (
+                <button key={city} className="fp-col-card" onClick={() => { setCollectionOpen(true); setCollectionMode("photos"); }} style={{ position: "relative", aspectRatio: "1/1", display: "block", cursor: "pointer", width: "100%", border: "none", padding: 0, background: "none" }}>
                   <img src={CITY_IMAGES[city]} alt={city} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%)" }} />
-                  <div style={{ position: "absolute", bottom: 10, left: 10, right: 10 }}>
-                    <div style={{ color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>{city}</div>
-                    <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, marginTop: 1 }}>{COUNTRY_MAP[city]}</div>
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.82) 100%)" }} />
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 10px 10px" }}>
+                    <div style={{ color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>{CITY_FLAGS[city]} {city}</div>
+                    <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, marginTop: 2 }}>{COUNTRY_MAP[city]}</div>
                   </div>
                 </button>
               ))}
-              {/* Add photo button */}
-              <button onClick={() => addPhotoInputRef.current?.click()} style={{ all: "unset", borderRadius: 20, aspectRatio: "2/3", background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer" }}>
-                <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,140,66,0.1)", border: "1px solid rgba(255,140,66,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <FontAwesomeIcon icon={faPlus} style={{ width: 12, height: 12, color: "#ff8c42" }} />
+              {/* Add photo tile */}
+              <button onClick={() => addPhotoInputRef.current?.click()} style={{ all: "unset", borderRadius: 20, aspectRatio: "1/1", background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", boxSizing: "border-box" }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <FontAwesomeIcon icon={faPlus} style={{ width: 13, height: 13, color: "rgba(255,255,255,0.5)" }} />
                 </div>
-                <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "1.5px" }}>Add</span>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600 }}>Add photo</div>
+                  <div style={{ color: "rgba(255,255,255,0.2)", fontSize: 9, marginTop: 2 }}>GPS auto-tagged</div>
+                </div>
               </button>
             </div>
           </div>
-        </>
-      )}
+        )}
+      </>
 
       {/* ── Account ── */}
-      <div className="fp-a" style={{ margin: "0 16px 24px" }}>
+      <div className="fp-a" style={{ margin: "36px 16px 24px" }}>
         <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 600, letterSpacing: "0.5px", textTransform: "uppercase", margin: "0 0 10px" }}>Account</p>
         <div style={{ ...glass, borderRadius: 20, overflow: "hidden" }}>
           {[
@@ -1277,8 +1305,8 @@ export default function ProfilePage() {
                 </h2>
                 <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>{visitedCities.filter(c => CITY_IMAGES[c]).length + userPhotos.length} photos · {userPhotos.length} pinned by you</p>
               </div>
-              <button className="fp-modal-btn-close" style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                <FontAwesomeIcon icon={faPlus} style={{ width: 13, height: 13, color: "rgba(255,255,255,0.5)" }} />
+              <button className="fp-modal-btn-close" onClick={() => setCollectionOpen(false)} style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                <FontAwesomeIcon icon={faXmark} style={{ width: 14, height: 14, color: "rgba(255,255,255,0.5)" }} />
               </button>
             </div>
 
@@ -1315,14 +1343,19 @@ export default function ProfilePage() {
                   {userPhotos.map(photo => (
                     <button key={photo.id} onClick={() => { setCollectionMode("map"); setFocusPhotoId(photo.id); }} style={{ all: "unset", borderRadius: 18, overflow: "hidden", position: "relative", aspectRatio: "1/1", cursor: "pointer", display: "block" }}>
                       <img src={photo.dataUrl} alt="photo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.8) 100%)" }} />
-                      <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", borderRadius: 20, padding: "3px 8px", display: "flex", alignItems: "center", gap: 4 }}>
-                        <span style={{ fontSize: 9 }}>📍</span>
-                        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, fontWeight: 600 }}>Your photo</span>
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 35%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.82) 100%)" }} />
+                      {/* Your photo badge */}
+                      <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", borderRadius: 20, padding: "3px 8px", display: "flex", alignItems: "center", gap: 4 }}>
+                        <div style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(255,140,66,0.8)", flexShrink: 0 }} />
+                        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, fontWeight: 600, letterSpacing: 0.2 }}>Your photo</span>
                       </div>
-                      <div style={{ position: "absolute", bottom: 8, left: 10, right: 10 }}>
-                        <div style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>{photo.label}</div>
-                        <div style={{ color: "rgba(255,140,66,0.7)", fontSize: 9, marginTop: 2, fontWeight: 600 }}>Tap to see on map →</div>
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 10px 10px" }}>
+                        <div style={{ color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: -0.2, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{photo.label}</div>
+                        {/* Map CTA pill — neutral glass */}
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.12)", borderRadius: 99, padding: "4px 10px" }}>
+                          <FontAwesomeIcon icon={faMap} style={{ width: 9, height: 9, color: "rgba(255,255,255,0.6)" }} />
+                          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, fontWeight: 600, letterSpacing: 0.2 }}>See on map</span>
+                        </div>
                       </div>
                     </button>
                   ))}
@@ -1330,29 +1363,32 @@ export default function ProfilePage() {
                   {visitedCities.filter(c => CITY_IMAGES[c]).map(city => (
                     <div key={city} style={{ borderRadius: 18, overflow: "hidden", position: "relative", aspectRatio: "1/1" }}>
                       <img src={CITY_IMAGES[city]} alt={city} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.8) 100%)" }} />
-                      <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", borderRadius: 20, padding: "3px 8px", display: "flex", alignItems: "center", gap: 4 }}>
-                        <span style={{ fontSize: 9 }}>📍</span>
-                        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, fontWeight: 600 }}>{city}</span>
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 35%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.85) 100%)" }} />
+                      <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", borderRadius: 20, padding: "3px 9px", display: "flex", alignItems: "center", gap: 5 }}>
+                        <span style={{ fontSize: 10 }}>{CITY_FLAGS[city]}</span>
+                        <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 9, fontWeight: 600, letterSpacing: 0.2 }}>{city}</span>
                       </div>
-                      <div style={{ position: "absolute", bottom: 8, left: 10, right: 10 }}>
-                        <div style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>{CITY_FLAGS[city]} {city}</div>
-                        <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, marginTop: 1 }}>{COUNTRY_MAP[city]}</div>
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 10px 10px" }}>
+                        <div style={{ color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: -0.3 }}>{city}</div>
+                        <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, marginTop: 2 }}>{COUNTRY_MAP[city]}</div>
                       </div>
                     </div>
                   ))}
                   {/* Add photo tile */}
-                  <button className="fp-add-tile" onClick={() => addPhotoInputRef.current?.click()} style={{ display: "flex", width: "100%", aspectRatio: "1/1", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", boxSizing: "border-box" }}>
-                    <div style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FontAwesomeIcon icon={faUpload} style={{ width: 15, height: 15, color: "rgba(255,255,255,0.3)" }} />
+                  <button onClick={() => addPhotoInputRef.current?.click()} style={{ all: "unset", display: "flex", width: "100%", aspectRatio: "1/1", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", boxSizing: "border-box", borderRadius: 18, background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.1)" }}>
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FontAwesomeIcon icon={faPlus} style={{ width: 15, height: 15, color: "rgba(255,255,255,0.45)" }} />
                     </div>
-                    <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontWeight: 500, letterSpacing: 0.2 }}>Add photo</span>
+                    <div style={{ textAlign: "center", padding: "0 8px" }}>
+                      <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, fontWeight: 600, marginBottom: 3 }}>Add photo</div>
+                      <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, lineHeight: 1.4 }}>GPS auto-tagged</div>
+                    </div>
                   </button>
                 </div>
                 {/* Location hint */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", background: "rgba(255,255,255,0.04)", borderRadius: 14 }}>
-                  <span style={{ fontSize: 14 }}>📍</span>
-                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, lineHeight: 1.4 }}>Photos with GPS data are pinned automatically. Tap any photo to see it on the map.</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", background: "rgba(255,255,255,0.04)", borderRadius: 14 }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>📍</span>
+                  <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, lineHeight: 1.5 }}>GPS from your photos is read automatically. Tap a photo to view it on the map.</span>
                 </div>
               </div>
             )}
@@ -1366,6 +1402,26 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      <nav className="hp-nav">
+        <div className="hp-nav-pill">
+          {NAV_ITEMS.map((item, i) =>
+            item.center ? (
+              <div key="center" className="hp-nav-center-wrap">
+                <Link href="/planner" className="hp-nav-center-btn" style={{ overflow: "hidden", position: "relative" }}>
+                  <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "50%", background: "linear-gradient(135deg, #F97316 0%, #396cbf 60%, #B497CF 100%)" }} />
+                  <FontAwesomeIcon icon={faPlus} style={{ width: 18, height: 18, color: "white", position: "relative", zIndex: 1 }} />
+                </Link>
+              </div>
+            ) : (
+              <Link key={i} href={item.href} className={`hp-nav-item${pathname === item.href ? " hp-nav-active" : ""}`}>
+                <FontAwesomeIcon icon={item.icon} className="hp-nav-icon" style={{ width: 20, height: 20 }} />
+                <span className="hp-nav-label">{item.label}</span>
+              </Link>
+            )
+          )}
+        </div>
+      </nav>
 
     </div>
   );

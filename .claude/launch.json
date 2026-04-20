@@ -2,11 +2,25 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "nextjs-app",
+      "name": "Opal Travel App",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
-      "autoPort": true
+      "cwd": "/Users/leqihuang/Documents/Playground"
+    },
+    {
+      "name": "Portfolio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3001,
+      "cwd": "/Users/leqihuang/Documents/Playground/portfolio"
+    },
+    {
+      "name": "Vibma MCP",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:mcp"],
+      "port": 3055,
+      "cwd": "/Users/leqihuang/Documents/Playground/Vibma"
     }
   ]
 }
