@@ -6017,33 +6017,34 @@ button {
 }
 
 .hp-greeting {
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 700;
   color: #fff;
   line-height: 1.1;
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.8px;
 }
 .hp-greeting strong { font-weight: 700; }
 
 .hp-avatar {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #fff;
   flex-shrink: 0;
   overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.15);
 }
 
 /* ── Countdown hero card ── */
 .hp-cd-card {
   margin: 0 16px;
-  height: 210px;
-  border-radius: 20px;
+  height: 230px;
+  border-radius: 22px;
   overflow: hidden;
   position: relative;
   border: none;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.65);
 }
 
 .hp-cd-img {
@@ -6060,7 +6061,7 @@ button {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.72) 100%);
+    linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.82) 100%);
 }
 
 .hp-cd-top {
@@ -6193,8 +6194,8 @@ button {
   align-items: flex-start;
   justify-content: space-between;
   padding: 0 16px;
-  margin-top: 36px;
-  margin-bottom: 14px;
+  margin-top: 28px;
+  margin-bottom: 12px;
 }
 /* Opal-style ALL CAPS category label above section title */
 .hp-section-cat {
@@ -6221,8 +6222,8 @@ button {
 }
 .hp-section-link {
   font-size: 14px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.3);
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
   border: none !important;
   background: none !important;
   padding: 0 !important;
@@ -6508,7 +6509,7 @@ button {
 .hp-disc-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 92px 92px;
+  grid-template-rows: 110px 110px;
   gap: 8px;
   margin: 0 16px;
 }
@@ -6693,18 +6694,6 @@ button {
 }
 .hp-nav-active .hp-nav-icon { color: #fff; }
 .hp-nav-active .hp-nav-label { color: #fff; font-weight: 700; }
-.hp-nav-active::before {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 6px rgba(255,255,255,0.5);
-}
 
 /* center add button */
 .hp-nav-center-wrap {
@@ -7090,8 +7079,8 @@ button {
 
 /* ── Featured article card ── */
 .hp-featured-card {
-  margin: 0 16px; height: 192px; border-radius: 20px; overflow: hidden;
-  position: relative; display: flex;
+  margin: 0 16px; height: 220px; border-radius: 22px; overflow: hidden;
+  position: relative; display: flex; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 .hp-featured-img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
@@ -7101,8 +7090,8 @@ button {
   background: linear-gradient(113.64deg, rgba(0,0,0,0.88) 7.74%, rgba(0,0,0,0.55) 45.77%, rgba(0,0,0,0.1) 66.91%, rgba(0,0,0,0) 92.27%);
 }
 .hp-featured-content {
-  position: absolute; top: 0; left: 0; bottom: 0; right: 130px;
-  padding: 18px 14px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; z-index: 2;
+  position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+  padding: 18px 16px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; z-index: 2;
 }
 .hp-featured-tag {
   font-size: 11px; font-weight: 600; color: #fff;
@@ -7110,7 +7099,7 @@ button {
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px; padding: 3px 9px; align-self: flex-start;
 }
-.hp-featured-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.35; }
+.hp-featured-title { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.3; letter-spacing: -0.2px; }
 .hp-featured-thumbs {
   position: absolute; top: 0; right: 0; bottom: 0; width: 120px;
   display: flex; flex-direction: column; align-items: stretch; justify-content: space-between;
@@ -7123,7 +7112,7 @@ button {
 /* ── 精选专题 topic cards ── */
 .hp-topics-scroll { display: flex; gap: 10px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; }
 .hp-topics-scroll::-webkit-scrollbar { display: none; }
-.hp-topic-card { position: relative; flex-shrink: 0; width: 138px; height: 165px; border-radius: 16px; overflow: hidden; display: block; }
+.hp-topic-card { position: relative; flex-shrink: 0; width: 148px; height: 175px; border-radius: 18px; overflow: hidden; display: block; }
 .hp-topic-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hp-topic-grad { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.06) 50%, transparent 100%); }
 .hp-topic-tag { position: absolute; top: 10px; left: 10px; background: rgba(20,20,20,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 14px; z-index: 2; }
