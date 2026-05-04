@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 
 const S = {
   bg:      "#09090f",
@@ -22,7 +22,7 @@ const CITY_FLAGS = {
 
 const DAY_COLORS = ["#ff8c42","#ff6b8a","#7c6fff","#3ecf8e","#f5c842","#4ecdc4"];
 
-export default function TripSharePage() {
+function TripShareInner() {
   const params = useSearchParams();
   const router = useRouter();
   const raw = params.get("d");
@@ -62,7 +62,6 @@ export default function TripSharePage() {
 
       {/* Header gradient */}
       <div style={{ position: "relative", padding: "56px 24px 32px", background: "linear-gradient(160deg, rgba(255,140,66,0.18) 0%, rgba(255,80,180,0.08) 60%, transparent 100%)" }}>
-        {/* Read-only badge */}
         <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "4px 12px", fontSize: 11, color: S.textDim, fontWeight: 600, letterSpacing: 0.5 }}>
           VIEW ONLY
         </div>
@@ -104,7 +103,6 @@ export default function TripSharePage() {
           const color = DAY_COLORS[(day - 1) % DAY_COLORS.length];
           return (
             <div key={day} style={{ marginBottom: 20 }}>
-              {/* Day header */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <div style={{ width: 32, height: 32, borderRadius: "50%", background: color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
                   {day}
@@ -122,7 +120,6 @@ export default function TripSharePage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {spots.map((spot, idx) => (
                     <div key={idx} style={{ background: S.card, border: `1px solid ${S.border}`, borderRadius: 14, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-                      {/* Timeline dot */}
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, flexShrink: 0 }}>
                         <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, opacity: 0.7 }} />
                         {idx < spots.length - 1 && <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.1)" }} />}
@@ -140,7 +137,7 @@ export default function TripSharePage() {
         })}
       </div>
 
-      {/* Bottom CTA — sticky */}
+      {/* Bottom CTA */}
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 24px 32px", background: "linear-gradient(to top, #09090f 60%, transparent)" }}>
         <button
           onClick={() => router.push("/home")}
@@ -150,5 +147,17 @@ export default function TripSharePage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function TripSharePage() {
+  return (
+    <Suspense fallback={
+      <div style={{ position: "fixed", inset: 0, background: "#09090f", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 14 }}>Loading…</div>
+      </div>
+    }>
+      <TripShareInner />
+    </Suspense>
   );
 }
