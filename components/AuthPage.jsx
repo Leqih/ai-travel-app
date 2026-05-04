@@ -2,9 +2,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const HERO_IMG    = "https://www.figma.com/api/mcp/asset/af8e9136-514f-4c3a-840b-e4500c5d4b5f";
-const GOOGLE_ICON = "https://www.figma.com/api/mcp/asset/21500be3-e026-4c55-baa1-6d2c5345492c";
-const FB_ICON     = "https://www.figma.com/api/mcp/asset/3e77327e-2295-4565-ab7f-98591bcf8034";
+const HERO_IMG    = "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=400&fit=crop&q=80";
+const GOOGLE_ICON = "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg";
+const FB_ICON     = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/240px-Facebook_Logo_%282019%29.png";
 
 export const S = {
   bg:          "#09090f",
