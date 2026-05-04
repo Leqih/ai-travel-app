@@ -300,7 +300,7 @@ export function HomeClient() {
 
             {/* Countdown view */}
             <div className={`hp-cd-count-view${planOpen || pickerOpen ? " hp-cd-hidden" : ""}`}>
-              {cdConfig.startDate ? (
+              {cdConfig.startDate && savedTrips.length > 0 ? (
                 <>
                   {/* Active countdown — show trip name + date + timer */}
                   <div className="hp-cd-top">
