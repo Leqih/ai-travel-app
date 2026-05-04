@@ -433,7 +433,7 @@ function TagDetailPanel({ tag, stats, isActive, onSetActive, onClose }) {
   const panelRef = useRef(null);
   const isUnlocked = tag.check(stats);
   const pct = tag.progress(stats);
-  const g = tag.glowRaw;
+  const g = isUnlocked ? "255,140,66" : tag.glowRaw;
 
   useEffect(() => {
     if (panelRef.current) {
@@ -587,7 +587,7 @@ function TagLibrarySheet({ open, onClose, stats, displayTagId, onSelectTag }) {
                 const isUnlocked = tag.check(stats);
                 const isActive = displayTagId === tag.id;
                 const pct = tag.progress(stats);
-                const g = tag.glowRaw;
+                const litColor = "255,140,66";
                 return (
                   <button key={tag.id} onClick={() => setDetail(tag)}
                     style={{ all: "unset", cursor: "pointer", padding: "22px 6px 16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 0, borderRadius: 18, background: isActive ? "rgba(255,255,255,0.055)" : "transparent", transition: "background 0.15s", position: "relative" }}>
@@ -600,12 +600,12 @@ function TagLibrarySheet({ open, onClose, stats, displayTagId, onSelectTag }) {
                     {/* Gem with glow halo */}
                     <div style={{ position: "relative", width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
                       {isUnlocked && (
-                        <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: `radial-gradient(circle, rgba(${g},0.28) 0%, transparent 70%)`, filter: "blur(6px)", pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: `radial-gradient(circle, rgba(${litColor},0.28) 0%, transparent 70%)`, filter: "blur(6px)", pointerEvents: "none" }} />
                       )}
                       <div style={{
                         width: 40, height: 40, position: "relative",
                         filter: isUnlocked
-                          ? `drop-shadow(0 2px 10px rgba(${g},0.9))`
+                          ? `drop-shadow(0 2px 10px rgba(${litColor},0.9))`
                           : "grayscale(1) brightness(0.25)",
                         transform: isUnlocked ? "translateY(-2px)" : "none",
                         transition: "filter 0.2s",
@@ -815,17 +815,17 @@ export default function ProfilePage() {
                   {ALL_TAGS.map(tag => {
                     const isUnlocked = tag.check(stats);
                     const isActive = activeId === tag.id;
-                    const g = tag.glowRaw;
+                    const litColor = "255,140,66";
                     return (
                       <button key={tag.id} onClick={() => setTagDetail(tag)}
                         style={{ all: "unset", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 5, width: 56, cursor: "pointer" }}>
                         <div style={{ position: "relative", width: 52, height: 52 }}>
                           <div style={{
                             width: 52, height: 52, borderRadius: 16,
-                            background: isUnlocked ? `rgba(${g},0.13)` : "rgba(255,255,255,0.04)",
+                            background: isUnlocked ? `rgba(${litColor},0.13)` : "rgba(255,255,255,0.04)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             padding: 10,
-                            filter: isUnlocked ? `drop-shadow(0 2px 8px rgba(${g},0.7))` : "grayscale(1) brightness(0.2)",
+                            filter: isUnlocked ? `drop-shadow(0 2px 8px rgba(${litColor},0.7))` : "grayscale(1) brightness(0.2)",
                             transition: "all 0.2s",
                           }}>{ACHIEVEMENT_ICONS[tag.id]}</div>
                           {isActive && (
