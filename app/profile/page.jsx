@@ -784,9 +784,6 @@ export default function ProfilePage() {
                 : <img src={`/memojis/${selectedMemoji}.png`} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               }
             </button>
-            <button style={{ ...glass, width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
-              <FontAwesomeIcon icon={faPen} style={{ width: 11, height: 11, color: "rgba(255,255,255,0.4)" }} />
-            </button>
           </div>
         </div>
 
