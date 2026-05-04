@@ -117,14 +117,19 @@ function pad(n) { return String(n).padStart(2, "0"); }
 export function HomeClient() {
   const pathname = usePathname();
   const router = useRouter();
-  const hour = new Date().getHours();
+
+  // ── Mounted guard — prevents SSR/client mismatch for date-dependent UI ──
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const hour = mounted ? new Date().getHours() : 0;
 
   // Prefetch all nav routes on mount so taps are instant
   useEffect(() => {
     ["/nearby", "/trips", "/profile", "/planner"].forEach(r => router.prefetch(r));
   }, [router]);
   const greeting = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
-  const today = new Date();
+  const today = mounted ? new Date() : new Date(0);
   const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
   // ── Splash screen — only on very first ever load (localStorage) ──
@@ -151,8 +156,8 @@ export function HomeClient() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerTripId, setPickerTripId] = useState(null);
   const [pickerDate, setPickerDate] = useState("");
-  const [calYear, setCalYear] = useState(new Date().getFullYear());
-  const [calMonth, setCalMonth] = useState(new Date().getMonth());
+  const [calYear, setCalYear] = useState(2025);
+  const [calMonth, setCalMonth] = useState(0);
 
   // Load from localStorage on mount; auto-select nearest upcoming trip if no countdown set
   useEffect(() => {
