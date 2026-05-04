@@ -753,7 +753,9 @@ export default function ProfilePage() {
               <span className="hp-hey">My Profile</span>
             </div>
             <div className="hp-greeting">Traveler</div>
-            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>Exploring the world ✈️</div>
+            <div style={{ display: "inline-flex", alignItems: "center", marginTop: 4, background: "#ff8c42", borderRadius: 12, padding: "2px 10px", boxShadow: "0 2px 8px rgba(255,140,66,0.35)" }}>
+              <span style={{ color: "#111", fontSize: 12, fontWeight: 700, lineHeight: 1.4 }}>Exploring the world ✈️</span>
+            </div>
             {(() => {
               const stats = { trips: trips.length, cities: visitedCities.length, countries: visitedCountries.length, days: totalDays };
               const activeTag = displayTagId ? ALL_TAGS.find(t => t.id === displayTagId) : null;
