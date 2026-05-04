@@ -3,8 +3,25 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
+
+// Fixed star positions — avoids SSR/client Math.random() hydration mismatch
+const STARS = [
+  { l: 8,  t: 14, w: 1.2, h: 1.2, o: 0.55, d: 1.2 },
+  { l: 23, t: 72, w: 1.8, h: 1.8, o: 0.30, d: 0.4 },
+  { l: 41, t: 5,  w: 1.0, h: 1.0, o: 0.45, d: 2.7 },
+  { l: 57, t: 88, w: 2.2, h: 2.2, o: 0.60, d: 0.9 },
+  { l: 68, t: 33, w: 1.5, h: 1.5, o: 0.25, d: 3.1 },
+  { l: 79, t: 61, w: 1.1, h: 1.1, o: 0.50, d: 1.8 },
+  { l: 15, t: 48, w: 2.0, h: 2.0, o: 0.35, d: 0.6 },
+  { l: 34, t: 91, w: 1.3, h: 1.3, o: 0.65, d: 2.3 },
+  { l: 50, t: 22, w: 1.7, h: 1.7, o: 0.40, d: 3.8 },
+  { l: 63, t: 77, w: 1.0, h: 1.0, o: 0.28, d: 1.5 },
+  { l: 88, t: 10, w: 2.4, h: 2.4, o: 0.55, d: 0.2 },
+  { l: 93, t: 54, w: 1.6, h: 1.6, o: 0.42, d: 2.9 },
+];
 
 const NAV_ITEMS = [
   { icon: faHouse,      label: "Home",      href: "/home"   },
@@ -20,17 +37,17 @@ export function CreateTripPage() {
     <div className="ct-shell">
       {/* Star field */}
       <div className="ct-stars" aria-hidden="true">
-        {Array.from({ length: 12 }).map((_, i) => (
+        {STARS.map((s, i) => (
           <span
             key={i}
             className="pl-star"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${1 + Math.random() * 1.5}px`,
-              height: `${1 + Math.random() * 1.5}px`,
-              opacity: 0.2 + Math.random() * 0.5,
-              animationDelay: `${Math.random() * 4}s`,
+              left: `${s.l}%`,
+              top: `${s.t}%`,
+              width: `${s.w}px`,
+              height: `${s.h}px`,
+              opacity: s.o,
+              animationDelay: `${s.d}s`,
             }}
           />
         ))}

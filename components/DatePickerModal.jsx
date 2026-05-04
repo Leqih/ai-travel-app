@@ -1,14 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const CITY_FLAGS = { Tokyo:"🇯🇵", Seoul:"🇰🇷", Bangkok:"🇹🇭", Bali:"🇮🇩", Paris:"🇫🇷", "New York":"🇺🇸", London:"🇬🇧", Rome:"🇮🇹", Istanbul:"🇹🇷", Dubai:"🇦🇪", Sydney:"🇦🇺", Barcelona:"🇪🇸", Kyoto:"🇯🇵", Singapore:"🇸🇬", Lisbon:"🇵🇹" };
 
 export default function DatePickerModal({ trip, initialDate = "", onSave, onClose }) {
-  const now = new Date();
   const [pickerDate, setPickerDate] = useState(initialDate || "");
-  const [calYear, setCalYear] = useState(now.getFullYear());
-  const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [calYear, setCalYear] = useState(2025);
+  const [calMonth, setCalMonth] = useState(0);
+
+  // Initialise to current month/year on client only (avoids SSR mismatch)
+  useEffect(() => {
+    const now = new Date();
+    setCalYear(now.getFullYear());
+    setCalMonth(now.getMonth());
+  }, []);
 
   function prevMonth() {
     if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
