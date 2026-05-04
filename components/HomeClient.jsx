@@ -136,13 +136,15 @@ export function HomeClient() {
   const [splashVisible, setSplashVisible] = useState(false);
   const [splashGone, setSplashGone] = useState(true);
   useEffect(() => {
-    try { if (localStorage.getItem("navora_splash_seen")) return; } catch (_) { return; }
+    // Safety fallback: always dismiss splash after 3s regardless of state
+    const safety = setTimeout(() => { setSplashVisible(false); setSplashGone(true); }, 3000);
+    try { if (localStorage.getItem("navora_splash_seen")) { clearTimeout(safety); return; } } catch (_) { clearTimeout(safety); return; }
     try { localStorage.setItem("navora_splash_seen", "1"); } catch (_) {}
     setSplashGone(false);
     setSplashVisible(true);
     const t1 = setTimeout(() => setSplashVisible(false), 900);
-    const t2 = setTimeout(() => setSplashGone(true), 1400);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    const t2 = setTimeout(() => { setSplashGone(true); clearTimeout(safety); }, 1400);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(safety); };
   }, []);
 
   const [tripSwitcherOpen, setTripSwitcherOpen] = useState(false);
@@ -269,7 +271,8 @@ export function HomeClient() {
   return (
     <>
     {!splashGone && (
-      <div className={`splash-screen${!splashVisible ? " splash-exit" : ""}`}>
+      <div className={`splash-screen${!splashVisible ? " splash-exit" : ""}`}
+        onClick={() => { setSplashVisible(false); setTimeout(() => setSplashGone(true), 550); }}>
         <div className="splash-icon-wrap">
           <div className="splash-icon-inner">
             <img src="/navora-logo.svg" alt="Navora" style={{ width: 120, height: 120, objectFit: "contain" }} />
