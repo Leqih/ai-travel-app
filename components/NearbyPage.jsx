@@ -1342,9 +1342,7 @@ export function NearbyPage() {
       </div>
 
       <div className="nd-bottom">
-        <div className="nd-card-mode-wrap">
-          <div className="nd-card-mode-btn">Card Mode</div>
-        </div>
+
         <div className="nd-filter-scroll">
           <button className={`nd-filter-sort${cardMode ? " nd-filter-sort-active" : ""}`} onClick={() => setCardMode((v) => !v)}>
             <span className="nd-sort-icon">≡</span>
