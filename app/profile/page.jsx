@@ -520,8 +520,8 @@ function TagDetailPanel({ tag, stats, isActive, onSetActive, onClose }) {
               </div>
             )}
             <button onClick={() => { onSetActive(tag.id); handleClose(); }}
-              style={{ all: "unset", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", boxSizing: "border-box", padding: "15px 0", borderRadius: 20, cursor: "pointer", background: isActive ? "rgba(255,255,255,0.09)" : "#fff", transition: "background 0.18s" }}>
-              <span style={{ color: isActive ? "rgba(255,255,255,0.4)" : "#0a0a12", fontSize: 15, fontWeight: 700 }}>
+              style={{ all: "unset", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", boxSizing: "border-box", padding: "15px 0", borderRadius: 20, cursor: "pointer", background: isActive ? "rgba(255,255,255,0.09)" : "#ff8c42", boxShadow: isActive ? "none" : "0 6px 20px rgba(255,140,66,0.4)", transition: "all 0.18s" }}>
+              <span style={{ color: isActive ? "rgba(255,255,255,0.4)" : "#fff", fontSize: 15, fontWeight: 700 }}>
                 {isActive ? "✓  Currently Active" : "Set as Active Tag"}
               </span>
             </button>
