@@ -651,12 +651,12 @@ function TagLibrarySheet({ open, onClose, stats, displayTagId, onSelectTag }) {
 export default function ProfilePage() {
   const pathname = usePathname();
   const shellRef = useRef(null);
-  const [trips, setTrips] = useState(() => {
-    if (typeof window === "undefined") return [];
-    try { return JSON.parse(localStorage.getItem("opal_trips") || "[]"); } catch (_) { return []; }
-  });
+  // Always start empty on SSR; load from localStorage in useEffect to avoid hydration mismatch
+  const [trips, setTrips] = useState([]);
 
   useEffect(() => {
+    // Initial load from localStorage (safe — runs only on client after hydration)
+    try { setTrips(JSON.parse(localStorage.getItem("opal_trips") || "[]")); } catch (_) {}
     const sync = () => {
       try { setTrips(JSON.parse(localStorage.getItem("opal_trips") || "[]")); } catch (_) {}
     };
@@ -669,7 +669,18 @@ export default function ProfilePage() {
   }, []);
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    // Load persisted profile settings after hydration
+    try {
+      const saved = localStorage.getItem("opal_memoji");
+      if (saved) setSelectedMemoji(saved);
+    } catch (_) {}
+    try {
+      const bud = localStorage.getItem("opal_daily_budget");
+      if (bud) setProfileBudget(bud);
+    } catch (_) {}
+  }, []);
 
   const [selectedMemoji, setSelectedMemoji] = useState("10");
   const [memojiPickerOpen, setMemojiPickerOpen] = useState(false);
@@ -716,10 +727,7 @@ export default function ProfilePage() {
     e.target.value = "";
   }
   const [budgetSheetOpen, setBudgetSheetOpen] = useState(false);
-  const [profileBudget, setProfileBudget] = useState(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("opal_daily_budget") || null;
-  });
+  const [profileBudget, setProfileBudget] = useState(null);
   const [displayTagId, setDisplayTagId] = useState(null);
   const [tagDetail, setTagDetail] = useState(null);
   const [tagLibOpen, setTagLibOpen] = useState(false);
