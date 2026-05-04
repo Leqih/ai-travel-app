@@ -3,6 +3,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 const Grainient = dynamic(() => import("@/components/Grainient"), { ssr: false });
 import { useState, useEffect, useRef, useMemo, Suspense } from "react";
+import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -156,12 +157,18 @@ function EmptyMap({ destination, spots, selectedIdx = 0, onPinClick, totalMode =
   const overlaysRef = useRef([]);
   const panRafRef   = useRef(null); // cancel in-flight pan animation
 
-  // Init map once
+  // Always keep a ref with the latest destination so the async map init reads the correct value
+  const destinationRef = useRef(destination);
+  destinationRef.current = destination;
+
+  // Init map once — reads destinationRef at resolution time so it gets the correct city
+  // even when destination is populated asynchronously from localStorage
   useEffect(() => {
     if (!mapRef.current) return;
-    const coords = (destination && CITY_COORDS[destination]) || { lat: 20, lng: 0, zoom: 2 };
     loadGoogleMaps().then((maps) => {
       if (mapInstRef.current) return;
+      const dest = destinationRef.current;
+      const coords = (dest && CITY_COORDS[dest]) || { lat: 35.6762, lng: 139.6503, zoom: 12 };
       mapInstRef.current = new maps.Map(mapRef.current, {
         center: { lat: coords.lat, lng: coords.lng },
         zoom: coords.zoom,
@@ -172,7 +179,7 @@ function EmptyMap({ destination, spots, selectedIdx = 0, onPinClick, totalMode =
     }).catch(() => {});
   }, []);
 
-  // Re-center when destination changes
+  // Re-center when destination changes (handles navigation between trips)
   useEffect(() => {
     if (!destination || !mapInstRef.current) return;
     const coords = CITY_COORDS[destination];
@@ -339,6 +346,27 @@ const SPOT_GRADIENTS = [
 ];
 const SPOT_EMOJIS = ["📍","🗺️","🏛️","🍜","🌿","🎨","🏔️","🛍️","📸","🎵"];
 
+/* Time conversion between display format and <input type="time"> value */
+function toTimeInput(t) {
+  if (!t) return "09:00";
+  if (/^\d{2}:\d{2}$/.test(t)) return t;
+  const m = t.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (!m) return "09:00";
+  let h = parseInt(m[1]);
+  if (m[3].toUpperCase() === "PM" && h !== 12) h += 12;
+  if (m[3].toUpperCase() === "AM" && h === 12) h = 0;
+  return `${String(h).padStart(2, "0")}:${m[2]}`;
+}
+function fromTimeInput(v) {
+  if (!v) return "";
+  const [hStr, mStr] = v.split(":");
+  let h = parseInt(hStr);
+  const ap = h >= 12 ? "PM" : "AM";
+  if (h > 12) h -= 12;
+  if (h === 0) h = 12;
+  return `${h}:${mStr} ${ap}`;
+}
+
 /* Hash spot name to a stable palette index so gradient/emoji travel with the spot */
 const spotPaletteIdx = (name = "") => {
   let h = 0;
@@ -357,15 +385,16 @@ const BUDGET_CATS = [
 
 /* Mock weather — destination-agnostic placeholders */
 const WEATHER_MOCK = [
-  { date: "Today",    icon: "🌤️", desc: "Partly Cloudy · 24°C" },
-  { date: "Tomorrow", icon: "☀️",  desc: "Sunny · 26°C"         },
-  { date: "Fri",      icon: "🌧️", desc: "Rainy · 20°C"         },
-  { date: "Sat",      icon: "⛅",  desc: "Cloudy · 22°C"        },
-  { date: "Sun",      icon: "☀️",  desc: "Clear · 25°C"         },
+  { date: "Today",    icon: "🌤️", cond: "Partly Cloudy", tempC: 24 },
+  { date: "Tomorrow", icon: "☀️",  cond: "Sunny",         tempC: 26 },
+  { date: "Fri",      icon: "🌧️", cond: "Rainy",         tempC: 20 },
+  { date: "Sat",      icon: "⛅",  cond: "Cloudy",        tempC: 22 },
+  { date: "Sun",      icon: "☀️",  cond: "Clear",         tempC: 25 },
 ];
+function toF(c) { return Math.round(c * 9 / 5 + 32); }
 
 const NAV_ITEMS = [
-  { icon: faHouse,      label: "Home",      href: "/"        },
+  { icon: faHouse,      label: "Home",      href: "/home"   },
   { icon: faCompass,    label: "Discover",  href: "/nearby"  },
   { center: true },
   { icon: faPlane,      label: "My Trips",  href: "/trips"   },
@@ -377,19 +406,30 @@ function ManualPlanInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const paramCity     = searchParams.get("city")     || "";
-  const paramDuration = searchParams.get("duration") || "";
-  const paramPrefs    = searchParams.get("prefs")    || "";
-  const paramBudget   = searchParams.get("budget")   || ""; // e.g. "Mid-Range · $500/day"
-  const paramId       = searchParams.get("id")       || "";
-  const paramAI       = searchParams.get("ai")       === "true";
+  const paramCity      = searchParams.get("city")      || "";
+  const paramDuration  = searchParams.get("duration")  || "";
+  const paramPrefs     = searchParams.get("prefs")     || "";
+  const paramBudget    = searchParams.get("budget")    || "";
+  const paramId        = searchParams.get("id")        || "";
+  const paramAI        = searchParams.get("ai")        === "true";
+  const paramStartDate = searchParams.get("startDate") || "";
+  const paramEndDate   = searchParams.get("endDate")   || "";
+  const paramDay       = parseInt(searchParams.get("day") || "0") || 0;
 
   // Derive clean destination label (strip country, e.g. "Tokyo, Japan" → "Tokyo")
   const initDest  = paramCity ? paramCity.split(",")[0].trim() : "";
   const initDur   = paramDuration || "";
   const initPrefs = paramPrefs ? paramPrefs.split(",").map(p => p.trim()).filter(Boolean) : [];
 
-  const [destination]           = useState(initDest);
+  const [destination, setDestination] = useState(initDest);
+  const [tripStartDate, setTripStartDate] = useState(paramStartDate || "");
+  const [tripEndDate,   setTripEndDate]   = useState(paramEndDate   || "");
+
+  const dateRangeLabel = (() => {
+    if (!tripStartDate || !tripEndDate) return null;
+    const fmt = d => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" });
+    return `${fmt(tripStartDate)} – ${fmt(tripEndDate)}`;
+  })();
   const [duration, setDuration] = useState(initDur);
   const [prefs]                 = useState(initPrefs);
   const [durationPickerOpen, setDurationPickerOpen] = useState(false);
@@ -397,7 +437,10 @@ function ManualPlanInner() {
   const [loadDone,    setLoadDone]    = useState(!paramId); // false for existing trips (load from localStorage), true for new trips
 
   const numDays = parseInt(duration) || 3;
-  const [tripDay, setTripDay]         = useState(0);
+  const [tripTitle,     setTripTitle]     = useState("");          // custom title; empty = auto-generated
+  const [titleEditing,  setTitleEditing]  = useState(false);
+  const [titleDraft,    setTitleDraft]    = useState("");
+  const [tripDay, setTripDay]         = useState(paramDay);
   const [tripTab, setTripTab]         = useState("overview");
   const [mapMode, setMapMode]         = useState(false);
   useEffect(() => {
@@ -414,6 +457,10 @@ function ManualPlanInner() {
     return init;
   });
 
+  // ── AI generation ──
+  const [aiLoading, setAiLoading] = useState(paramAI && !paramId);
+  const [aiError,   setAiError]   = useState(null);
+
   // ── Add-spot search sheet ──
   const [addSheetDay,   setAddSheetDay]   = useState(null);
   const [spotSearch,    setSpotSearch]    = useState("");
@@ -424,13 +471,60 @@ function ManualPlanInner() {
 
   // ── Budget tracker ──
   const [budget,        setBudget]        = useState(paramBudget || "");
-  const [expenses,      setExpenses]      = useState([]); // [{cat, amount, note}]
+  const [expenses,      setExpenses]      = useState([]); // [{cat, amount, note, paidBy, splitWith}]
   const [addExpOpen,    setAddExpOpen]    = useState(false);
   const [expCat,        setExpCat]        = useState("Food");
   const [expAmount,     setExpAmount]     = useState("");
   const [expNote,       setExpNote]       = useState("");
   const [setBudgetOpen, setSetBudgetOpen] = useState(false);
   const [budgetInput,   setBudgetInput]   = useState("");
+  const [splitExpIdx,   setSplitExpIdx]   = useState(null); // index of expense being split
+  const [splitCount,    setSplitCount]    = useState(2);    // number of people
+  const [weatherUnit,   setWeatherUnit]   = useState("C");  // "C" or "F"
+
+  // ── Collections ──
+  const [collections,      setCollections]      = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`navora_coll_${tripId}`) || "[]"); } catch(_) { return []; }
+  });
+  const [collAddOpen,      setCollAddOpen]      = useState(false);
+  const [collViewId,       setCollViewId]       = useState(null);
+  const [collViewPhoto,    setCollViewPhoto]    = useState(null); // full-screen photo preview
+  const [newCollName,      setNewCollName]      = useState("");
+  const [newCollEmoji,     setNewCollEmoji]     = useState("📍");
+  const collFileRef = useRef(null);
+  const COLL_EMOJIS = ["📍","🍜","🏛️","🌿","🛍️","🎵","🌅","🏖️","🍣","🎨","🏔️","🌃"];
+
+  function saveCollections(next) {
+    setCollections(next);
+    try { localStorage.setItem(`navora_coll_${tripId}`, JSON.stringify(next)); } catch(_) {}
+  }
+  function createCollection() {
+    if (!newCollName.trim()) return;
+    saveCollections([...collections, { id: Date.now(), name: newCollName.trim(), emoji: newCollEmoji, photos: [] }]);
+    setNewCollName(""); setNewCollEmoji("📍"); setCollAddOpen(false);
+  }
+  function deleteCollection(id) {
+    saveCollections(collections.filter(c => c.id !== id));
+    if (collViewId === id) setCollViewId(null);
+  }
+  function handleCollPhoto(e) {
+    const file = e.target.files?.[0];
+    if (!file || collViewId === null) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target.result;
+      saveCollections(collections.map(c =>
+        c.id === collViewId ? { ...c, photos: [dataUrl, ...(c.photos || [])] } : c
+      ));
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+  function deleteCollPhoto(collId, photoIdx) {
+    saveCollections(collections.map(c =>
+      c.id === collId ? { ...c, photos: c.photos.filter((_, i) => i !== photoIdx) } : c
+    ));
+  }
 
   // ── Map card carousel (pin↔card sync) ──
   const [selectedActIdx, setSelectedActIdx] = useState(0);
@@ -440,6 +534,9 @@ function ManualPlanInner() {
   const swipeRef       = useRef({ startX: 0, currentX: 0, dragging: false });
   const springRef      = useRef(null);
   const autoSaveReady  = useRef(false); // prevent auto-save from overwriting localStorage before load effect runs
+
+  // ── Inline time editing ──
+  const [editingTime, setEditingTime] = useState(null); // { day, idx }
 
   // ── Drag-handle reorder ──
   const [dragInfo, setDragInfo] = useState(null); // { day, fromIdx, currentIdx } — drives visual state
@@ -552,10 +649,61 @@ function ManualPlanInner() {
           if (saved.activities) setActivities(saved.activities);
           if (saved.budget) setBudget(saved.budget);
           if (saved.expenses?.length) setExpenses(saved.expenses);
+          if (saved.destination && !initDest) setDestination(saved.destination);
+          if (saved.startDate) setTripStartDate(saved.startDate);
+          if (saved.endDate)   setTripEndDate(saved.endDate);
+          if (saved.tripTitle) setTripTitle(saved.tripTitle);
         }
       } catch (_) {}
     }
-    setLoadDone(true); // batched with above setters — auto-save won't fire until this re-render
+    setLoadDone(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── AI plan generation ──
+  useEffect(() => {
+    if (!paramAI || paramId || !destination) return;
+    async function generate() {
+      setAiLoading(true);
+      setAiError(null);
+      try {
+        const res = await fetch("/api/plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            city: destination,
+            duration: numDays,
+            budget: paramBudget,
+            prefs: initPrefs,
+          }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        setActivities(prev => {
+          const next = {};
+          for (let i = 1; i <= numDays; i++) {
+            const dayItems = data.itinerary[String(i)] || [];
+            next[i] = dayItems.map((item, idx) => ({
+              id: `ai_${i}_${idx}`,
+              name: item.name,
+              address: item.address || "",
+              category: item.category || "attraction",
+              time: item.time || "",
+              note: item.note || "",
+              lat: item.lat ?? null,
+              lng: item.lng ?? null,
+            }));
+          }
+          return next;
+        });
+      } catch (err) {
+        setAiError(err.message);
+      } finally {
+        setAiLoading(false);
+      }
+    }
+    generate();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -588,6 +736,9 @@ function ManualPlanInner() {
         budget,
         activities,
         expenses,
+        tripTitle: tripTitle || undefined,
+        startDate: tripStartDate || undefined,
+        endDate:   tripEndDate   || undefined,
         updatedAt: now,
         createdAt: idx >= 0 ? trips[idx].createdAt : now,
       };
@@ -595,7 +746,59 @@ function ManualPlanInner() {
       else trips.unshift(trip);
       localStorage.setItem("opal_trips", JSON.stringify(trips));
     } catch (_) {}
-  }, [activities, expenses, budget, tripId, destination, duration, prefs, loadDone]);
+  }, [activities, expenses, budget, tripId, destination, duration, prefs, tripStartDate, tripEndDate, loadDone, tripTitle]);
+
+  // ── Share ──
+  const [shareCopied, setShareCopied] = useState(false);
+  const [shareUrl,    setShareUrl]    = useState("");
+  const [shareOpen,   setShareOpen]   = useState(false);
+
+  function handleShare() {
+    // Compact activities: only keep name + time per spot (drop photos, notes, etc.)
+    const compactActivities = {};
+    Object.entries(activities || {}).forEach(([day, spots]) => {
+      compactActivities[day] = (spots || []).map(s => ({ name: s.name, time: s.time }));
+    });
+    const payload = {
+      title:       tripTitle || makeTripTitle(destination, prefs),
+      destination,
+      duration,
+      startDate:   tripStartDate,
+      endDate:     tripEndDate,
+      budget,
+      activities:  compactActivities,
+      isAI:        !!paramAI,
+    };
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    const url = `${window.location.origin}/trip/share?d=${encoded}`;
+    setShareUrl(url);
+
+    // Try clipboard first, fallback to share sheet modal
+    const doCopy = () => {
+      try {
+        // execCommand fallback (works even without focus/HTTPS)
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        return ok;
+      } catch (_) { return false; }
+    };
+
+    if (navigator.clipboard && document.hasFocus()) {
+      navigator.clipboard.writeText(url)
+        .then(() => { setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); })
+        .catch(() => { if (!doCopy()) setShareOpen(true); else { setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); } });
+    } else if (doCopy()) {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2500);
+    } else {
+      setShareOpen(true);
+    }
+  }
 
   // ── Collaborators / invite ──
   const [inviteOpen,    setInviteOpen]    = useState(false);
@@ -605,13 +808,14 @@ function ManualPlanInner() {
   ]);
 
   const totalSpent  = expenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
-  const totalBudget = parseFloat(budget) || 0;
+  const totalBudget = parseFloat((budget || "").replace(/[$,]/g, "")) || 0;
   const budgetPct   = totalBudget > 0 ? Math.min(100, (totalSpent / totalBudget) * 100) : 0;
   const budgetOver  = totalBudget > 0 && totalSpent > totalBudget;
 
   const addExpense = () => {
     if (!expAmount) return;
-    setExpenses(prev => [...prev, { cat: expCat, amount: expAmount, note: expNote }]);
+    const paidBy = (() => { try { return localStorage.getItem("navora_display_name") || "Me"; } catch(_) { return "Me"; } })();
+    setExpenses(prev => [...prev, { cat: expCat, amount: expAmount, note: expNote, paidBy }]);
     setExpAmount(""); setExpNote(""); setAddExpOpen(false);
   };
   const autoSvcRef   = useRef(null);
@@ -842,12 +1046,21 @@ function ManualPlanInner() {
     }));
   };
 
+  const updateTime = (day, idx, timeStr) => {
+    setActivities(prev => {
+      const arr = [...(prev[day] || [])];
+      arr[idx] = { ...arr[idx], time: timeStr };
+      return { ...prev, [day]: arr };
+    });
+  };
+
   const moveSpot = (day, fromIdx, toIdx) => {
     setActivities(prev => {
       const arr = [...(prev[day] || [])];
+      const times = arr.map(a => a.time);
       const [item] = arr.splice(fromIdx, 1);
       arr.splice(toIdx, 0, item);
-      return { ...prev, [day]: arr };
+      return { ...prev, [day]: arr.map((a, i) => ({ ...a, time: times[i] })) };
     });
   };
 
@@ -865,6 +1078,75 @@ function ManualPlanInner() {
   // ── Plan / Itinerary Editor — identical structure to NearbyPage trip panel ──
   return (
     <div className="nd-shell">
+
+      {/* AI generation loading overlay */}
+      {aiLoading && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 9999,
+          background: "#09090f",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          fontFamily: `-apple-system, "SF Pro Display", "Helvetica Neue", sans-serif`,
+        }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: 22,
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            marginBottom: 20,
+          }}>
+            <span style={{ fontSize: 36 }}>✦</span>
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: -0.3, marginBottom: 6 }}>
+            Building your plan
+          </div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 40, letterSpacing: 0.2 }}>
+            AI is crafting your {destination} itinerary…
+          </div>
+          <div style={{ display: "flex", gap: 7 }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                width: 8, height: 8, borderRadius: "50%",
+                background: "#ff8c42",
+                animation: `ai-bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+              }} />
+            ))}
+          </div>
+          <style>{`
+            @keyframes ai-bounce {
+              0%, 80%, 100% { opacity: 0.2; transform: scale(0.75); }
+              40% { opacity: 1; transform: scale(1); }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {/* Share copied toast */}
+      {shareCopied && (
+        <div style={{
+          position: "fixed", bottom: 90, left: "50%", transform: "translateX(-50%)", zIndex: 9999,
+          background: "rgba(20,20,30,0.92)", backdropFilter: "blur(16px)",
+          border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24,
+          padding: "10px 20px", color: "#fff", fontSize: 14, fontWeight: 600,
+          display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        }}>
+          <span style={{ color: "#ff8c42", fontSize: 16 }}>✓</span> Link copied — share with friends!
+        </div>
+      )}
+
+      {/* AI error toast */}
+      {aiError && (
+        <div style={{
+          position: "fixed", top: 60, left: 16, right: 16, zIndex: 9998,
+          background: "rgba(255,80,60,0.15)", backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,80,60,0.3)", borderRadius: 12,
+          padding: "12px 16px", color: "#fff", fontSize: 13,
+        }}>
+          ⚠ AI plan failed: {aiError}. Add spots manually.
+        </div>
+      )}
+
       {/* Full-screen dark map — centered on destination, pins for added spots */}
       <EmptyMap
         destination={destination}
@@ -879,13 +1161,15 @@ function ManualPlanInner() {
         {/* Back button — returns to planner/AI plan page */}
         <button className="nd-mapview-back"
           onClick={() => router.back()}
-          onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); router.back(); }}>
+          onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); router.back(); }}
+          style={{ zIndex: 1200 }}>
           <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14, color: "white" }} />
         </button>
 
         {/* Share button (top right) */}
-        <button className="nd-mapview-share-btn"
-          onClick={() => navigator.share?.({ title: `${destination || "My Trip"} · ${duration}`, text: "Check out my trip plan!" })}>
+        <button className="nd-mapview-share-btn" onClick={handleShare}
+          onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); handleShare(); }}
+          style={{ zIndex: 1200 }}>
           <FontAwesomeIcon icon={faShareNodes} style={{ width: 16, height: 16, color: "white" }} />
         </button>
 
@@ -1125,37 +1409,38 @@ function ManualPlanInner() {
             <div className="mp-trip-header-left">
               <span className="mp-trip-flag">{CITY_FLAGS[destination] || "✈️"}</span>
               <div className="mp-trip-header-text">
-                <h2 className="mp-trip-title">
-                  {makeTripTitle(destination, prefs)}
-                  {paramAI && (
-                    <span style={{ marginLeft: 8, display: "inline-flex", alignItems: "center", gap: 3, background: "linear-gradient(90deg,rgba(255,140,66,0.15),rgba(255,80,180,0.15))", border: "1px solid rgba(255,140,66,0.25)", borderRadius: 8, padding: "2px 7px", fontSize: 10, fontWeight: 700, color: "#ff9a52", letterSpacing: 0.5, verticalAlign: "middle" }}>
-                      ✦ AI
-                    </span>
-                  )}
-                </h2>
+                {titleEditing ? (
+                  <input
+                    autoFocus
+                    value={titleDraft}
+                    onChange={e => setTitleDraft(e.target.value)}
+                    onBlur={() => { setTripTitle(titleDraft.trim() || ""); setTitleEditing(false); }}
+                    onKeyDown={e => { if (e.key === "Enter" || e.key === "Escape") { setTripTitle(titleDraft.trim() || ""); setTitleEditing(false); } }}
+                    className="mp-trip-title-input"
+                    style={{ fontSize: 20, fontWeight: 700, background: "transparent", border: "none", borderBottom: "1.5px solid rgba(255,140,66,0.5)", color: "#fff", outline: "none", width: "100%", letterSpacing: -0.3, padding: "0 0 2px" }}
+                    placeholder="Trip name…"
+                  />
+                ) : (
+                  <h2
+                    className="mp-trip-title"
+                    onClick={() => { const cur = tripTitle || makeTripTitle(destination, prefs); setTitleDraft(cur); setTitleEditing(true); }}
+                    style={{ cursor: "text" }}
+                    title="Tap to rename"
+                  >
+                    {tripTitle || makeTripTitle(destination, prefs)}
+                    {paramAI && (
+                      <span style={{ marginLeft: 8, display: "inline-flex", alignItems: "center", gap: 3, background: "linear-gradient(90deg,rgba(255,140,66,0.15),rgba(255,80,180,0.15))", border: "1px solid rgba(255,140,66,0.25)", borderRadius: 8, padding: "2px 7px", fontSize: 10, fontWeight: 700, color: "#ff9a52", letterSpacing: 0.5, verticalAlign: "middle" }}>
+                        ✦ AI
+                      </span>
+                    )}
+                  </h2>
+                )}
                 <div className="mp-trip-meta">
                   {duration && (
-                    <div style={{ position: "relative" }} onClick={e => e.stopPropagation()}>
-                      <span
-                        className="mp-trip-badge"
-                        onClick={() => setDurationPickerOpen(o => !o)}
-                        style={{ cursor: "pointer", userSelect: "none" }}>
-                        {duration}
-                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" style={{ marginLeft: 4, opacity: 0.6 }}>
-                          <path d="M1.5 3L4 5.5L6.5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
+                    <div style={{ position: "relative" }}>
+                      <span className="mp-trip-badge">
+                        {dateRangeLabel || duration}
                       </span>
-                      {durationPickerOpen && (
-                        <div className="mp-sheet-day-picker" style={{ minWidth: 130 }} onClick={e => e.stopPropagation()}>
-                          {DURATIONS.map(d => (
-                            <button key={d}
-                              className={`mp-sheet-day-option${d === duration ? " mp-sheet-day-option--active" : ""}`}
-                              onClick={() => changeDuration(d)}>
-                              {d}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   )}
                   {paramCity && paramCity.includes(",") && (
@@ -1227,12 +1512,42 @@ function ManualPlanInner() {
                         </div>
                         <div className="nd-trip-overview-list">
                           {(activities[dayNum] || []).map((act, idx) => (
-                            <div key={idx} className="nd-trip-overview-row">
-                              <div className="nd-trip-overview-info">
-                                <span className="nd-trip-overview-name">{act.name}</span>
-                                <span className="nd-trip-overview-time">{act.time}</span>
+                            <div key={act._id || (act.name + (act.lat || idx))}>
+                              {dragInfo?.day === dayNum && dragInfo?.currentIdx === idx && dragInfo?.fromIdx !== idx && (
+                                <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.5)", margin: "0 0 4px", transition: "opacity 0.15s" }} />
+                              )}
+                              <div
+                                className="nd-trip-overview-row"
+                                style={dragInfo?.day === dayNum && dragInfo?.fromIdx === idx ? { opacity: 0.15, transform: 'scale(0.97)', transition: 'opacity 0.15s, transform 0.15s' } : {}}
+                              >
+                                <div
+                                  className="mp-drag-handle"
+                                  onTouchStart={e => { e.preventDefault(); e.stopPropagation(); startDrag(dayNum, idx, e.nativeEvent.touches[0].clientY, e.currentTarget.parentElement); }}
+                                  onMouseDown={e => { e.preventDefault(); e.stopPropagation(); startDrag(dayNum, idx, e.nativeEvent.clientY, e.currentTarget.parentElement); }}
+                                >
+                                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <rect x="3" y="4" width="12" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
+                                    <rect x="3" y="8" width="12" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
+                                    <rect x="3" y="12" width="12" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
+                                  </svg>
+                                </div>
+                                <div className="nd-trip-overview-info">
+                                  <span className="nd-trip-overview-name">{act.name}</span>
+                                  {editingTime?.day === dayNum && editingTime?.idx === idx ? (
+                                    <input
+                                      type="time"
+                                      autoFocus
+                                      defaultValue={toTimeInput(act.time)}
+                                      onBlur={e => { updateTime(dayNum, idx, fromTimeInput(e.target.value)); setEditingTime(null); }}
+                                      onClick={e => e.stopPropagation()}
+                                      style={{ background: "none", border: "none", color: "#ff8c42", fontSize: 12, fontFamily: "inherit", outline: "none", padding: 0, width: 90, cursor: "pointer" }}
+                                    />
+                                  ) : (
+                                    <span className="nd-trip-overview-time" onClick={e => { e.stopPropagation(); setEditingTime({ day: dayNum, idx }); }} style={{ cursor: "pointer" }}>{act.time}</span>
+                                  )}
+                                </div>
+                                <button className="mp-spot-remove" onClick={e => { e.stopPropagation(); removeSpot(dayNum, idx); }}>×</button>
                               </div>
-                              <button className="mp-spot-remove" onClick={e => { e.stopPropagation(); removeSpot(dayNum, idx); }}>×</button>
                             </div>
                           ))}
                           {/* Add spot — styled as a dashed overview-row */}
@@ -1283,7 +1598,18 @@ function ManualPlanInner() {
                             </div>
                             <div className="nd-trip-overview-info" style={{ flex: 1 }}>
                               <span className="nd-trip-overview-name">{idx + 1} · {act.name}</span>
-                              <span className="nd-trip-overview-time">{act.time}</span>
+                              {editingTime?.day === tripDay && editingTime?.idx === idx ? (
+                                <input
+                                  type="time"
+                                  autoFocus
+                                  defaultValue={toTimeInput(act.time)}
+                                  onBlur={e => { updateTime(tripDay, idx, fromTimeInput(e.target.value)); setEditingTime(null); }}
+                                  onClick={e => e.stopPropagation()}
+                                  style={{ background: "none", border: "none", color: "#ff8c42", fontSize: 12, fontFamily: "inherit", outline: "none", padding: 0, width: 90, cursor: "pointer" }}
+                                />
+                              ) : (
+                                <span className="nd-trip-overview-time" onClick={e => { e.stopPropagation(); setEditingTime({ day: tripDay, idx }); }} style={{ cursor: "pointer" }}>{act.time}</span>
+                              )}
                             </div>
                             <button className="mp-spot-remove" onClick={e => { e.stopPropagation(); removeSpot(tripDay, idx); }}>×</button>
                           </div>
@@ -1319,9 +1645,31 @@ function ManualPlanInner() {
                     <span className="nd-trip-section-icon">📸</span>
                     <span className="nd-trip-section-title">Collections</span>
                   </div>
-                  <p className="nd-trip-coll-count">My Collections · 0</p>
+                  <p className="nd-trip-coll-count">My Collections · {collections.length}</p>
                   <div className="nd-trip-coll-grid">
-                    <div className="nd-trip-coll-add">+</div>
+                    {collections.map(c => {
+                      const cover = c.photos?.[0];
+                      return (
+                        <div key={c.id} className="nd-trip-coll-thumb"
+                          onClick={() => setCollViewId(c.id)}
+                          style={{ cursor: "pointer", position: "relative", overflow: "hidden", background: cover ? "transparent" : "rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                          {cover ? (
+                            <>
+                              <img src={cover} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)" }} />
+                              <span style={{ position: "relative", fontSize: 18 }}>{c.emoji}</span>
+                              <span style={{ position: "relative", fontSize: 9, fontWeight: 600, color: "#fff", textAlign: "center", maxWidth: 70, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", padding: "0 4px" }}>{c.name}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span style={{ fontSize: 28 }}>{c.emoji}</span>
+                              <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.7)", textAlign: "center", maxWidth: 70, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", padding: "0 4px" }}>{c.name}</span>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+                    <div className="nd-trip-coll-add" onClick={() => setCollAddOpen(true)} style={{ cursor: "pointer" }}>+</div>
                   </div>
                 </div>
                 {/* ── Budget / Spending Tracker ── */}
@@ -1347,7 +1695,7 @@ function ManualPlanInner() {
                       {budget ? (
                         <>
                           <span className="mp-budget-label">Budget</span>
-                          <span className="mp-budget-amount">${parseFloat(budget).toLocaleString()}</span>
+                          <span className="mp-budget-amount">{budget.startsWith("$") ? budget : `$${parseFloat((budget || "").replace(/[$,]/g, "")).toLocaleString()}`}</span>
                           <span className="mp-budget-edit-hint">Edit</span>
                         </>
                       ) : (
@@ -1398,17 +1746,34 @@ function ManualPlanInner() {
                   {/* Expense list */}
                   {expenses.length > 0 && (
                     <div className="mp-expense-list">
-                      {expenses.map((e, i) => (
-                        <div key={i} className="mp-expense-row">
-                          <span className="mp-expense-icon">{BUDGET_CATS.find(c => c.label === e.cat)?.icon || "💊"}</span>
-                          <div className="mp-expense-info">
-                            <span className="mp-expense-cat">{e.cat}</span>
-                            {e.note && <span className="mp-expense-note">{e.note}</span>}
+                      {expenses.map((e, i) => {
+                        const perPerson = e.splitWith > 1
+                          ? (parseFloat(e.amount) / e.splitWith).toFixed(2)
+                          : null;
+                        return (
+                          <div key={i} className="mp-expense-row">
+                            <span className="mp-expense-icon">{BUDGET_CATS.find(c => c.label === e.cat)?.icon || "💊"}</span>
+                            <div className="mp-expense-info">
+                              <span className="mp-expense-cat">{e.cat}</span>
+                              {e.note && <span className="mp-expense-note">{e.note}</span>}
+                              <span className="mp-expense-paidby">
+                                {e.splitWith > 1
+                                  ? `÷ ${e.splitWith} people · $${perPerson} each`
+                                  : `Paid by ${e.paidBy || "Me"}`
+                                }
+                                <button className="mp-expense-split-inline"
+                                  onClick={() => { setSplitExpIdx(i); setSplitCount(e.splitWith > 1 ? e.splitWith : 2); }}>
+                                  {e.splitWith > 1 ? "Edit split" : "Split"}
+                                </button>
+                              </span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                              <span className="mp-expense-amount">${parseFloat(e.amount).toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                              <button className="mp-expense-del" onClick={() => setExpenses(prev => prev.filter((_, j) => j !== i))}>×</button>
+                            </div>
                           </div>
-                          <span className="mp-expense-amount">${parseFloat(e.amount).toLocaleString(undefined, {maximumFractionDigits:0})}</span>
-                          <button className="mp-expense-del" onClick={() => setExpenses(prev => prev.filter((_, j) => j !== i))}>×</button>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
 
@@ -1420,25 +1785,50 @@ function ManualPlanInner() {
                 <div className="nd-trip-section-head" style={{ marginTop: 8 }}>
                   <span className="nd-trip-section-icon">☁️</span>
                   <span className="nd-trip-section-title">Weather · Next {WEATHER_MOCK.length} Days</span>
+                  <div className="nd-weather-unit-toggle" style={{ marginLeft: "auto", display: "flex", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(255,255,255,0.12)", fontSize: 12, fontWeight: 700 }}>
+                    <button onClick={() => setWeatherUnit("C")} style={{ padding: "3px 10px", background: weatherUnit === "C" ? "rgba(255,255,255,0.15)" : "transparent", color: "#fff", opacity: weatherUnit === "C" ? 1 : 0.4, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 12 }}>°C</button>
+                    <button onClick={() => setWeatherUnit("F")} style={{ padding: "3px 10px", background: weatherUnit === "F" ? "rgba(255,255,255,0.15)" : "transparent", color: "#fff", opacity: weatherUnit === "F" ? 1 : 0.4, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 12 }}>°F</button>
+                  </div>
                 </div>
                 <div className="nd-trip-weather">
                   <p className="nd-trip-weather-city">{destination || "Destination"}</p>
                   <div className="nd-trip-weather-inner">
-                    {WEATHER_MOCK.map((w, idx) => (
-                      <div key={idx} className="nd-trip-weather-row">
-                        <span className={`nd-trip-weather-date${idx === 0 ? " nd-trip-weather-date-today" : ""}`}>{w.date}</span>
-                        <div className="nd-trip-weather-right">
-                          <span className="nd-trip-weather-icon">{w.icon}</span>
-                          <span className={`nd-trip-weather-desc${idx === 0 ? " nd-trip-weather-desc-today" : ""}`}>{w.desc}</span>
+                    {WEATHER_MOCK.map((w, idx) => {
+                      const temp = weatherUnit === "C" ? `${w.tempC}°C` : `${toF(w.tempC)}°F`;
+                      return (
+                        <div key={idx} className="nd-trip-weather-row">
+                          <span className={`nd-trip-weather-date${idx === 0 ? " nd-trip-weather-date-today" : ""}`}>{w.date}</span>
+                          <div className="nd-trip-weather-right">
+                            <span className="nd-trip-weather-icon">{w.icon}</span>
+                            <span className={`nd-trip-weather-desc${idx === 0 ? " nd-trip-weather-desc-today" : ""}`}>{w.cond} · {temp}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </>
             )}
-            <div style={{ height: 40 }} />
+            <div style={{ height: 72 }} />
           </div>
+
+          {/* Floating "+ Add to Trip" pill — bottom-right, over content, same pattern as NearbyPage */}
+          <button
+            onClick={() => router.push("/trips")}
+            style={{
+              position: "absolute", bottom: 20, right: 16,
+              height: 40, borderRadius: 20, border: "none", cursor: "pointer",
+              padding: "0 18px",
+              background: "#fff",
+              color: "#111",
+              fontSize: 14, fontWeight: 700,
+              display: "flex", alignItems: "center", gap: 6,
+              boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
+              zIndex: 10,
+              fontFamily: `-apple-system, "SF Pro Display", "Helvetica Neue", sans-serif`,
+            }}>
+            + Add to Trip
+          </button>
         </div>
       </div>
 
@@ -1564,7 +1954,7 @@ function ManualPlanInner() {
         ];
         const isCustom = budgetInput && !PRESETS.find(p => p.amount === budgetInput);
 
-        return (
+        return createPortal(
           <div className="mp-exp-page">
             <div className="mp-exp-page-bar">
               <button className="mp-exp-page-back" onClick={() => setSetBudgetOpen(false)}>
@@ -1612,12 +2002,13 @@ function ManualPlanInner() {
                   className="mp-setbudget-input" />
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         );
       })()}
 
       {/* ── Invite / Collaborators Secondary Page ── */}
-      {inviteOpen && (
+      {inviteOpen && createPortal(
         <div className="mp-exp-page">
           <div className="mp-exp-page-bar">
             <button className="mp-exp-page-back" onClick={() => { setInviteOpen(false); setInviteCopied(false); }}>
@@ -1669,24 +2060,12 @@ function ManualPlanInner() {
             </button>
           </div>
 
-          {/* Share button */}
-          <div className="mp-invite-actions">
-            <button className="mp-invite-action-btn" onClick={() => {
-              navigator.share?.({
-                title: makeTripTitle(destination, prefs),
-                text: `Join my trip plan on Campus Nest!`,
-                url: "https://campusnest.app/plan/join/abc123",
-              }).catch(() => {});
-            }}>
-              <FontAwesomeIcon icon={faShareNodes} style={{ width: 15, height: 15 }} />
-              Share invite
-            </button>
-          </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ── Add Expense Secondary Page ── */}
-      {addExpOpen && (
+      {addExpOpen && createPortal(
         <div className="mp-exp-page">
           {/* Top bar */}
           <div className="mp-exp-page-bar">
@@ -1725,12 +2104,250 @@ function ManualPlanInner() {
               placeholder="What was this for?"
               value={expNote} onChange={e => setExpNote(e.target.value)} />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
+
+      {/* ── Split Bill Sheet ── */}
+      {splitExpIdx !== null && (() => {
+        const e = expenses[splitExpIdx];
+        if (!e) return null;
+        const total = parseFloat(e.amount) || 0;
+        const perPerson = splitCount > 0 ? (total / splitCount) : 0;
+        const catIcon = BUDGET_CATS.find(c => c.label === e.cat)?.icon || "💊";
+        const confirmSplit = () => {
+          setExpenses(prev => prev.map((ex, i) => i === splitExpIdx ? { ...ex, splitWith: splitCount } : ex));
+          setSplitExpIdx(null);
+        };
+        return createPortal(
+          <div className="mp-exp-page">
+            <div className="mp-exp-page-bar">
+              <button className="mp-exp-page-back" onClick={() => setSplitExpIdx(null)}>
+                <FontAwesomeIcon icon={faChevronLeft} style={{ width: 10, height: 14 }} />
+              </button>
+              <span className="mp-exp-page-title">Split Bill</span>
+              <button className="mp-exp-page-add" onClick={confirmSplit}>Done</button>
+            </div>
+
+            {/* Expense summary */}
+            <div className="mp-split-expense-card">
+              <span className="mp-split-expense-icon">{catIcon}</span>
+              <div className="mp-split-expense-info">
+                <span className="mp-split-expense-name">{e.cat}{e.note ? ` · ${e.note}` : ""}</span>
+                <span className="mp-split-expense-total">Total: ${total.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+              </div>
+            </div>
+
+            {/* Per-person hero */}
+            <div className="mp-split-hero">
+              <p className="mp-split-hero-label">Each person pays</p>
+              <p className="mp-split-hero-amount">${perPerson.toFixed(2)}</p>
+            </div>
+
+            {/* People count stepper */}
+            <p className="mp-exp-section-label">Split between</p>
+            <div className="mp-split-stepper-wrap">
+              <button className="mp-split-step-btn" onClick={() => setSplitCount(c => Math.max(2, c - 1))}>−</button>
+              <div className="mp-split-count-display">
+                <span className="mp-split-count-num">{splitCount}</span>
+                <span className="mp-split-count-lbl">people</span>
+              </div>
+              <button className="mp-split-step-btn" onClick={() => setSplitCount(c => Math.min(20, c + 1))}>+</button>
+            </div>
+
+            {/* Quick presets */}
+            <div className="mp-split-presets">
+              {[2, 3, 4, 5, 6, 8, 10].map(n => (
+                <button key={n}
+                  className={`mp-split-preset${splitCount === n ? " mp-split-preset--active" : ""}`}
+                  onClick={() => setSplitCount(n)}>{n}</button>
+              ))}
+            </div>
+
+            {/* Breakdown */}
+            <p className="mp-exp-section-label" style={{ marginTop: 24 }}>Breakdown</p>
+            <div className="mp-split-breakdown">
+              {Array.from({ length: splitCount }, (_, idx) => (
+                <div key={idx} className="mp-split-breakdown-row">
+                  <span className="mp-split-person-avatar">{idx === 0 ? "🙋" : `P${idx + 1}`}</span>
+                  <span className="mp-split-person-name">{idx === 0 ? (e.paidBy || "Me") : `Person ${idx + 1}`}</span>
+                  <span className="mp-split-person-share">${perPerson.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          </div>,
+          document.body
+        );
+      })()}
 
       {/* Drag active: transparent overlay blocks taps on other elements */}
       {dragInfo && (
         <div style={{ position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none" }} />
+      )}
+
+      {/* ── Create Collection sheet ── */}
+      {collAddOpen && createPortal(
+        <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", display: "flex", alignItems: "flex-end" }}
+          onClick={() => setCollAddOpen(false)}>
+          <div style={{ width: "100%", background: "#09090f", borderRadius: "24px 24px 0 0", padding: "20px 20px 36px", border: "1px solid rgba(255,255,255,0.08)" }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ width: 36, height: 4, borderRadius: 99, background: "rgba(255,255,255,0.15)", margin: "0 auto 20px" }} />
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 18 }}>New Collection</div>
+
+            {/* Emoji picker */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+              {COLL_EMOJIS.map(e => (
+                <button key={e} onClick={() => setNewCollEmoji(e)}
+                  style={{ width: 44, height: 44, borderRadius: 12, border: `2px solid ${newCollEmoji === e ? "#ff8c42" : "transparent"}`, background: newCollEmoji === e ? "rgba(255,140,66,0.15)" : "rgba(255,255,255,0.06)", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {e}
+                </button>
+              ))}
+            </div>
+
+            {/* Name input */}
+            <input
+              autoFocus
+              value={newCollName}
+              onChange={e => setNewCollName(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") createCollection(); }}
+              placeholder="Collection name…"
+              style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 14px", fontSize: 15, color: "#fff", outline: "none", fontFamily: "inherit", marginBottom: 14 }}
+            />
+
+            <button onClick={createCollection} disabled={!newCollName.trim()}
+              style={{ width: "100%", padding: "13px 0", borderRadius: 14, border: "none", cursor: newCollName.trim() ? "pointer" : "not-allowed", fontSize: 15, fontWeight: 700, background: newCollName.trim() ? "#ff8c42" : "rgba(255,255,255,0.08)", color: newCollName.trim() ? "#fff" : "rgba(255,255,255,0.3)", transition: "all 0.15s" }}>
+              Create
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Hidden file input for camera/gallery */}
+      <input ref={collFileRef} type="file" accept="image/*" capture="environment"
+        style={{ display: "none" }} onChange={handleCollPhoto} />
+
+      {/* ── View Collection sheet ── */}
+      {collViewId !== null && (() => {
+        const coll = collections.find(c => c.id === collViewId);
+        if (!coll) return null;
+        const photos = coll.photos || [];
+        return createPortal(
+          <>
+            <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", display: "flex", alignItems: "flex-end" }}
+              onClick={() => setCollViewId(null)}>
+              <div style={{ width: "100%", background: "#09090f", borderRadius: "24px 24px 0 0", border: "1px solid rgba(255,255,255,0.08)", maxHeight: "88dvh", display: "flex", flexDirection: "column", overflow: "hidden", fontFamily: `-apple-system, "SF Pro Display", "Helvetica Neue", sans-serif` }}
+                onClick={e => e.stopPropagation()}>
+
+                {/* Drag handle */}
+                <div style={{ flexShrink: 0, paddingTop: 12, display: "flex", justifyContent: "center" }}>
+                  <div style={{ width: 36, height: 4, borderRadius: 99, background: "rgba(255,255,255,0.12)" }} />
+                </div>
+
+                {/* Header */}
+                <div style={{ flexShrink: 0, padding: "16px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    {/* Emoji avatar — glass morphism */}
+                    <div style={{ width: 52, height: 52, borderRadius: 16, background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>
+                      {coll.emoji}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: -0.3, color: "#fff", lineHeight: 1.2 }}>{coll.name}</div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 3 }}>
+                        {photos.length === 0 ? "No photos yet" : `${photos.length} ${photos.length === 1 ? "photo" : "photos"}`}
+                      </div>
+                    </div>
+                    {/* Delete button */}
+                    <button onClick={() => { deleteCollection(coll.id); setCollViewId(null); }}
+                      style={{ height: 34, padding: "0 14px", borderRadius: 999, background: "rgba(255,60,60,0.1)", border: "1px solid rgba(255,60,60,0.2)", color: "#ff5050", fontSize: 12, fontWeight: 600, cursor: "pointer", letterSpacing: 0.2 }}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                {/* Scrollable photo area */}
+                <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 0" }}>
+                  {photos.length === 0 ? (
+                    /* Empty state */
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 0 24px", gap: 10 }}>
+                      <div style={{ width: 68, height: 68, borderRadius: 20, background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>
+                        🖼️
+                      </div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.7)", marginTop: 6 }}>No photos yet</div>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", textAlign: "center", maxWidth: 220, lineHeight: 1.6 }}>
+                        Capture memories from your trip and save them here
+                      </div>
+                    </div>
+                  ) : (
+                    /* 2-column photo grid */
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8, paddingBottom: 16 }}>
+                      {photos.map((src, i) => (
+                        <div key={i} style={{ aspectRatio: "1", borderRadius: 16, overflow: "hidden", cursor: "pointer" }}
+                          onClick={() => setCollViewPhoto({ src, collId: coll.id, idx: i })}>
+                          <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Add Photo CTA — sticky bottom */}
+                <div style={{ flexShrink: 0, padding: "12px 16px 40px", background: "linear-gradient(to top, #09090f 65%, transparent)" }}>
+                  <button onClick={() => collFileRef.current?.click()}
+                    style={{ width: "100%", padding: "14px 0", borderRadius: 16, border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, background: "#ff8c42", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 16px rgba(255,140,66,0.3)", fontFamily: `-apple-system, "SF Pro Display", "Helvetica Neue", sans-serif` }}>
+                    <span style={{ fontSize: 17 }}>📷</span> Add Photo
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Full-screen photo preview */}
+            {collViewPhoto && (
+              <div style={{ position: "fixed", inset: 0, zIndex: 10100, background: "rgba(0,0,0,0.97)", display: "flex", flexDirection: "column" }}
+                onClick={() => setCollViewPhoto(null)}>
+                {/* Top close button */}
+                <div style={{ padding: "56px 20px 12px", display: "flex", justifyContent: "flex-end" }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => setCollViewPhoto(null)}
+                    style={{ width: 36, height: 36, borderRadius: 50, background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    ✕
+                  </button>
+                </div>
+                <img src={collViewPhoto.src} alt="" style={{ flex: 1, objectFit: "contain", width: "100%" }} />
+                <div style={{ padding: "16px 20px 48px" }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => { deleteCollPhoto(collViewPhoto.collId, collViewPhoto.idx); setCollViewPhoto(null); }}
+                    style={{ width: "100%", padding: "14px 0", borderRadius: 16, border: "none", background: "rgba(255,60,60,0.85)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: `-apple-system, "SF Pro Display", "Helvetica Neue", sans-serif` }}>
+                    🗑 Delete Photo
+                  </button>
+                </div>
+              </div>
+            )}
+          </>,
+          document.body
+        );
+      })()}
+
+      {/* Share link modal — fallback when clipboard unavailable */}
+      {shareOpen && createPortal(
+        <div style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+          onClick={() => setShareOpen(false)}>
+          <div style={{ background: "#09090f", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: 24, width: "100%", maxWidth: 360 }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Share Trip Plan</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 16 }}>Copy this link and send it to your friends</div>
+            <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 12px", fontSize: 11, color: "rgba(255,255,255,0.6)", marginBottom: 16, fontFamily: "monospace", userSelect: "all", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {shareUrl.slice(0, 60)}…
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => setShareOpen(false)} style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.6)", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+                Close
+              </button>
+              <button onClick={() => { const ta = document.createElement("textarea"); ta.value = shareUrl; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); setShareOpen(false); setShareCopied(true); setTimeout(() => setShareCopied(false), 2500); }} style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: "none", background: "#ff8c42", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                Copy Link
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

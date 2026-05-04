@@ -3678,7 +3678,8 @@ button {
 .nd-trip-overview-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 20px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255,255,255,0.06);
@@ -3691,6 +3692,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: 1;
 }
 .nd-trip-overview-name {
   font-size: 16px;
@@ -7858,7 +7860,7 @@ button {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.3px;
-  color: #4a8fe8;
+  color: #ff8c42;
   text-transform: uppercase;
 }
 
@@ -8653,7 +8655,7 @@ button {
 
 /* Back button — Figma dark glass circle */
 .nd-mapview-back {
-  position: absolute; top: 52px; left: 20px; z-index: 10;
+  position: absolute; top: 52px; left: 20px; z-index: 1200;
   width: 44px; height: 44px; border-radius: 50%;
   background: rgba(20,20,20,0.9);
   border: none;
@@ -8665,7 +8667,7 @@ button {
 }
 
 .nd-mapview-share-btn {
-  position: absolute; top: 52px; right: 20px; z-index: 10;
+  position: absolute; top: 52px; right: 20px; z-index: 1200;
   width: 44px; height: 44px; border-radius: 50%;
   background: rgba(20,20,20,0.9);
   border: none;
@@ -13950,9 +13952,9 @@ button {
 /* ── Budget / Spending Tracker ── */
 .mp-budget-section {
   background: rgba(255,255,255,0.04);
-  border: none;
-  border-radius: 18px;
-  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 18px 16px 12px;
   margin-bottom: 16px;
 }
 /* Planned budget hint banner */
@@ -13997,7 +13999,7 @@ button {
   display: flex; align-items: center; gap: 8px; padding: 0;
 }
 .mp-budget-label { font-size: 12px; color: rgba(255,255,255,0.4); }
-.mp-budget-amount { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.mp-budget-amount { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
 .mp-budget-placeholder { font-size: 14px; color: rgba(255,255,255,0.35); font-weight: 500; }
 .mp-budget-input-wrap {
   display: flex; align-items: center; gap: 6px; flex: 1;
@@ -14027,11 +14029,11 @@ button {
 }
 .mp-budget-bar-fill {
   height: 100%; border-radius: 3px;
-  background: linear-gradient(90deg, #4ade80, #22d3ee);
+  background: linear-gradient(90deg, #ff8c42, #ffb347);
   transition: width 0.4s ease;
 }
 .mp-budget-bar-fill--over { background: linear-gradient(90deg, #f97316, #ef4444); }
-.mp-budget-remaining { font-size: 11px; font-weight: 600; color: #4ade80; white-space: nowrap; }
+.mp-budget-remaining { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.45); white-space: nowrap; }
 
 .mp-budget-cats {
   display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
@@ -14047,20 +14049,105 @@ button {
 
 .mp-expense-list { margin-bottom: 10px; }
 .mp-expense-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 0;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .mp-expense-row:last-child { border-bottom: none; }
-.mp-expense-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
-.mp-expense-info { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.mp-expense-cat { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
-.mp-expense-note { font-size: 11px; color: rgba(255,255,255,0.35); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-expense-amount { font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
-.mp-expense-del {
-  background: none; border: none; color: rgba(255,255,255,0.25);
-  font-size: 18px; line-height: 1; cursor: pointer; padding: 0 2px; flex-shrink: 0;
+.mp-expense-icon {
+  font-size: 20px; width: 36px; height: 36px;
+  background: rgba(255,255,255,0.06); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
+.mp-expense-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mp-expense-cat { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.mp-expense-note { font-size: 11px; color: rgba(255,255,255,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-expense-paidby {
+  font-size: 11px; color: rgba(255,140,66,0.8); font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+}
+.mp-expense-split-inline {
+  background: none; border: none; padding: 0;
+  font-size: 10px; font-weight: 700; color: #ff8c42;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  letter-spacing: 0.2px; flex-shrink: 0;
+}
+.mp-expense-amount { font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.mp-expense-del {
+  background: none; border: none; color: rgba(255,255,255,0.2);
+  font-size: 16px; line-height: 1; cursor: pointer; padding: 0; flex-shrink: 0;
+}
+
+/* ── Split Bill Sheet ── */
+.mp-split-expense-card {
+  display: flex; align-items: center; gap: 14px;
+  margin: 0 20px 8px; padding: 16px 18px;
+  background: rgba(255,255,255,0.05); border-radius: 16px;
+}
+.mp-split-expense-icon { font-size: 28px; flex-shrink: 0; }
+.mp-split-expense-info { display: flex; flex-direction: column; gap: 3px; }
+.mp-split-expense-name { font-size: 15px; font-weight: 600; color: #fff; }
+.mp-split-expense-total { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+.mp-split-hero {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px 20px 20px;
+}
+.mp-split-hero-label { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 6px; }
+.mp-split-hero-amount { font-size: 52px; font-weight: 800; color: #ff8c42; letter-spacing: -2px; margin: 0; }
+
+.mp-split-stepper-wrap {
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  padding: 0 20px 20px;
+}
+.mp-split-step-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: none;
+  color: #fff; font-size: 22px; font-weight: 300;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.mp-split-step-btn:active { background: rgba(255,255,255,0.16); }
+.mp-split-count-display { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; }
+.mp-split-count-num { font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1; }
+.mp-split-count-lbl { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 600; letter-spacing: 0.3px; }
+
+.mp-split-presets {
+  display: flex; gap: 8px; padding: 0 20px 4px;
+  justify-content: center; flex-wrap: wrap;
+}
+.mp-split-preset {
+  height: 32px; min-width: 40px; padding: 0 12px;
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.mp-split-preset--active {
+  background: rgba(255,140,66,0.18); border-color: #ff8c42; color: #ff8c42;
+}
+
+.mp-split-breakdown {
+  display: flex; flex-direction: column; gap: 0;
+  margin: 0 20px; background: rgba(255,255,255,0.05); border-radius: 16px;
+  overflow: hidden; max-height: 220px; overflow-y: auto;
+}
+.mp-split-breakdown-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.mp-split-breakdown-row:last-child { border-bottom: none; }
+.mp-split-person-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
+.mp-split-person-name { flex: 1; font-size: 14px; color: rgba(255,255,255,0.75); font-weight: 500; }
+.mp-split-person-share { font-size: 14px; font-weight: 700; color: #ff8c42; }
 
 /* ── Add Expense Secondary Page ── */
 .mp-exp-page {
@@ -14101,7 +14188,7 @@ button {
   font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
 }
 .mp-exp-page-add {
-  background: #fff; color: #111;
+  background: #ff8c42; color: #fff;
   border: none; border-radius: 20px;
   padding: 7px 18px;
   font-size: 14px; font-weight: 700;
@@ -14165,8 +14252,8 @@ button {
 }
 .mp-exp-cat-tile:active { transform: scale(0.95); }
 .mp-exp-cat-tile--active {
-  background: #fff;
-  border-color: #fff;
+  background: #ff8c42;
+  border-color: #ff8c42;
 }
 .mp-exp-cat-tile-icon { font-size: 26px; line-height: 1; }
 .mp-exp-cat-tile-label {
@@ -14174,7 +14261,7 @@ button {
   color: rgba(255,255,255,0.6);
   letter-spacing: 0.1px;
 }
-.mp-exp-cat-tile--active .mp-exp-cat-tile-label { color: #111; }
+.mp-exp-cat-tile--active .mp-exp-cat-tile-label { color: #fff; }
 
 /* Note input */
 .mp-exp-note-wrap {
@@ -14296,15 +14383,16 @@ button {
 .mp-setbudget-input::placeholder { color: rgba(255,255,255,0.2); font-weight: 400; }
 
 .mp-add-exp-btn {
-  width: 100%; padding: 10px;
-  background: rgba(255,255,255,0.06);
-  border: none;
-  border-radius: 12px;
-  color: rgba(255,255,255,0.45);
-  font-size: 13px; font-weight: 600;
+  width: 100%; padding: 12px;
+  background: rgba(255,140,66,0.1);
+  border: 1px solid rgba(255,140,66,0.2);
+  border-radius: 14px;
+  color: #ff8c42;
+  font-size: 13px; font-weight: 700;
   cursor: pointer; transition: background 0.15s;
+  margin-top: 4px;
 }
-.mp-add-exp-btn:active { background: rgba(255,255,255,0.1); }
+.mp-add-exp-btn:active { background: rgba(255,140,66,0.2); }
 
 .mp-add-exp-form {
   background: rgba(255,255,255,0.05);

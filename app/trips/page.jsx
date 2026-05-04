@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus, faChevronRight, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const NAV_ITEMS = [
-  { icon: faHouse,      label: "Home",      href: "/"        },
+  { icon: faHouse,      label: "Home",      href: "/home"   },
   { icon: faCompass,    label: "Discover",  href: "/nearby"  },
   { center: true },
   { icon: faPlane,      label: "My Trips",  href: "/trips"   },
@@ -173,8 +173,8 @@ export default function TripsPage() {
           };
           const status = getStatus();
 
-          // Tag label — prefs or fallback
-          const tagLabel = trip.prefs?.length > 0 ? (Array.isArray(trip.prefs) ? trip.prefs[0] : trip.prefs) : (trip.destination || "Trip");
+          // Tag label — stop count
+          const tagLabel = count > 0 ? `${count} ${count === 1 ? "stop" : "stops"}` : (trip.duration || "Trip");
 
           const card = (
             <div className="hp-trip-card" style={{ width: "100%", height: 220, borderRadius: 20, flexShrink: "unset" }}>
@@ -212,10 +212,15 @@ export default function TripsPage() {
               {/* Info */}
               <div className="hp-trip-info" style={{ bottom: 50 }}>
                 <p className="hp-trip-title" style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.3 }}>
-                  {flag} {trip.destination}
+                  {flag} {trip.tripTitle || title}
                 </p>
                 <p className="hp-trip-meta" style={{ fontSize: 11, marginTop: 3 }}>
-                  {[trip.duration, count > 0 && `${count} places`].filter(Boolean).join(" · ")}
+                  {trip.startDate && trip.endDate
+                    ? (() => {
+                        const fmt = d => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" });
+                        return `${fmt(trip.startDate)} – ${fmt(trip.endDate)}`;
+                      })()
+                    : [trip.duration, count > 0 && `${count} places`].filter(Boolean).join(" · ")}
                 </p>
               </div>
 

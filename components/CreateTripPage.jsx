@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faCompass, faPlane, faCircleUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const NAV_ITEMS = [
-  { icon: faHouse,      label: "Home",      href: "/"        },
+  { icon: faHouse,      label: "Home",      href: "/home"   },
   { icon: faCompass,    label: "Discover",  href: "/nearby"  },
   { center: true },
   { icon: faPlane,      label: "My Trips",  href: "/trips"   },

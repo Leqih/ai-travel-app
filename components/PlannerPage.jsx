@@ -12,7 +12,7 @@ const Aurora = dynamic(() => import("./Aurora"), { ssr: false });
 const Grainient = dynamic(() => import("./Grainient"), { ssr: false });
 
 const NAV_ITEMS = [
-  { icon: faHouse,       label: "Home",      href: "/"        },
+  { icon: faHouse,       label: "Home",      href: "/home"   },
   { icon: faCompass,     label: "Discover",  href: "/nearby"  },
   { center: true },
   { icon: faPlane,       label: "My Trips",  href: "/trips"   },
@@ -382,11 +382,11 @@ function CitySheet({ open, onClose, value, onSelect }) {
 }
 
 /* ── Budget selector — spinnable dial ── */
-/* 36 ticks, each tick = $100, range $0–$3,500 */
+/* 50 ticks, each tick = $200, range $0–$10,000 */
 const MIN_BUDGET = 0;
-const MAX_BUDGET = 3500;
-const TICK_COUNT = 36;
-const TICK_VALUE = 100; // each tick = $100
+const MAX_BUDGET = 10000;
+const TICK_COUNT = 50;
+const TICK_VALUE = 200; // each tick = $200
 
 function budgetToAngle(budget) {
   const t = Math.max(0, Math.min(1, budget / MAX_BUDGET));
@@ -402,9 +402,9 @@ function angleToBudget(angle) {
 }
 
 function getBudgetLabel(amount) {
-  if (amount <= 100) return "Budget";
-  if (amount <= 500) return "Mid-Range";
-  if (amount <= 1500) return "Luxury";
+  if (amount <= 1000) return "Budget";
+  if (amount <= 3000) return "Mid-Range";
+  if (amount <= 7000) return "Luxury";
   return "Ultra-Luxury";
 }
 
@@ -576,7 +576,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
   const [mode, setMode] = useState("single"); // "single" | "range"
   const [amount, setAmount] = useState(MIN_BUDGET);
   const [rangeMin, setRangeMin] = useState(0);
-  const [rangeMax, setRangeMax] = useState(3500);
+  const [rangeMax, setRangeMax] = useState(10000);
   const [editing, setEditing] = useState(false);
   const [inputVal, setInputVal] = useState("");
   const inputRef = useRef(null);
@@ -588,17 +588,17 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
     if (open) {
       if (value && value.includes("–")) {
         setMode("range");
-        const parts = value.replace(/[$,/day]/g, "").split("–").map(s => parseInt(s.trim(), 10));
+        const parts = value.replace(/[$,]/g, "").split("–").map(s => parseInt(s.trim(), 10));
         if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
           setRangeMin(parts[0]);
           setRangeMax(parts[1]);
         }
       } else if (value && value.startsWith("$")) {
         setMode("single");
-        const num = parseInt(value.replace(/[$,/day]/g, ""), 10);
+        const num = parseInt(value.replace(/[$,]/g, ""), 10);
         setAmount(isNaN(num) ? 0 : num);
       } else {
-        const map = { "Budget": 100, "Mid-Range": 500, "Luxury": 1500, "Ultra-Luxury": 3000 };
+        const map = { "Budget": 1000, "Mid-Range": 3000, "Luxury": 7000, "Ultra-Luxury": 10000 };
         setAmount(map[value] || 0);
       }
     }
@@ -667,7 +667,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
         <span className="pl-budget-icon-wrap">
           <FontAwesomeIcon icon={faCreditCard} style={{ width: 18, height: 14, color: "rgba(255,255,255,0.5)" }} />
         </span>
-        <span className="pl-budget-title">Daily Budget</span>
+        <span className="pl-budget-title">Total Budget</span>
         <div className="pl-budget-toggle">
           <button className={`pl-budget-toggle-btn ${mode === "single" ? "pl-budget-toggle-active" : ""}`} onClick={() => setMode("single")}>Single</button>
           <button className={`pl-budget-toggle-btn ${mode === "range" ? "pl-budget-toggle-active" : ""}`} onClick={() => setMode("range")}>Range</button>
@@ -774,7 +774,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
           </div>
           <div className="pl-dial-range">
             <span>MIN $0</span>
-            <span>MAX $3,500</span>
+            <span>MAX $10,000</span>
           </div>
         </div>
       ) : (
@@ -812,7 +812,7 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
               key={b.label}
               className={`pl-budget-seg ${b.label === getBudgetLabel(amount) ? "pl-budget-seg-active" : ""}`}
               onClick={() => {
-                const map = { "Budget": 100, "Mid-Range": 500, "Luxury": 1500, "Ultra-Luxury": 3000 };
+                const map = { "Budget": 1000, "Mid-Range": 3000, "Luxury": 7000, "Ultra-Luxury": 10000 };
                 setAmount(map[b.label]);
               }}
             >
@@ -823,10 +823,10 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
       ) : (
         <div className="pl-budget-segments">
           {[
-            { label: "Budget", min: 0, max: 500 },
-            { label: "Mid-Range", min: 500, max: 1500 },
-            { label: "Luxury", min: 1500, max: 3000 },
-            { label: "Flexible", min: 0, max: 3500 },
+            { label: "Budget", min: 0, max: 2000 },
+            { label: "Mid-Range", min: 2000, max: 5000 },
+            { label: "Luxury", min: 5000, max: 10000 },
+            { label: "Flexible", min: 0, max: 10000 },
           ].map((p) => {
             const isActive = Math.abs(rangeMin - p.min) <= 50 && Math.abs(rangeMax - p.max) <= 50;
             return (
@@ -846,9 +846,9 @@ function BudgetSheet({ open, onClose, value, onSelect }) {
         className="pl-sheet-cta"
         onClick={() => {
           if (mode === "single") {
-            onSelect(`$${amount.toLocaleString()}/day`);
+            onSelect(`$${amount.toLocaleString()}`);
           } else {
-            onSelect(`$${rangeMin.toLocaleString()} – $${rangeMax.toLocaleString()}/day`);
+            onSelect(`$${rangeMin.toLocaleString()} – $${rangeMax.toLocaleString()}`);
           }
           onClose();
         }}
@@ -996,12 +996,12 @@ function CalendarMonth({ year, month, startDate, endDate, hoveredDate, onDayClic
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", rowGap: 2 }}>
         {/* Weekday headers */}
         {WEEKDAYS.map(w => (
-          <div key={w} style={{ textAlign: "center", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.22)", paddingBottom: 10, letterSpacing: 0.8, textTransform: "uppercase" }}>{w}</div>
+          <div key={w} style={{ textAlign: "center", fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.2)", paddingBottom: 12, letterSpacing: 1, textTransform: "uppercase" }}>{w}</div>
         ))}
 
         {cells.map((date, i) => {
           const state = dayState(date);
-          if (state === "empty") return <div key={`e${i}`} style={{ height: 40 }} />;
+          if (state === "empty") return <div key={`e${i}`} style={{ height: 44 }} />;
           const isStart = state === "start" || state === "single";
           const isEnd = state === "end" || state === "single";
           const inRange = state === "in-range";
@@ -1009,7 +1009,6 @@ function CalendarMonth({ year, month, startDate, endDate, hoveredDate, onDayClic
           const isToday = isSameDay(date, today);
 
           // Range pill background — extends edge-to-edge between start and end
-          const col = (i + firstDow) % 7; // 0=Sun … 6=Sat
           const rangeLeft = isStart && !isEnd ? "50%" : (inRange || isEnd) ? "0%" : "50%";
           const rangeRight = isEnd && !isStart ? "50%" : (inRange || isStart) ? "0%" : "50%";
           const showRange = (inRange || isStart || isEnd) && !(isStart && isEnd);
@@ -1019,14 +1018,14 @@ function CalendarMonth({ year, month, startDate, endDate, hoveredDate, onDayClic
               key={date.toISOString()}
               onClick={() => !isPast && onDayClick(date)}
               onMouseEnter={() => onDayHover(date)}
-              style={{ position: "relative", height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: isPast ? "default" : "pointer" }}
+              style={{ position: "relative", height: 44, display: "flex", alignItems: "center", justifyContent: "center", cursor: isPast ? "default" : "pointer" }}
             >
               {/* Range fill band */}
               {showRange && (
                 <div style={{
-                  position: "absolute", top: 4, bottom: 4,
+                  position: "absolute", top: 5, bottom: 5,
                   left: rangeLeft, right: rangeRight,
-                  background: "rgba(255,140,66,0.15)",
+                  background: "rgba(255,255,255,0.08)",
                   pointerEvents: "none",
                 }} />
               )}
@@ -1034,31 +1033,31 @@ function CalendarMonth({ year, month, startDate, endDate, hoveredDate, onDayClic
               {/* Day circle */}
               <div style={{
                 position: "relative", zIndex: 1,
-                width: 34, height: 34,
+                width: 36, height: 36,
                 borderRadius: "50%",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                background: (isStart || isEnd) ? "linear-gradient(135deg,#ff9a52,#ff6a1a)" : "transparent",
-                boxShadow: (isStart || isEnd) ? "0 4px 16px rgba(255,120,40,0.45)" : "none",
+                background: (isStart || isEnd) ? "#fff" : "transparent",
+                boxShadow: (isStart || isEnd) ? "0 2px 12px rgba(0,0,0,0.3)" : "none",
                 transition: "background 0.14s, box-shadow 0.14s",
               }}>
                 <span style={{
-                  fontSize: 13, lineHeight: 1,
-                  fontWeight: (isStart || isEnd) ? 800 : isToday ? 700 : 400,
+                  fontSize: 14, lineHeight: 1,
+                  fontWeight: (isStart || isEnd) ? 700 : isToday ? 700 : 400,
                   color: isPast
-                    ? "rgba(255,255,255,0.15)"
+                    ? "rgba(255,255,255,0.13)"
                     : (isStart || isEnd)
-                    ? "#fff"
+                    ? "#09090f"
                     : isToday
                     ? "#ff9a52"
                     : inRange
-                    ? "rgba(255,255,255,0.9)"
-                    : "rgba(255,255,255,0.75)",
+                    ? "#fff"
+                    : "rgba(255,255,255,0.7)",
                 }}>
                   {date.getDate()}
                 </span>
                 {/* Today dot */}
                 {isToday && !(isStart || isEnd) && (
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#ff8c42", marginTop: 2 }} />
+                  <div style={{ width: 3, height: 3, borderRadius: "50%", background: "#ff8c42", marginTop: 3 }} />
                 )}
               </div>
             </div>
@@ -1122,79 +1121,88 @@ function DurationSheet({ open, onClose, value, onSelect }) {
   const fmtDate = d => d?.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   return (
-    <BottomSheet open={open} onClose={onClose} sheetStyle={{ height: "88vh", maxHeight: "88vh" }}>
-      <h2 className="pl-sheet-title" style={{ marginBottom: 16 }}>Trip Dates</h2>
+    <BottomSheet open={open} onClose={onClose} sheetStyle={{ paddingBottom: 32 }}>
 
-      {/* Date range summary bar */}
-      <div style={{
-        display: "flex", alignItems: "stretch",
-        background: "rgba(255,255,255,0.05)",
-        borderRadius: 14,
-        border: "1px solid rgba(255,255,255,0.08)",
-        marginBottom: 20, overflow: "hidden",
-      }}>
-        {/* Start */}
-        <div style={{ flex: 1, padding: "12px 0", textAlign: "center", borderRight: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.4, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", marginBottom: 5 }}>Depart</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: startDate ? "#fff" : "rgba(255,255,255,0.2)", letterSpacing: -0.3 }}>
-            {startDate ? fmtDate(startDate) : "—"}
+      {/* Date range summary — two cards + connector */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24, marginTop: 4, width: "100%" }}>
+        {/* Depart card */}
+        <div style={{
+          flex: 1, minWidth: 0, borderRadius: 16, padding: "14px 16px",
+          background: startDate ? "#fff" : "rgba(255,255,255,0.06)",
+          border: startDate ? "none" : "1px solid rgba(255,255,255,0.09)",
+          transition: "background 0.2s, border 0.2s",
+        }}>
+          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 5,
+            color: startDate ? "rgba(9,9,15,0.4)" : "rgba(255,255,255,0.28)" }}>Depart</div>
+          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.4, whiteSpace: "nowrap",
+            color: startDate ? "#09090f" : "rgba(255,255,255,0.2)" }}>
+            {startDate ? fmtDate(startDate) : "Add date"}
           </div>
         </div>
 
-        {/* Duration badge */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 14px", borderRight: "1px solid rgba(255,255,255,0.08)" }}>
-          {days ? (
-            <>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "#ff9a52", lineHeight: 1, letterSpacing: -0.5 }}>{days}</div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,140,66,0.6)", letterSpacing: 0.8, textTransform: "uppercase", marginTop: 2 }}>days</div>
-            </>
-          ) : (
-            <div style={{ fontSize: 18, color: "rgba(255,255,255,0.12)" }}>→</div>
-          )}
+        {/* Connector */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, flexShrink: 0 }}>
+          {days && <div style={{ fontSize: 10, fontWeight: 800, color: "#ff8c42", letterSpacing: -0.2 }}>{days}d</div>}
+          <div style={{ width: 24, height: 1.5, background: days ? "linear-gradient(90deg,#ff9a52,#ff5f1f)" : "rgba(255,255,255,0.12)", borderRadius: 2 }} />
         </div>
 
-        {/* End */}
-        <div style={{ flex: 1, padding: "12px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.4, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", marginBottom: 5 }}>Return</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: rangeEnd ? "#fff" : "rgba(255,255,255,0.2)", letterSpacing: -0.3 }}>
-            {rangeEnd ? fmtDate(rangeEnd) : "—"}
+        {/* Return card */}
+        <div style={{
+          flex: 1, minWidth: 0, borderRadius: 16, padding: "14px 16px",
+          background: rangeEnd ? "#fff" : "rgba(255,255,255,0.06)",
+          border: rangeEnd ? "none" : "1px solid rgba(255,255,255,0.09)",
+          transition: "background 0.2s, border 0.2s",
+        }}>
+          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 5,
+            color: rangeEnd ? "rgba(9,9,15,0.4)" : "rgba(255,255,255,0.28)" }}>Return</div>
+          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.4, whiteSpace: "nowrap",
+            color: rangeEnd ? "#09090f" : "rgba(255,255,255,0.2)" }}>
+            {rangeEnd ? fmtDate(rangeEnd) : "Add date"}
           </div>
         </div>
       </div>
 
       {/* Month navigation */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, padding: "0 2px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 2px", width: "100%" }}>
         <button
           onClick={prevMonth} disabled={!canGoPrev}
           style={{
-            width: 36, height: 36, borderRadius: "50%",
-            background: canGoPrev ? "rgba(255,255,255,0.07)" : "transparent",
-            border: "none",
-            color: canGoPrev ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.12)",
-            fontSize: 20, cursor: canGoPrev ? "pointer" : "default",
-            display: "flex", alignItems: "center", justifyContent: "center",
+            width: 36, height: 36, borderRadius: "50%", border: "none",
+            background: "transparent",
+            color: canGoPrev ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.1)",
+            fontSize: 22, cursor: canGoPrev ? "pointer" : "default",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
           }}
         >‹</button>
-        <div style={{ textAlign: "center" }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: -0.2 }}>{MONTH_NAMES[viewMonth]}</span>
-          <span style={{ fontSize: 16, fontWeight: 400, color: "rgba(255,255,255,0.3)", marginLeft: 6 }}>{viewYear}</span>
+        <div>
+          <span style={{ fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: -0.4 }}>{MONTH_NAMES[viewMonth]}</span>
+          <span style={{ fontSize: 18, fontWeight: 300, color: "rgba(255,255,255,0.25)", marginLeft: 6 }}>{viewYear}</span>
         </div>
         <button
           onClick={nextMonth}
           style={{
-            width: 36, height: 36, borderRadius: "50%",
-            background: "rgba(255,255,255,0.07)", border: "none",
-            color: "rgba(255,255,255,0.7)",
-            fontSize: 20, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
+            width: 36, height: 36, borderRadius: "50%", border: "none",
+            background: "transparent",
+            color: "rgba(255,255,255,0.6)",
+            fontSize: 22, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
           }}
         >›</button>
       </div>
 
-      {/* Hint */}
-      <div style={{ textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.2)", marginBottom: 12, letterSpacing: 0.3, minHeight: 16 }}>
-        {!startDate ? "Tap a date to set departure" : !endDate ? "Now tap a return date" : ""}
-      </div>
+      {/* Hint pill */}
+      {(!startDate || !endDate) && (
+        <div style={{ textAlign: "center", marginBottom: 12 }}>
+          <span style={{
+            display: "inline-block", fontSize: 11, fontWeight: 600, letterSpacing: 0.3,
+            color: "rgba(255,255,255,0.35)",
+            background: "rgba(255,255,255,0.05)", borderRadius: 20,
+            padding: "4px 14px",
+          }}>
+            {!startDate ? "Tap a date to set departure" : "Now tap a return date"}
+          </span>
+        </div>
+      )}
 
       {/* Single-month calendar */}
       <div onMouseLeave={() => setHoveredDate(null)}>
@@ -1210,7 +1218,7 @@ function DurationSheet({ open, onClose, value, onSelect }) {
       <button
         className="pl-sheet-cta"
         disabled={!startDate || !endDate}
-        onClick={() => { onSelect(label); onClose(); }}
+        onClick={() => { onSelect({ label, startDate, endDate }); onClose(); }}
         style={{ opacity: startDate && endDate ? 1 : 0.35, transition: "opacity 0.2s" }}
       >
         {startDate && endDate ? `Set ${label}` : "Select your dates"}
@@ -1234,7 +1242,9 @@ export function PlannerPage() {
   const [city, setCity] = useState(null);
   const [budget, setBudget] = useState(null);
   const [style, setStyle] = useState(null);
-  const [duration, setDuration] = useState(null);
+  const [duration, setDuration]         = useState(null);
+  const [tripStartDate, setTripStartDate] = useState(null);
+  const [tripEndDate,   setTripEndDate]   = useState(null);
   const [generating, setGenerating] = useState(false);
 
   const [activeSheet, setActiveSheet] = useState(null);
@@ -1274,6 +1284,8 @@ export function PlannerPage() {
       if (duration) params.set("duration", duration);
       if (budget) params.set("budget", budget);
       if (style) params.set("prefs", style);
+      if (tripStartDate) params.set("startDate", tripStartDate.toISOString().split("T")[0]);
+      if (tripEndDate)   params.set("endDate",   tripEndDate.toISOString().split("T")[0]);
       params.set("ai", "true");
       router.push(`/planner/manual?${params.toString()}`);
     }, 3200);
@@ -1432,7 +1444,8 @@ export function PlannerPage() {
       <CitySheet open={activeSheet === "city"} onClose={() => setActiveSheet(null)} value={city} onSelect={setCity} />
       <BudgetSheet open={activeSheet === "budget"} onClose={() => setActiveSheet(null)} value={budget} onSelect={setBudget} />
       <StyleSheet open={activeSheet === "style"} onClose={() => setActiveSheet(null)} value={style} onSelect={setStyle} />
-      <DurationSheet open={activeSheet === "duration"} onClose={() => setActiveSheet(null)} value={duration} onSelect={setDuration} />
+      <DurationSheet open={activeSheet === "duration"} onClose={() => setActiveSheet(null)} value={duration}
+        onSelect={({ label, startDate, endDate }) => { setDuration(label); setTripStartDate(startDate); setTripEndDate(endDate); }} />
 
       <nav className="hp-nav">
         <div className="hp-nav-pill">

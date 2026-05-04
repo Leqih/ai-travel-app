@@ -43,10 +43,12 @@ const DISCOVER = [
 ];
 
 const TOPICS = [
-  { id: 1, tag: "Outdoor",   title: "Japan's Best Hiking Trails", img: "https://picsum.photos/seed/japan-hike/220/160",   city: "Tokyo", category: "nature"  },
-  { id: 2, tag: "Deep Dive", title: "Hidden Alleys of Kyoto",     img: "https://picsum.photos/seed/kyoto-alley/220/160",  city: "Kyoto", category: "culture" },
-  { id: 3, tag: "Food",      title: "Osaka Street Food Map",      img: "https://picsum.photos/seed/osaka-food/220/160",   city: "Osaka", category: "food"    },
-  { id: 4, tag: "Culture",   title: "Festivals & Crafts",         img: "https://picsum.photos/seed/japan-craft/220/160",  city: "Tokyo", category: "culture" },
+  { id: "japan-hiking",    tag: "Outdoor",   title: "Japan's Best Hiking Trails",  img: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=440&h=320&fit=crop" },
+  { id: "kyoto-alleys",   tag: "Deep Dive", title: "Hidden Alleys of Kyoto",      img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=440&h=320&fit=crop" },
+  { id: "osaka-food",     tag: "Food",      title: "Osaka Street Food Map",       img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=440&h=320&fit=crop" },
+  { id: "tokyo-culture",  tag: "Culture",   title: "Tokyo's Festivals & Crafts",  img: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=440&h=320&fit=crop" },
+  { id: "bali-wellness",  tag: "Wellness",  title: "Bali's Best Retreat Spots",   img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=440&h=320&fit=crop" },
+  { id: "seoul-nights",   tag: "Nightlife", title: "Seoul After Dark Guide",      img: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=440&h=320&fit=crop" },
 ];
 
 const MY_TRIPS = [
@@ -95,7 +97,7 @@ const STATS = [
 ];
 
 const NAV_ITEMS = [
-  { icon: faHouse,       label: "Home",      href: "/"        },
+  { icon: faHouse,       label: "Home",      href: "/home"   },
   { icon: faCompass,     label: "Discover",  href: "/nearby"  },
   { center: true },
   { icon: faPlane,       label: "My Trips",  href: "/trips"   },
@@ -125,19 +127,20 @@ export function HomeClient() {
   const today = new Date();
   const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
-  // ── Splash screen — only on first load per session ──
+  // ── Splash screen — only on very first ever load (localStorage) ──
   const [splashVisible, setSplashVisible] = useState(false);
   const [splashGone, setSplashGone] = useState(true);
   useEffect(() => {
-    if (sessionStorage.getItem("navora_splash_seen")) return;
-    sessionStorage.setItem("navora_splash_seen", "1");
+    try { if (localStorage.getItem("navora_splash_seen")) return; } catch (_) { return; }
+    try { localStorage.setItem("navora_splash_seen", "1"); } catch (_) {}
     setSplashGone(false);
     setSplashVisible(true);
-    const t1 = setTimeout(() => setSplashVisible(false), 1300);
-    const t2 = setTimeout(() => setSplashGone(true), 1900);
+    const t1 = setTimeout(() => setSplashVisible(false), 900);
+    const t2 = setTimeout(() => setSplashGone(true), 1400);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
+  const [tripSwitcherOpen, setTripSwitcherOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [planDay, setPlanDay]   = useState(1);
   const [cd, setCd] = useState({ days: 0, h: "00", m: "00", s: "00" });
@@ -151,12 +154,28 @@ export function HomeClient() {
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount; auto-select nearest upcoming trip if no countdown set
   useEffect(() => {
     try {
+      const trips = JSON.parse(localStorage.getItem("opal_trips") || "[]");
+      setSavedTrips(trips);
       const saved = localStorage.getItem("opal_countdown");
-      if (saved) setCdConfig(JSON.parse(saved));
-      setSavedTrips(JSON.parse(localStorage.getItem("opal_trips") || "[]"));
+      if (saved) {
+        setCdConfig(JSON.parse(saved));
+      } else {
+        // Auto-pick the nearest future trip that has a startDate
+        const now = new Date();
+        const upcoming = trips
+          .filter(t => t.startDate)
+          .map(t => ({ ...t, _start: new Date(t.startDate + "T00:00:00") }))
+          .filter(t => t._start >= now)
+          .sort((a, b) => a._start - b._start)[0];
+        if (upcoming) {
+          const cfg = { tripId: upcoming.id, tripName: upcoming.destination || "My Trip", startDate: upcoming.startDate };
+          setCdConfig(cfg);
+          localStorage.setItem("opal_countdown", JSON.stringify(cfg));
+        }
+      }
     } catch (_) {}
   }, []);
 
@@ -174,6 +193,16 @@ export function HomeClient() {
       setCalMonth(d.getMonth());
     } catch (_) {}
   }, [pickerOpen]);
+
+  function cycleTrip() {
+    const datedTrips = savedTrips.filter(t => t.startDate);
+    if (datedTrips.length < 2) return;
+    const curIdx = datedTrips.findIndex(t => t.id === cdConfig.tripId);
+    const next = datedTrips[(curIdx + 1) % datedTrips.length];
+    const cfg = { tripId: next.id, tripName: next.destination || "My Trip", startDate: next.startDate };
+    setCdConfig(cfg);
+    localStorage.setItem("opal_countdown", JSON.stringify(cfg));
+  }
 
   function prevMonth() {
     if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
@@ -294,15 +323,16 @@ export function HomeClient() {
                       })()}
                     </div>
                     <button
-                      onClick={() => setPickerOpen(true)}
+                      onClick={() => setTripSwitcherOpen(true)}
                       style={{
                         background: "none", border: "none",
                         borderRadius: 16, padding: "4px 11px", cursor: "pointer",
                         color: "rgba(255,255,255,0.85)",
                         fontSize: 11, fontWeight: 600, letterSpacing: 0.2,
+                        display: "flex", alignItems: "center", gap: 4,
                       }}>
-                      {new Date(cdConfig.startDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      {" "}<span style={{ opacity: 0.6, fontSize: 10 }}>✎</span>
+                      My Plans
+                      <span style={{ opacity: 0.5, fontSize: 10 }}>⌄</span>
                     </button>
                   </div>
                   <div className="hp-cd-main">{`In ${cd.days} days`}</div>
@@ -513,6 +543,50 @@ export function HomeClient() {
             </>)}
 
 
+            {/* ── Trip switcher sheet ── */}
+            {tripSwitcherOpen && (
+              <div style={{
+                position: "absolute", inset: 0, zIndex: 20,
+                background: "rgba(9,9,15,0.92)", backdropFilter: "blur(16px)",
+                borderRadius: "inherit", display: "flex", flexDirection: "column",
+                padding: "20px 16px 16px",
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <span style={{ color: "#fff", fontSize: 14, fontWeight: 700, letterSpacing: -0.2 }}>Switch Plan</span>
+                  <button onClick={() => setTripSwitcherOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, overflowY: "auto" }}>
+                  {savedTrips.filter(t => t.startDate).map(trip => {
+                    const isActive = trip.id === cdConfig.tripId;
+                    const fmt = d => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                    const stops = Object.values(trip.activities || {}).flat().length;
+                    return (
+                      <button key={trip.id} onClick={() => {
+                        const cfg = { tripId: trip.id, tripName: trip.destination || "My Trip", startDate: trip.startDate };
+                        setCdConfig(cfg);
+                        localStorage.setItem("opal_countdown", JSON.stringify(cfg));
+                        setTripSwitcherOpen(false);
+                      }} style={{
+                        display: "flex", alignItems: "center", gap: 12,
+                        background: isActive ? "rgba(255,140,66,0.15)" : "rgba(255,255,255,0.06)",
+                        border: `1px solid ${isActive ? "rgba(255,140,66,0.4)" : "rgba(255,255,255,0.08)"}`,
+                        borderRadius: 12, padding: "10px 14px", cursor: "pointer", textAlign: "left",
+                      }}>
+                        <span style={{ fontSize: 22 }}>{CITY_FLAGS[trip.destination] || "✈️"}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>{trip.destination}</div>
+                          <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, marginTop: 1 }}>
+                            {fmt(trip.startDate)}{trip.endDate ? ` – ${fmt(trip.endDate)}` : ""}{stops > 0 ? ` · ${stops} stops` : ""}
+                          </div>
+                        </div>
+                        {isActive && <span style={{ color: "#ff8c42", fontSize: 14 }}>✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Today's plan view — dynamic from saved trip */}
             {(() => {
               const linkedTrip = savedTrips.find(t => t.id === cdConfig.tripId);
@@ -556,13 +630,15 @@ export function HomeClient() {
                       </div>
                     ) : (
                       dayActs.map((act, i) => (
-                        <div key={act._id || i} className="hp-cd-plan-row">
+                        <div key={act._id || i} className="hp-cd-plan-row" style={{ cursor: "pointer" }}
+                          onClick={() => router.push(`/planner/manual?id=${cdConfig.tripId}&city=${encodeURIComponent(linkedTrip?.destination || "")}&duration=${encodeURIComponent(linkedTrip?.duration || "")}&day=${planDay}`)}>
                           <span className="hp-cd-plan-time">{act.time || "—"}</span>
                           <span className="hp-cd-plan-icon">{CAT_EMOJI[act.category] || CAT_EMOJI.default}</span>
                           <div className="hp-cd-plan-info">
                             <span className="hp-cd-plan-name">{act.name}</span>
                             <span className="hp-cd-plan-note">{act.address?.split(",").slice(0, 2).join(",") || act.category || ""}</span>
                           </div>
+                          <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 14, marginLeft: "auto", paddingLeft: 8 }}>›</span>
                         </div>
                       ))
                     )}
@@ -678,12 +754,12 @@ export function HomeClient() {
 
         <div className="hp-topics-scroll">
           {TOPICS.map((t) => (
-            <Link key={t.id} href={`/nearby?city=${t.city}&category=${t.category}`} className="hp-topic-card">
+            <Link key={t.id} href={`/blog/${t.id}`} className="hp-topic-card">
               <img className="hp-topic-img" src={t.img} alt={t.title} />
               <div className="hp-topic-grad" />
               <span className="hp-topic-tag">{t.tag}</span>
               <p className="hp-topic-title">{t.title}</p>
-              <div className="hp-topic-action-btn">+ Explore</div>
+              <div className="hp-topic-action-btn">Read Guide ›</div>
             </Link>
           ))}
         </div>

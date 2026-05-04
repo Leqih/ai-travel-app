@@ -2,9 +2,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const HERO_IMG   = "https://www.figma.com/api/mcp/asset/055dba02-4d1b-4a1e-a470-f10f77a9637c";
-const GOOGLE_ICON = "https://www.figma.com/api/mcp/asset/4d027e30-f708-442b-a328-ccfb611e972d";
-const FB_ICON    = "https://www.figma.com/api/mcp/asset/d50b44cf-11e2-4ae1-9fe1-908a0c9288a2";
+const HERO_IMG    = "https://www.figma.com/api/mcp/asset/af8e9136-514f-4c3a-840b-e4500c5d4b5f";
+const GOOGLE_ICON = "https://www.figma.com/api/mcp/asset/21500be3-e026-4c55-baa1-6d2c5345492c";
+const FB_ICON     = "https://www.figma.com/api/mcp/asset/3e77327e-2295-4565-ab7f-98591bcf8034";
 
 export const S = {
   bg:          "#09090f",
@@ -24,6 +24,14 @@ export function AuthPage() {
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [focused, setFocused]   = useState(null);
+  const [loading, setLoading]   = useState(false);
+
+  function handleSignIn() {
+    setLoading(true);
+    setTimeout(() => router.push("/home"), 1800);
+  }
+
+  if (loading) return <SplashLoader />;
 
   return (
     <AuthShell>
@@ -31,33 +39,37 @@ export function AuthPage() {
       <HeroImage />
 
       {/* Form */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "14px 24px 20px", gap: 12, overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "14px 24px 20px", overflow: "auto" }}>
 
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 3px", letterSpacing: -0.5 }}>
-            Welcome Back <span style={{ fontWeight: 400 }}>👋</span>
-          </h1>
-          <p style={{ fontSize: 12, color: S.textDim, margin: 0, lineHeight: 1.4 }}>
-            Sign in to start planning your next trip.
-          </p>
-        </div>
+        {/* Top: title + fields */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 3px", letterSpacing: -0.5 }}>
+              Welcome Back <span style={{ fontWeight: 400 }}>👋</span>
+            </h1>
+            <p style={{ fontSize: 12, color: S.textDim, margin: 0, lineHeight: 1.4 }}>
+              Sign in to start planning your next trip.
+            </p>
+          </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <Field label="Email" type="email" placeholder="Example@email.com"
-            value={email} onChange={setEmail}
-            focused={focused === "email"} onFocus={() => setFocused("email")} onBlur={() => setFocused(null)} />
-          <Field label="Password" type="password" placeholder="At least 8 characters"
-            value={password} onChange={setPassword}
-            focused={focused === "password"} onFocus={() => setFocused("password")} onBlur={() => setFocused(null)} />
-          <div style={{ textAlign: "right" }}>
-            <button style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: S.accent, fontWeight: 600, padding: 0 }}>
-              Forgot Password?
-            </button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <Field label="Email" type="email" placeholder="Example@email.com"
+              value={email} onChange={setEmail}
+              focused={focused === "email"} onFocus={() => setFocused("email")} onBlur={() => setFocused(null)} />
+            <Field label="Password" type="password" placeholder="At least 8 characters"
+              value={password} onChange={setPassword}
+              focused={focused === "password"} onFocus={() => setFocused("password")} onBlur={() => setFocused(null)} />
+            <div style={{ textAlign: "right" }}>
+              <button style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: S.accent, fontWeight: 600, padding: 0 }}>
+                Forgot Password?
+              </button>
+            </div>
           </div>
         </div>
 
-        <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 12 }}>
-        <CTAButton onClick={() => router.push("/home")}>Sign in</CTAButton>
+        {/* Bottom: CTA — marginTop: auto pins it to the bottom */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: "auto" }}>
+          <CTAButton onClick={handleSignIn}>Sign in</CTAButton>
           <Divider label="Or sign in with" />
           <div style={{ display: "flex", gap: 12 }}>
             <SocialBtn icon={<img src={GOOGLE_ICON} alt="Google" style={{ width: 20, height: 20 }} />} label="Google" />
@@ -93,9 +105,8 @@ export function AuthShell({ children }) {
 
 export function HeroImage() {
   return (
-    <div style={{ position: "relative", margin: "16px 16px 0", borderRadius: 20, overflow: "hidden", flexShrink: 0, height: "22vh" }}>
+    <div style={{ position: "relative", margin: "16px 16px 0", borderRadius: 20, overflow: "hidden", flexShrink: 0, height: 183 }}>
       <img src={HERO_IMG} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-      <div style={{ position: "absolute", inset: 0, background: "rgba(9,9,15,0.45)" }} />
     </div>
   );
 }
@@ -128,8 +139,8 @@ export function CTAButton({ onClick, children }) {
       width: "100%", padding: "14px 0",
       borderRadius: 12, border: "none", cursor: "pointer",
       fontSize: 15, fontWeight: 700,
-      background: "linear-gradient(135deg, #ff9a52, #ff5f1f)",
-      color: "#fff", boxShadow: "0 6px 20px rgba(255,110,30,0.35)",
+      background: "#ff6524",
+      color: "#fff", boxShadow: "0px 6px 10px rgba(255,110,30,0.35)",
     }}>
       {children}
     </button>
@@ -157,5 +168,44 @@ export function SocialBtn({ icon, label }) {
     }}>
       {icon}{label}
     </button>
+  );
+}
+
+export function SplashLoader() {
+  return (
+    <div style={{
+      position: "fixed", inset: 0,
+      background: "#09090f",
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      fontFamily: S.font,
+    }}>
+      <div style={{
+        width: 96, height: 96, borderRadius: 24,
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        marginBottom: 24,
+      }}>
+        <img src="/navora-logo.svg" alt="Navora" style={{ width: 72, height: 72, objectFit: "contain" }} />
+      </div>
+      <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", letterSpacing: 3, marginBottom: 8 }}>NAVORA</div>
+      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", letterSpacing: 1.5, marginBottom: 48 }}>PLAN YOUR JOURNEY</div>
+      <div style={{ display: "flex", gap: 7 }}>
+        {[0, 1, 2].map(i => (
+          <div key={i} style={{
+            width: 8, height: 8, borderRadius: "50%",
+            background: S.accent,
+            animation: `splash-bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+          }} />
+        ))}
+      </div>
+      <style>{`
+        @keyframes splash-bounce {
+          0%, 80%, 100% { opacity: 0.2; transform: scale(0.75); }
+          40% { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
+    </div>
   );
 }

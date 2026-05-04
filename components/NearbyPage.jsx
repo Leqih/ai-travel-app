@@ -142,7 +142,7 @@ function uimg(name, w = 400, h = 300, idx = 0) {
 }
 
 const NAV_ITEMS = [
-  { icon: faHouse,      label: "Home",      href: "/"        },
+  { icon: faHouse,      label: "Home",      href: "/home"   },
   { icon: faCompass,    label: "Discover",  href: "/nearby"  },
   { center: true },
   { icon: faPlane,      label: "My Trips",  href: "/trips"   },

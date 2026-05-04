@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const NAV_ITEMS = [
-  { icon: faHouse,      label: "Home",     href: "/"        },
+  { icon: faHouse,      label: "Home",     href: "/home"   },
   { icon: faCompass,    label: "Discover", href: "/nearby"  },
   { center: true },
   { icon: faPlane,      label: "My Trips", href: "/trips"   },
@@ -594,11 +594,53 @@ export default function ProfilePage() {
     };
   }, []);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const [selectedMemoji, setSelectedMemoji] = useState("10");
   const [memojiPickerOpen, setMemojiPickerOpen] = useState(false);
   const [activeCity, setActiveCity] = useState(null);
-  const [collectionOpen, setCollectionOpen] = useState(false);
+  const [selectedTrip,   setSelectedTrip]   = useState(null);
   const [collectionMode, setCollectionMode] = useState("photos");
+  const [tripPhotos,     setTripPhotos]     = useState([]);
+  const profFileRef = useRef(null);
+
+  // Load photos whenever a trip is selected
+  useEffect(() => {
+    if (!selectedTrip) { setTripPhotos([]); return; }
+    try {
+      const colls = JSON.parse(localStorage.getItem(`navora_coll_${selectedTrip.id}`) || "[]");
+      const all = colls.flatMap(c => (c.photos || []).map(src => ({ src, collName: c.name, collEmoji: c.emoji })));
+      setTripPhotos(all);
+    } catch(_) { setTripPhotos([]); }
+  }, [selectedTrip]);
+
+  function openTripCollection(trip) {
+    setSelectedTrip(trip);
+    setCollectionMode("photos");
+  }
+
+  function handleProfPhoto(e) {
+    const file = e.target.files?.[0];
+    if (!file || !selectedTrip) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const dataUrl = ev.target.result;
+      try {
+        const colls = JSON.parse(localStorage.getItem(`navora_coll_${selectedTrip.id}`) || "[]");
+        let profColl = colls.find(c => c.name === "Photos");
+        if (!profColl) {
+          profColl = { id: Date.now(), emoji: "📷", name: "Photos", photos: [] };
+          colls.unshift(profColl);
+        }
+        profColl.photos = [dataUrl, ...(profColl.photos || [])];
+        localStorage.setItem(`navora_coll_${selectedTrip.id}`, JSON.stringify(colls));
+        setTripPhotos(prev => [{ src: dataUrl, collName: "Photos", collEmoji: "📷" }, ...prev]);
+      } catch(_) {}
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
   const [budgetSheetOpen, setBudgetSheetOpen] = useState(false);
   const [profileBudget, setProfileBudget] = useState(() => {
     if (typeof window === "undefined") return null;
@@ -624,7 +666,7 @@ export default function ProfilePage() {
   const totalDays = trips.reduce((s, t) => s + (parseInt(t.duration) || 0), 0);
 
   return (
-    <div className="hp-shell" style={{ fontFamily: `-apple-system,"SF Pro Display","Helvetica Neue",sans-serif` }}>
+    <div className="hp-shell" suppressHydrationWarning style={{ fontFamily: `-apple-system,"SF Pro Display","Helvetica Neue",sans-serif` }}>
       <div ref={shellRef} className="hp-scroll" style={{ paddingBottom: 110 }}>
 
       {/* ══ Header — dot-grid bg matches homepage ══ */}
@@ -675,42 +717,6 @@ export default function ProfilePage() {
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginTop: 5 }}>{s.l}</div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* ══ Destinations section ══ */}
-      <div className="fp-a hp-section-hd">
-        <div>
-          <p className="hp-section-cat">Travel Footprint</p>
-          <p className="hp-section-title">Destinations</p>
-          <p className="hp-section-sub">Cities you've explored</p>
-        </div>
-        <span className="hp-section-link">{visitedCities.length} visited</span>
-      </div>
-      <div className="fp-a" style={{ padding: "0 16px" }}>
-        <div style={{ overflowX: "auto", margin: "0 -16px", padding: "0 16px 4px", scrollbarWidth: "none" }}>
-          <div style={{ display: "flex", gap: 8 }}>
-            {GEMS.map(gem => {
-              const earned = visitedCities.includes(gem.city);
-              return (
-                <div key={gem.city} style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 5, width: 56 }}>
-                  <div style={{
-                    width: 52, height: 52, borderRadius: 16,
-                    background: earned ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 24,
-                    filter: earned ? "none" : "grayscale(1) brightness(0.2)",
-                    transition: "all 0.2s",
-                  }}>{CITY_FLAGS[gem.city] || "✈️"}</div>
-                  <span style={{
-                    color: earned ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.2)",
-                    fontSize: 10, fontWeight: 500, textAlign: "center",
-                    width: 56, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>{gem.city}</span>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </div>
 
@@ -816,8 +822,8 @@ export default function ProfilePage() {
       </div>
 
 
-      {/* ══ Collection section ══ */}
-      {visitedCities.length > 0 && (
+      {/* ══ Collection section — one card per trip ══ */}
+      {mounted && trips.length > 0 && (
         <>
           <div className="fp-a hp-section-hd">
             <div>
@@ -825,30 +831,36 @@ export default function ProfilePage() {
               <p className="hp-section-title">Collection</p>
               <p className="hp-section-sub">Memories from your trips</p>
             </div>
-            <button onClick={() => { setCollectionOpen(true); setCollectionMode("photos"); }} style={{ all: "unset", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}>
-              {visitedCities.filter(c => CITY_IMAGES[c]).length} photos
-            </button>
+            <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>{trips.length} {trips.length === 1 ? "trip" : "trips"}</span>
           </div>
           <div className="fp-a" style={{ padding: "0 16px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-              {visitedCities.filter(c => CITY_IMAGES[c]).map(city => (
-                <button key={city} className="fp-col-card" onClick={() => { setCollectionOpen(true); setCollectionMode("photos"); }} style={{ position: "relative", aspectRatio: "2/3", display: "block", cursor: "pointer", width: "100%" }}>
-                  <img src={CITY_IMAGES[city]} alt={city} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%)" }} />
-                  <div style={{ position: "absolute", bottom: 10, left: 10, right: 10 }}>
-                    <div style={{ color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>{city}</div>
-                    <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, marginTop: 1 }}>{COUNTRY_MAP[city]}</div>
-                  </div>
-                </button>
-              ))}
-              <button onClick={() => { setCollectionOpen(true); setCollectionMode("photos"); }} style={{ all: "unset", borderRadius: 20, aspectRatio: "2/3", background: "rgba(20,20,20,0.7)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer" }}>
-                <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,140,66,0.1)", border: "1px solid rgba(255,140,66,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <FontAwesomeIcon icon={faPlus} style={{ width: 12, height: 12, color: "#ff8c42" }} />
-                </div>
-                <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "1.5px" }}>Add</span>
-              </button>
+              {trips.map(trip => {
+                const city = trip.destination;
+                const img = CITY_IMAGES[city];
+                const flag = CITY_FLAGS[city] || "✈️";
+                return (
+                  <button key={trip.id} className="fp-col-card" onClick={() => openTripCollection(trip)}
+                    style={{ position: "relative", aspectRatio: "2/3", display: "block", cursor: "pointer", width: "100%" }}>
+                    {img
+                      ? <img src={img} alt={city} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      : <div style={{ width: "100%", height: "100%", background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36 }}>{flag}</div>
+                    }
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%)" }} />
+                    <div style={{ position: "absolute", bottom: 10, left: 10, right: 10 }}>
+                      <div style={{ color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: -0.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {trip.title || city}
+                      </div>
+                      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 10, marginTop: 1 }}>{city}</div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
+          {/* Hidden file input for profile photo adding */}
+          <input ref={profFileRef} type="file" accept="image/*" capture="environment"
+            style={{ display: "none" }} onChange={handleProfPhoto} />
         </>
       )}
 
@@ -1033,34 +1045,41 @@ export default function ProfilePage() {
         />
       )}
 
-      {/* ── Collection Modal ── */}
-      {collectionOpen && (
-        <div className="pl-sheet-overlay" style={{ zIndex: 200, background: "rgba(0,0,0,0.25)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)" }} onClick={() => setCollectionOpen(false)}>
+      {/* ── Trip Collection Sheet ── */}
+      {mounted && selectedTrip && (
+        <div className="pl-sheet-overlay" style={{ zIndex: 200, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }} onClick={() => setSelectedTrip(null)}>
           <div className="pl-sheet fp-collection-sheet" onClick={e => e.stopPropagation()}>
 
             <div className="pl-sheet-handle" />
 
             {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", padding: "14px 0 0", gap: 10, width: "100%" }}>
+            <div style={{ display: "flex", alignItems: "center", padding: "14px 0 0", gap: 12, width: "100%" }}>
+              {/* Destination thumbnail */}
+              {CITY_IMAGES[selectedTrip.destination] && (
+                <div style={{ width: 44, height: 44, borderRadius: 14, overflow: "hidden", flexShrink: 0 }}>
+                  <img src={CITY_IMAGES[selectedTrip.destination]} alt={selectedTrip.destination}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: "0 0 2px", color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase" }}>My Collection</p>
-                <h2 style={{ margin: 0, color: "#fff", fontSize: 22, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.1 }}>
-                  Travel Memories
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+                  {CITY_FLAGS[selectedTrip.destination] || "✈️"} {selectedTrip.destination}
+                </p>
+                <h2 style={{ margin: "2px 0 0", color: "#fff", fontSize: 19, fontWeight: 800, letterSpacing: -0.4, lineHeight: 1.15, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {selectedTrip.title || selectedTrip.destination}
                 </h2>
-                <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>{visitedCities.filter(c => CITY_IMAGES[c]).length} photos · location recorded</p>
               </div>
-              <button className="fp-modal-btn-close" style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                <FontAwesomeIcon icon={faPlus} style={{ width: 13, height: 13, color: "rgba(255,255,255,0.5)" }} />
+              <button className="fp-modal-btn-close" onClick={() => setSelectedTrip(null)}
+                style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                <FontAwesomeIcon icon={faXmark} style={{ width: 13, height: 13, color: "rgba(255,255,255,0.5)" }} />
               </button>
             </div>
 
             {/* Segmented tab control */}
-            <div style={{ padding: "10px 0 0", width: "100%" }}>
+            <div style={{ padding: "12px 0 0", width: "100%" }}>
               <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 16, padding: 3, gap: 2 }}>
                 {[{ id: "photos", icon: faImages, label: "Photos" }, { id: "map", icon: faMap, label: "Map" }].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setCollectionMode(tab.id)}
+                  <button key={tab.id} onClick={() => setCollectionMode(tab.id)}
                     className={collectionMode === tab.id ? "fp-tab-active" : ""}
                     style={{
                       flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
@@ -1076,49 +1095,48 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Separator */}
-            <div style={{ height: 1, background: "rgba(255,255,255,0.05)", margin: "14px -28px 0", width: "calc(100% + 56px)" }} />
+            <div style={{ height: 1, background: "rgba(255,255,255,0.05)", margin: "12px -20px 0", width: "calc(100% + 40px)" }} />
 
-            {/* Photos mode — all cities */}
+            {/* Photos mode */}
             {collectionMode === "photos" && (
               <div className="fp-scroll-hide fp-collection-body">
-                {/* Existing photos grid */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
-                  {visitedCities.filter(c => CITY_IMAGES[c]).map(city => (
-                    <div key={city} style={{ borderRadius: 18, overflow: "hidden", position: "relative", aspectRatio: "1/1" }}>
-                      <img src={CITY_IMAGES[city]} alt={city} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.8) 100%)" }} />
-                      {/* Location metadata pill */}
-                      <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", borderRadius: 20, padding: "3px 8px", display: "flex", alignItems: "center", gap: 4 }}>
-                        <span style={{ fontSize: 9 }}>📍</span>
-                        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, fontWeight: 600 }}>{city}</span>
-                      </div>
-                      <div style={{ position: "absolute", bottom: 8, left: 10, right: 10 }}>
-                        <div style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>{CITY_FLAGS[city]} {city}</div>
-                        <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, marginTop: 1 }}>{COUNTRY_MAP[city]}</div>
-                      </div>
+                {tripPhotos.length === 0 ? (
+                  /* Empty state */
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "44px 0 24px", gap: 10 }}>
+                    <div style={{ width: 68, height: 68, borderRadius: 20, background: "rgba(20,20,20,0.7)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>
+                      🖼️
                     </div>
-                  ))}
-                  {/* Add photo tile */}
-                  <button className="fp-add-tile" style={{ display: "flex", width: "100%", aspectRatio: "1/1", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", boxSizing: "border-box" }}>
-                    <div style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <FontAwesomeIcon icon={faUpload} style={{ width: 15, height: 15, color: "rgba(255,255,255,0.3)" }} />
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.7)", marginTop: 6 }}>No photos yet</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", textAlign: "center", maxWidth: 220, lineHeight: 1.6 }}>
+                      Add photos from this trip to build your memory collection
                     </div>
-                    <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontWeight: 500, letterSpacing: 0.2 }}>Add photo</span>
-                  </button>
-                </div>
-                {/* Location hint */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", background: "rgba(255,255,255,0.04)", borderRadius: 14 }}>
-                  <span style={{ fontSize: 14 }}>📍</span>
-                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, lineHeight: 1.4 }}>Location is recorded when you upload photos to your collection.</span>
-                </div>
+                  </div>
+                ) : (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+                    {tripPhotos.map((photo, i) => (
+                      <div key={i} style={{ borderRadius: 16, overflow: "hidden", position: "relative", aspectRatio: "1/1" }}>
+                        <img src={photo.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        {/* Collection label pill */}
+                        <div style={{ position: "absolute", top: 7, left: 7, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", borderRadius: 20, padding: "3px 7px", display: "flex", alignItems: "center", gap: 3 }}>
+                          <span style={{ fontSize: 9 }}>{photo.collEmoji}</span>
+                          <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 9, fontWeight: 600 }}>{photo.collName}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* Add Photo CTA */}
+                <button onClick={() => profFileRef.current?.click()}
+                  style={{ width: "100%", padding: "13px 0", borderRadius: 16, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, background: "#ff8c42", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(255,140,66,0.28)", fontFamily: `-apple-system,"SF Pro Display","Helvetica Neue",sans-serif`, marginTop: tripPhotos.length > 0 ? 4 : 0 }}>
+                  <span style={{ fontSize: 16 }}>📷</span> Add Photo
+                </button>
               </div>
             )}
 
-            {/* Map mode */}
+            {/* Map mode — shows destination pin */}
             {collectionMode === "map" && (
               <div className="fp-collection-map">
-                <CollectionMapView visitedCities={visitedCities} />
+                <CollectionMapView visitedCities={selectedTrip.destination ? [selectedTrip.destination] : []} />
               </div>
             )}
           </div>

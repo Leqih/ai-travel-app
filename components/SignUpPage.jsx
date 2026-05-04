@@ -1,7 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthShell, CTAButton, Divider, SocialBtn, S, HERO_IMG, GOOGLE_ICON, FB_ICON } from "./AuthPage";
+import { AuthShell, CTAButton, Divider, SocialBtn, S } from "./AuthPage";
+
+const SIGNUP_HERO   = "https://www.figma.com/api/mcp/asset/19def161-1f4f-421b-8ccf-d952a40ae814";
+const SIGNUP_GOOGLE = "https://www.figma.com/api/mcp/asset/c37905b1-b1c8-4bd6-b0af-8a913540d650";
+const SIGNUP_FB     = "https://www.figma.com/api/mcp/asset/963a287d-89aa-4145-9da1-3cde2ab18493";
 
 function CompactField({ label, type, placeholder, value, onChange, focused, onFocus, onBlur }) {
   return (
@@ -33,56 +37,65 @@ export function SignUpPage() {
   const [confirm, setConfirm]   = useState("");
   const [focused, setFocused]   = useState(null);
 
+  function handleCreate() {
+    if (name) {
+      try { localStorage.setItem("navora_display_name", name); } catch(_) {}
+    }
+    router.push("/home");
+  }
+
   return (
     <AuthShell>
-      {/* Hero — shorter to leave room for 4 fields */}
-      <div style={{ position: "relative", margin: "16px 16px 0", borderRadius: 20, overflow: "hidden", flexShrink: 0, height: "22vh" }}>
-        <img src={HERO_IMG} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(9,9,15,0.45)" }} />
+      {/* Hero */}
+      <div style={{ position: "relative", margin: "16px 16px 0", borderRadius: 20, overflow: "hidden", flexShrink: 0, height: 183 }}>
+        <img src={SIGNUP_HERO} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
       </div>
 
       {/* Form */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "14px 24px 20px", gap: 12, overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "14px 24px 20px", overflow: "auto" }}>
 
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 3px", letterSpacing: -0.5 }}>
-            Create Account <span style={{ fontWeight: 400 }}>✨</span>
-          </h1>
-          <p style={{ fontSize: 12, color: S.textDim, margin: 0, lineHeight: 1.4 }}>
-            Join thousands of travelers planning smarter.
+        {/* Top: title + fields */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 3px", letterSpacing: -0.5 }}>
+              Create Account <span style={{ fontWeight: 400 }}>✨</span>
+            </h1>
+            <p style={{ fontSize: 12, color: S.textDim, margin: 0, lineHeight: 1.4 }}>
+              Join thousands of travelers planning smarter.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <CompactField label="Full Name" type="text" placeholder="Your name"
+              value={name} onChange={setName}
+              focused={focused === "name"} onFocus={() => setFocused("name")} onBlur={() => setFocused(null)} />
+            <CompactField label="Email" type="email" placeholder="Example@email.com"
+              value={email} onChange={setEmail}
+              focused={focused === "email"} onFocus={() => setFocused("email")} onBlur={() => setFocused(null)} />
+            <CompactField label="Password" type="password" placeholder="At least 8 characters"
+              value={password} onChange={setPassword}
+              focused={focused === "password"} onFocus={() => setFocused("password")} onBlur={() => setFocused(null)} />
+            <CompactField label="Confirm Password" type="password" placeholder="Repeat your password"
+              value={confirm} onChange={setConfirm}
+              focused={focused === "confirm"} onFocus={() => setFocused("confirm")} onBlur={() => setFocused(null)} />
+          </div>
+        </div>
+
+        {/* Bottom: CTA — marginTop: auto pins it to the bottom */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: "auto" }}>
+          <CTAButton onClick={handleCreate}>Create Account</CTAButton>
+          <Divider label="Or sign up with" />
+          <div style={{ display: "flex", gap: 12 }}>
+            <SocialBtn icon={<img src={SIGNUP_GOOGLE} alt="Google" style={{ width: 20, height: 20 }} />} label="Google" />
+            <SocialBtn icon={<img src={SIGNUP_FB} alt="Facebook" style={{ width: 20, height: 20 }} />} label="Facebook" />
+          </div>
+          <p style={{ textAlign: "center", fontSize: 13, color: S.textDim, margin: 0 }}>
+            Already have an account?{" "}
+            <button onClick={() => router.push("/login")} style={{ background: "none", border: "none", cursor: "pointer", color: S.accent, fontWeight: 700, fontSize: 13, padding: 0 }}>
+              Sign in
+            </button>
           </p>
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <CompactField label="Full Name" type="text" placeholder="Your name"
-            value={name} onChange={setName}
-            focused={focused === "name"} onFocus={() => setFocused("name")} onBlur={() => setFocused(null)} />
-          <CompactField label="Email" type="email" placeholder="Example@email.com"
-            value={email} onChange={setEmail}
-            focused={focused === "email"} onFocus={() => setFocused("email")} onBlur={() => setFocused(null)} />
-          <CompactField label="Password" type="password" placeholder="At least 8 characters"
-            value={password} onChange={setPassword}
-            focused={focused === "password"} onFocus={() => setFocused("password")} onBlur={() => setFocused(null)} />
-          <CompactField label="Confirm Password" type="password" placeholder="Repeat your password"
-            value={confirm} onChange={setConfirm}
-            focused={focused === "confirm"} onFocus={() => setFocused("confirm")} onBlur={() => setFocused(null)} />
-        </div>
-
-        <CTAButton onClick={() => router.push("/home")}>Create Account</CTAButton>
-
-        <Divider label="Or sign up with" />
-
-        <div style={{ display: "flex", gap: 12 }}>
-          <SocialBtn icon={<img src={GOOGLE_ICON} alt="Google" style={{ width: 20, height: 20 }} />} label="Google" />
-          <SocialBtn icon={<img src={FB_ICON} alt="Facebook" style={{ width: 20, height: 20 }} />} label="Facebook" />
-        </div>
-
-        <p style={{ textAlign: "center", fontSize: 13, color: S.textDim, margin: 0 }}>
-          Already have an account?{" "}
-          <button onClick={() => router.push("/login")} style={{ background: "none", border: "none", cursor: "pointer", color: S.accent, fontWeight: 700, fontSize: 13, padding: 0 }}>
-            Sign in
-          </button>
-        </p>
       </div>
     </AuthShell>
   );
