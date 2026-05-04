@@ -763,7 +763,7 @@ export default function ProfilePage() {
             </div>
             <div className="hp-greeting">Traveler</div>
             <button onClick={() => setTagLibOpen(true)} style={{ all: "unset", display: "inline-flex", alignItems: "center", marginTop: 4, background: "#ff8c42", borderRadius: 12, padding: "2px 10px", boxShadow: "0 2px 8px rgba(255,140,66,0.35)", cursor: "pointer" }}>
-              <span style={{ color: "#111", fontSize: 12, fontWeight: 700, lineHeight: 1.4 }}>Exploring the world ✈️</span>
+              <span style={{ color: "#ff8c42", fontSize: 12, fontWeight: 700, lineHeight: 1.4 }}>Exploring the world ✈️</span>
             </button>
             {(() => {
               const stats = { trips: trips.length, cities: visitedCities.length, countries: visitedCountries.length, days: totalDays };
